@@ -16,10 +16,15 @@
     "test:e2e": "playwright test",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
+    "db:migrate": "prisma migrate dev && prisma generate",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "prepare": "husky"
   },
   "dependencies": {
+    "@node-rs/argon2": "^2.2.1",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "^7.10.0",
     "class-variance-authority": "^0.7.1",
@@ -30,7 +35,8 @@
     "radix-ui": "^1.6.7",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
