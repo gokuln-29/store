@@ -241,6 +241,8 @@ model User {
   isActive        Boolean   @default(true)
   preferredLocale String?
   lastLoginAt     DateTime?
+  /// Bump to invalidate every existing session ("log out everywhere", deactivation, role change).
+  sessionVersion  Int       @default(0)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -280,6 +282,33 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ─────────────────────────────── Auth ───────────────────────────────
+
+/// One-time login codes sent by SMS. Only a hash of the code is stored.
+model OtpCode {
+  id         String    @id @default(cuid())
+  /// E.164, e.g. +919876543210
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  ip         String?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+  @@index([expiresAt])
+}
+
+/// Fixed-window counters for rate limiting (login, OTP, checkout, coupons).
+model RateLimit {
+  key       String   @id
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }
 
 // ─────────────────────────────── Catalog ───────────────────────────────
