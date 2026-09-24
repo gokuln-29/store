@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { authorize } from "@/lib/auth-guards";
 import { deleteCategory, saveCategory } from "@/lib/services/category.service";
+import { setVariantStock } from "@/lib/services/inventory.service";
 import { saveProduct, setProductsStatus } from "@/lib/services/product.service";
 import {
   categoryFormSchema,
@@ -91,4 +92,21 @@ export async function setProductsStatusAction(
   const count = await setProductsStatus(parsed.data.ids, parsed.data.status, user.id);
   revalidateCatalog();
   return { ok: true, data: { count } };
+}
+
+const stockSchema = z.object({ id: idSchema, stock: z.int().min(0).max(10_000_000) });
+
+export async function setVariantStockAction(
+  id: string,
+  stock: number,
+): Promise<ActionResult<{ stock: number }>> {
+  const user = await authorize("catalog:write");
+  if (!user) return FORBIDDEN;
+  const parsed = stockSchema.safeParse({ id, stock });
+  if (!parsed.success)
+    return { ok: false, error: "validation", fieldErrors: { stock: "numberInvalid" } };
+  const result = await setVariantStock(parsed.data.id, parsed.data.stock, user.id);
+  if (!result.ok) return { ok: false, error: result.error };
+  revalidateCatalog();
+  return { ok: true, data: { stock: result.stock } };
 }
