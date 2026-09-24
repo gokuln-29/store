@@ -74,6 +74,16 @@ export const RATE_LIMITS = {
     limit: 20,
     windowMs: 60 * MINUTE,
   }),
+  couponByIp: (ip: string): RateLimitRule => ({
+    key: `coupon:ip:${ip}`,
+    limit: 30,
+    windowMs: 10 * MINUTE,
+  }),
+  placeOrderByUser: (userId: string): RateLimitRule => ({
+    key: `place-order:user:${userId}`,
+    limit: 10,
+    windowMs: 10 * MINUTE,
+  }),
   deliveryCheckByIp: (ip: string): RateLimitRule => ({
     key: `delivery-check:ip:${ip}`,
     limit: 60,
