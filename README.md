@@ -24,8 +24,13 @@ next-intl (English, Tamil, Kannada) · Vitest · Playwright · pnpm
 pnpm install                    # installs deps and generates the Prisma client
 cp .env.example .env            # then fill in values (AUTH_SECRET: openssl rand -base64 32)
 pnpm db:up                      # start PostgreSQL in Docker
+pnpm db:migrate                 # apply migrations and generate the Prisma client
+pnpm db:seed                    # demo store: owner, settings, 3 categories, 12 products
 pnpm dev                        # http://localhost:3000 -> redirects to /en
 ```
+
+The seed creates an owner admin: `owner@example.com` / `ChangeMe@123` unless you set
+`SEED_OWNER_EMAIL` and `SEED_OWNER_PASSWORD` in `.env` (required in production).
 
 Check the app and database are up: <http://localhost:3000/api/health> should return
 `{"status":"ok","db":"ok",...}`.
@@ -52,8 +57,10 @@ DATABASE_URL="postgresql://ecom:ecom@localhost:5440/ecom?schema=public"
 | `pnpm test`                | Unit tests (Vitest)                               |
 | `pnpm test:e2e`            | End-to-end tests (Playwright; needs `pnpm db:up`) |
 | `pnpm db:up` / `db:down`   | Start / stop the local PostgreSQL container       |
-| `pnpm prisma migrate dev`  | Create and apply a migration                      |
-| `pnpm prisma db seed`      | Seed demo data (from Phase 1)                     |
+| `pnpm db:migrate`          | Create/apply migrations and regenerate the client |
+| `pnpm db:seed`             | Seed demo data (safe to re-run)                   |
+| `pnpm db:reset`            | Drop the database, re-apply migrations and seed   |
+| `pnpm db:studio`           | Browse data in Prisma Studio                      |
 
 First time running e2e tests: `pnpm exec playwright install chromium`.
 
@@ -71,7 +78,7 @@ src/
   messages/            # en.json, ta.json, kn.json
   styles/globals.css   # Tailwind + theme tokens
   proxy.ts             # locale detection and redirects (Next.js 16 "proxy", formerly middleware)
-prisma/                # schema and migrations
+prisma/                # schema, migrations, seed (data model: docs/erd.md)
 tests/unit, tests/e2e  # Vitest and Playwright tests
 ```
 
