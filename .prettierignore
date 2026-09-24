@@ -1,0 +1,12 @@
+pnpm-lock.yaml
+src/generated/
+.next/
+playwright-report/
+test-results/
+.agents/
+.windsurf/
+.claude/skills/
+skills-lock.json
+CLAUDE.md
+BUILD_WORKFLOW.md
+AGENTS.md
