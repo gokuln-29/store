@@ -32,6 +32,14 @@ pnpm dev                        # http://localhost:3000 -> redirects to /en
 The seed creates an owner admin: `owner@example.com` / `ChangeMe@123` unless you set
 `SEED_OWNER_EMAIL` and `SEED_OWNER_PASSWORD` in `.env` (required in production).
 
+### Logging in (development)
+
+- **Admin:** <http://localhost:3000/en/admin/login> with the seeded owner account above.
+- **Customer:** <http://localhost:3000/en/login>, enter any Indian mobile number (e.g. `98765 43210`).
+  With `SMS_PROVIDER=console` the 6-digit code is printed in the `pnpm dev` terminal.
+
+Roles and permissions are defined in `src/lib/permissions.ts` (OWNER, STAFF, CUSTOMER).
+
 Check the app and database are up: <http://localhost:3000/api/health> should return
 `{"status":"ok","db":"ok",...}`.
 
