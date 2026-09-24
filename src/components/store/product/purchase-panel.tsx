@@ -4,6 +4,8 @@ import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "@/i18n/navigation";
+import { useCart } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Price } from "../price";
@@ -42,7 +44,10 @@ export function PurchasePanel({
   pricesIncludeTax: boolean;
 }) {
   const t = useTranslations("Product");
+  const tCart = useTranslations("Cart");
   const locale = useLocale();
+  const router = useRouter();
+  const addToCart = useCart((s) => s.add);
   const initial = variants.find((v) => v.stock > 0) ?? variants[0]!;
   const [selection, setSelection] = useState<Record<string, string>>(initial.optionValues);
   const [quantity, setQuantity] = useState(1);
@@ -198,7 +203,12 @@ export function PurchasePanel({
           size="lg"
           className="flex-1 sm:flex-none"
           disabled={variant.stock <= 0}
-          onClick={() => toast.info(t("comingSoon"))}
+          onClick={() => {
+            addToCart(variant.id, quantity);
+            toast.success(tCart("added"), {
+              action: { label: tCart("view"), onClick: () => router.push("/cart") },
+            });
+          }}
         >
           <ShoppingCart className="size-4" aria-hidden />
           {t("addToCart")}

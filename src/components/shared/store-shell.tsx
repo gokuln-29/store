@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { STORE_FONTS, googleFontsHref } from "@/lib/constants/fonts";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { readableForeground } from "@/lib/utils/color";
+import { CartSync } from "@/components/store/cart/cart-sync";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
@@ -46,6 +47,7 @@ export async function StoreShell({ children }: { children: ReactNode }) {
           {children}
         </main>
         <SiteFooter />
+        <CartSync />
       </div>
     </>
   );
