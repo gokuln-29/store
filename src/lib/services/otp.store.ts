@@ -11,10 +11,13 @@ export const postgresOtpStore: OtpStore = {
   },
 
   async replaceActive({ phone, codeHash, expiresAt, ip, now }) {
-    await db.$transaction([
-      db.otpCode.updateMany({ where: { phone, consumedAt: null }, data: { consumedAt: now } }),
-      db.otpCode.create({ data: { phone, codeHash, expiresAt, ip } }),
-    ]);
+    await db.$transaction(async (tx) => {
+      await tx.otpCode.updateMany({
+        where: { phone, consumedAt: null },
+        data: { consumedAt: now },
+      });
+      await tx.otpCode.create({ data: { phone, codeHash, expiresAt, ip } });
+    });
   },
 
   async incrementAttempts(id, max) {

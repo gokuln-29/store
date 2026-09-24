@@ -35,23 +35,30 @@ export function optionalText(max: number) {
 }
 
 /** Localized text where every language may be empty (stored as null if all are). */
+/** A missing value (e.g. an editor that was never touched) counts as empty. */
+const localizedValue = z.string().trim().max(10_000, "tooLong").optional();
+
 export const optionalLocalizedSchema = z
-  .partialRecord(z.enum(locales), z.string().trim().max(10_000, "tooLong"))
+  .partialRecord(z.enum(locales), localizedValue)
   .transform((value) => {
-    const filled = Object.fromEntries(Object.entries(value).filter(([, v]) => v));
+    const filled = Object.fromEntries(
+      Object.entries(value).filter((e): e is [string, string] => Boolean(e[1])),
+    );
     return Object.keys(filled).length ? filled : null;
   });
 
 /** Localized text that needs at least the given locale filled. */
 export function requiredLocalizedSchema(requiredLocale: (typeof locales)[number] = "en") {
   return z
-    .partialRecord(z.enum(locales), z.string().trim().max(10_000, "tooLong"))
+    .partialRecord(z.enum(locales), localizedValue)
     .superRefine((value, ctx) => {
       if (!value[requiredLocale]) {
         ctx.addIssue({ code: "custom", message: "required", path: [requiredLocale] });
       }
     })
-    .transform((value) => Object.fromEntries(Object.entries(value).filter(([, v]) => v)));
+    .transform((value) =>
+      Object.fromEntries(Object.entries(value).filter((e): e is [string, string] => Boolean(e[1]))),
+    );
 }
 
 export const urlOrPathSchema = z

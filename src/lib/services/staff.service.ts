@@ -24,7 +24,8 @@ export async function listStaff({ page, pageSize, q, sort, dir }: StaffQuery) {
         }
       : {}),
   };
-  const [rows, total] = await db.$transaction([
+  // Separate queries (not a batch transaction): the pg adapter runs batches on one client.
+  const [rows, total] = await Promise.all([
     db.user.findMany({
       where,
       // "nulls last" is only valid on nullable columns.

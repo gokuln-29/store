@@ -117,3 +117,15 @@ describe("settings validators", () => {
     expect(shippingRuleSchema.safeParse({ ...base, estimatedDaysMin: "5" }).success).toBe(false);
   });
 });
+
+describe("localized schemas", () => {
+  it("treat missing (undefined) translations as empty", async () => {
+    const { optionalLocalizedSchema, requiredLocalizedSchema } =
+      await import("@/lib/validators/common");
+    expect(optionalLocalizedSchema.parse({ en: undefined, ta: "" })).toBeNull();
+    expect(requiredLocalizedSchema("en").parse({ en: "Ring", ta: undefined })).toEqual({
+      en: "Ring",
+    });
+    expect(requiredLocalizedSchema("en").safeParse({ en: undefined }).success).toBe(false);
+  });
+});
