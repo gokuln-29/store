@@ -10,7 +10,7 @@ const INDIC_FALLBACK =
 
 function fontStack(name: string): string {
   const font = STORE_FONTS.find((f) => f.name === name);
-  return font?.googleId ? `"${font.family}", ${INDIC_FALLBACK}` : INDIC_FALLBACK;
+  return font?.googleId ? `"Rupee Local", "${font.family}", ${INDIC_FALLBACK}` : INDIC_FALLBACK;
 }
 
 /** Storefront theme variables from StoreSettings (brand colours and fonts). */

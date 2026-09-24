@@ -35,7 +35,8 @@ export function LocaleSwitcher({ supported }: { supported?: readonly string[] })
         value={locale}
         onChange={onChange}
         disabled={isPending}
-        className="cursor-pointer bg-transparent outline-none disabled:opacity-50"
+        // System font: language names in other scripts shouldn't download web fonts on every page.
+        className="cursor-pointer bg-transparent font-[system-ui] outline-none disabled:opacity-50"
       >
         {routing.locales
           .filter((l) => !supported || supported.includes(l) || l === locale)

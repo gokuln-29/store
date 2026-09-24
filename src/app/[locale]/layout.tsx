@@ -7,18 +7,23 @@ import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { localize } from "@/lib/utils/localized";
+import { siteUrl } from "@/lib/seo";
 import "@/styles/globals.css";
 
 const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-noto-sans", display: "swap" });
+// Tamil/Kannada fonts are not preloaded: their @font-face unicode-range makes the browser
+// fetch them only on pages that actually contain those scripts.
 const notoTamil = Noto_Sans_Tamil({
   subsets: ["tamil"],
   variable: "--font-noto-tamil",
   display: "swap",
+  preload: false,
 });
 const notoKannada = Noto_Sans_Kannada({
   subsets: ["kannada"],
   variable: "--font-noto-kannada",
   display: "swap",
+  preload: false,
 });
 
 export function generateStaticParams() {
@@ -31,6 +36,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   const [t, settings] = await Promise.all([getTranslations({ locale }), getStoreSettings()]);
   const storeName = settings.name;
   return {
+    metadataBase: new URL(siteUrl()),
     title: { default: storeName, template: `%s | ${storeName}` },
     description:
       localize(settings.tagline, locale, settings.defaultLocale) || t("Metadata.description"),

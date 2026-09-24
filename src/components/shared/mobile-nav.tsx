@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "@/i18n/navigation";
 
-type NavLink = { readonly href: "/" | "/account"; readonly label: string };
+export type NavLink = { readonly href: string; readonly label: string };
 
 export function MobileNav({ links }: { links: readonly NavLink[] }) {
   const t = useTranslations("Header");
