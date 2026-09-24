@@ -74,6 +74,11 @@ export const RATE_LIMITS = {
     limit: 20,
     windowMs: 60 * MINUTE,
   }),
+  deliveryCheckByIp: (ip: string): RateLimitRule => ({
+    key: `delivery-check:ip:${ip}`,
+    limit: 60,
+    windowMs: MINUTE,
+  }),
   otpVerifyByIp: (ip: string): RateLimitRule => ({
     key: `otp-verify:ip:${ip}`,
     limit: 30,
