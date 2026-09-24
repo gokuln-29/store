@@ -1,0 +1,10 @@
+// Prisma schema. Domain models are added in Phase 1 (see CLAUDE.md section 9).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
