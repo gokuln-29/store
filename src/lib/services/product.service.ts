@@ -2,6 +2,7 @@ import { Prisma, type ProductStatus } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { getStorageProvider } from "@/lib/providers/storage";
 import { sanitizeRichText } from "@/lib/utils/sanitize";
+import { buildSearchText } from "@/lib/utils/search-text";
 import { slugify, uniqueSlug } from "@/lib/utils/slug";
 import {
   productAttributesSchema,
@@ -245,6 +246,12 @@ export async function saveProductInTx(
       hsnCode: data.hsnCode,
       metaTitle: json(data.metaTitle),
       metaDescription: json(data.metaDescription),
+      searchText: buildSearchText({
+        name: data.name,
+        brand: data.brand,
+        slug,
+        skus: data.variants.map((v) => v.sku),
+      }),
       ...(data.status === "PUBLISHED" && !existing?.publishedAt ? { publishedAt: new Date() } : {}),
     };
     const product = existing

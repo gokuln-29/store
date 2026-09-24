@@ -387,6 +387,10 @@ model Product {
   metaTitle       Json? /// localized
   metaDescription Json? /// localized
 
+  /// Lowercased names (all languages), brand, slug and SKUs for trigram search.
+  /// Maintained by product.service; indexed with pg_trgm (see migration).
+  searchText String @default("")
+
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
