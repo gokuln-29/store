@@ -62,7 +62,9 @@ DATABASE_URL="postgresql://ecom:ecom@localhost:5440/ecom?schema=public"
 | `pnpm lint`                | ESLint                                            |
 | `pnpm typecheck`           | Generate route types and run `tsc`                |
 | `pnpm format`              | Format with Prettier                              |
-| `pnpm test`                | Unit tests (Vitest)                               |
+| `pnpm test`                | Unit + integration tests (Vitest)                 |
+| `pnpm test:unit`           | Unit tests only (no database needed)              |
+| `pnpm test:integration`    | Service tests against the `*_test` database       |
 | `pnpm test:e2e`            | End-to-end tests (Playwright; needs `pnpm db:up`) |
 | `pnpm db:up` / `db:down`   | Start / stop the local PostgreSQL container       |
 | `pnpm db:migrate`          | Create/apply migrations and regenerate the client |
@@ -71,6 +73,14 @@ DATABASE_URL="postgresql://ecom:ecom@localhost:5440/ecom?schema=public"
 | `pnpm db:studio`           | Browse data in Prisma Studio                      |
 
 First time running e2e tests: `pnpm exec playwright install chromium`.
+
+**Integration tests** use a separate database (`DATABASE_URL_TEST`, must end in `_test`).
+`docker-compose` creates `ecom_test` automatically on a fresh volume; with an existing volume run
+`docker exec ecom-postgres psql -U ecom -c "CREATE DATABASE ecom_test"` once. Tables are emptied
+before every test, and migrations are applied automatically.
+
+**Image uploads** go to Cloudinary when `CLOUDINARY_*` is set, otherwise to `./uploads`
+(served at `/uploads/...`). Uploaded files are checked by content, max 4 MB, SVG is not allowed.
 
 A pre-commit hook (Husky + lint-staged) lints and formats staged files.
 

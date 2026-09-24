@@ -29,7 +29,8 @@ test.describe("admin authentication", () => {
     await page.goto("/en/admin/login");
     await expect(page).toHaveURL(/\/en\/admin$/);
 
-    await page.getByRole("button", { name: "Log out" }).click();
+    await page.getByRole("button", { name: "Account menu" }).click();
+    await page.getByRole("menuitem", { name: "Log out" }).click();
     await expect(page).toHaveURL(/\/en\/admin\/login$/);
     await page.goto("/en/admin");
     await expect(page).toHaveURL(/\/en\/admin\/login/);

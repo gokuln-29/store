@@ -12,8 +12,9 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: { baseURL, trace: "on-first-retry" },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    { name: "setup", testMatch: /.*\.setup\.ts/ },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] }, dependencies: ["setup"] },
+    { name: "mobile", use: { ...devices["Pixel 7"] }, dependencies: ["setup"] },
   ],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
