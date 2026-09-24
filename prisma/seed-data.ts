@@ -693,3 +693,114 @@ export const shippingRules = [
     estimatedDaysMax: 7,
   },
 ];
+
+// ───────────────────────────── Home page ─────────────────────────────
+
+export const banners = [
+  {
+    id: "seed-banner-festive",
+    title: t("Festive collection", "பண்டிகைத் தொகுப்பு", "ಹಬ್ಬದ ಸಂಗ್ರಹ"),
+    subtitle: t(
+      "Handwoven silks and cottons for every celebration",
+      "ஒவ்வொரு கொண்டாட்டத்துக்கும் கைத்தறிப் பட்டும் பருத்தியும்",
+      "ಪ್ರತಿ ಸಂಭ್ರಮಕ್ಕೂ ಕೈಮಗ್ಗದ ರೇಷ್ಮೆ ಮತ್ತು ಹತ್ತಿ",
+    ),
+    ctaLabel: t("Shop clothing", "ஆடைகளை வாங்குங்கள்", "ಉಡುಪುಗಳನ್ನು ಖರೀದಿಸಿ"),
+    imageUrl: "https://picsum.photos/seed/banner-festive/1600/600",
+    mobileImageUrl: "https://picsum.photos/seed/banner-festive-m/800/800",
+    linkUrl: "/c/clothing",
+    sortOrder: 1,
+  },
+  {
+    id: "seed-banner-coffee",
+    title: t("Fresh filter coffee", "புதிய ஃபில்டர் காபி", "ತಾಜಾ ಫಿಲ್ಟರ್ ಕಾಫಿ"),
+    subtitle: t(
+      "Roasted this week, delivered to your door",
+      "இந்த வாரம் வறுத்தது, உங்கள் வீட்டு வாசலுக்கு",
+      "ಈ ವಾರ ಹುರಿದದ್ದು, ನಿಮ್ಮ ಮನೆ ಬಾಗಿಲಿಗೆ",
+    ),
+    ctaLabel: t("Shop food", "உணவுப் பொருட்களை வாங்குங்கள்", "ಆಹಾರ ಪದಾರ್ಥಗಳನ್ನು ಖರೀದಿಸಿ"),
+    imageUrl: "https://picsum.photos/seed/banner-coffee/1600/600",
+    mobileImageUrl: "https://picsum.photos/seed/banner-coffee-m/800/800",
+    linkUrl: "/c/food",
+    sortOrder: 2,
+  },
+];
+
+/** Home sections in display order. Category ids are resolved from slugs in seed.ts. */
+export const homeSections = [
+  {
+    id: "seed-home-offer",
+    type: "OFFER_STRIP" as const,
+    config: {
+      message: t(
+        "Free delivery on orders above ₹999 · Use WELCOME10 for 10% off",
+        "₹999க்கு மேற்பட்ட ஆர்டர்களுக்கு இலவச டெலிவரி · 10% தள்ளுபடிக்கு WELCOME10",
+        "₹999ಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಆರ್ಡರ್‌ಗಳಿಗೆ ಉಚಿತ ಡೆಲಿವರಿ · 10% ರಿಯಾಯಿತಿಗೆ WELCOME10",
+      ),
+      linkUrl: "/shop",
+    },
+  },
+  {
+    id: "seed-home-hero",
+    type: "HERO_BANNER" as const,
+    config: { bannerIds: ["seed-banner-festive", "seed-banner-coffee"] },
+  },
+  {
+    id: "seed-home-categories",
+    type: "FEATURED_CATEGORIES" as const,
+    title: t("Shop by category", "வகை வாரியாக வாங்குங்கள்", "ವರ್ಗದ ಪ್ರಕಾರ ಖರೀದಿಸಿ"),
+    categorySlugs: ["clothing", "food", "electronics"],
+  },
+  {
+    id: "seed-home-featured",
+    type: "PRODUCT_CAROUSEL" as const,
+    title: t("Bestsellers", "அதிகம் விற்பனையானவை", "ಹೆಚ್ಚು ಮಾರಾಟವಾದವು"),
+    config: { source: "featured", categoryId: null, limit: 8 },
+  },
+  {
+    id: "seed-home-new",
+    type: "PRODUCT_CAROUSEL" as const,
+    title: t("New arrivals", "புதிய வரவுகள்", "ಹೊಸ ಆಗಮನಗಳು"),
+    config: { source: "newest", categoryId: null, limit: 8 },
+  },
+  {
+    id: "seed-home-testimonials",
+    type: "TESTIMONIALS" as const,
+    title: t("What our customers say", "எங்கள் வாடிக்கையாளர்கள் சொல்வது", "ನಮ್ಮ ಗ್ರಾಹಕರು ಹೇಳುವುದು"),
+    config: {
+      items: [
+        {
+          quote: t(
+            "The silk saree was even more beautiful in person. Quick delivery too!",
+            "பட்டுப் புடவை நேரில் இன்னும் அழகாக இருந்தது. டெலிவரியும் விரைவாக வந்தது!",
+            "ರೇಷ್ಮೆ ಸೀರೆ ನೇರವಾಗಿ ನೋಡಿದಾಗ ಇನ್ನೂ ಸುಂದರವಾಗಿತ್ತು. ಡೆಲಿವರಿಯೂ ಬೇಗ ಬಂತು!",
+          ),
+          author: "Lakshmi",
+          location: "Chennai",
+          rating: 5,
+        },
+        {
+          quote: t(
+            "Best filter coffee I've ordered online. Tastes like home.",
+            "ஆன்லைனில் நான் வாங்கிய சிறந்த ஃபில்டர் காபி. வீட்டுச் சுவை.",
+            "ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ನಾನು ತರಿಸಿದ ಅತ್ಯುತ್ತಮ ಫಿಲ್ಟರ್ ಕಾಫಿ. ಮನೆಯ ರುಚಿ.",
+          ),
+          author: "Suresh",
+          location: "Mysuru",
+          rating: 5,
+        },
+        {
+          quote: t(
+            "Earbuds sound great for the price. Easy returns process.",
+            "விலைக்கு ஏற்ற நல்ல ஒலி. திருப்பி அனுப்புவதும் எளிது.",
+            "ಬೆಲೆಗೆ ತಕ್ಕ ಉತ್ತಮ ಧ್ವನಿ. ಹಿಂತಿರುಗಿಸುವುದೂ ಸುಲಭ.",
+          ),
+          author: "Arjun",
+          location: "Bengaluru",
+          rating: 4,
+        },
+      ],
+    },
+  },
+];

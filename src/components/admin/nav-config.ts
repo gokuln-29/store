@@ -4,6 +4,7 @@ import {
   History,
   KeyRound,
   LayoutDashboard,
+  LayoutTemplate,
   Package,
   Settings,
   Users,
@@ -16,6 +17,7 @@ export type AdminNavKey =
   | "products"
   | "categories"
   | "inventory"
+  | "content"
   | "settings"
   | "staff"
   | "auditLog"
@@ -55,6 +57,16 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         permission: "catalog:read",
       },
       { href: "/admin/inventory", key: "inventory", icon: Boxes, permission: "catalog:read" },
+    ],
+  },
+  {
+    items: [
+      {
+        href: "/admin/content",
+        key: "content",
+        icon: LayoutTemplate,
+        permission: "content:manage",
+      },
     ],
   },
   {

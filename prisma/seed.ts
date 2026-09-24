@@ -14,8 +14,11 @@ import {
   productVariantSchema,
   variantOptionValuesSchema,
 } from "../src/lib/validators/catalog";
+import { buildSearchText } from "../src/lib/utils/search-text";
 import {
+  banners,
   categories,
+  homeSections,
   coupons,
   productImage,
   products,
@@ -132,6 +135,12 @@ async function seedProducts(categoryIds: Map<string, string>) {
       hsnCode: p.hsnCode,
       metaTitle: p.name,
       metaDescription: p.shortDescription,
+      searchText: buildSearchText({
+        name: p.name,
+        brand: p.brand,
+        slug: p.slug,
+        skus: variants.map((v) => v.sku),
+      }),
     };
 
     await db.$transaction(async (tx) => {
@@ -197,6 +206,35 @@ async function seedShipping() {
   console.log(`  shipping rules: ${shippingRules.length}`);
 }
 
+async function seedHomePage(categoryIds: Map<string, string>) {
+  for (const { id, ...banner } of banners) {
+    await db.banner.upsert({ where: { id }, create: { id, ...banner }, update: banner });
+  }
+  for (const [index, section] of homeSections.entries()) {
+    const config =
+      "config" in section
+        ? section.config
+        : {
+            categoryIds: (section.categorySlugs ?? [])
+              .map((slug) => categoryIds.get(slug))
+              .filter(Boolean),
+          };
+    const data = {
+      type: section.type,
+      title: "title" in section ? section.title : Prisma.DbNull,
+      config: config as Prisma.InputJsonValue,
+      sortOrder: index,
+      isActive: true,
+    };
+    await db.homeSection.upsert({
+      where: { id: section.id },
+      create: { id: section.id, ...data },
+      update: data,
+    });
+  }
+  console.log(`  home page: ${banners.length} banners, ${homeSections.length} sections`);
+}
+
 async function main() {
   console.log("Seeding database…");
   await seedOwner();
@@ -205,6 +243,7 @@ async function main() {
   await seedProducts(categoryIds);
   await seedCoupons(categoryIds);
   await seedShipping();
+  await seedHomePage(categoryIds);
   console.log("Done.");
 }
 
