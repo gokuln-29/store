@@ -1,0 +1,33 @@
+{
+  "Metadata": {
+    "description": "ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಖರೀದಿಸಿ"
+  },
+  "Common": {
+    "storeNamePlaceholder": "ನಿಮ್ಮ ಅಂಗಡಿ",
+    "skipToContent": "ಮುಖ್ಯ ವಿಷಯಕ್ಕೆ ಹೋಗಿ"
+  },
+  "Header": {
+    "home": "ಮುಖಪುಟ",
+    "account": "ಖಾತೆ",
+    "cart": "ಕಾರ್ಟ್",
+    "openMenu": "ಮೆನು ತೆರೆಯಿರಿ",
+    "menu": "ಮೆನು",
+    "primaryNav": "ಮುಖ್ಯ ಸಂಚರಣೆ"
+  },
+  "LocaleSwitcher": {
+    "label": "ಭಾಷೆ",
+    "locale": "{locale, select, en {English} ta {தமிழ்} kn {ಕನ್ನಡ} other {Unknown}}"
+  },
+  "Footer": {
+    "rights": "© {year} {storeName}. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ."
+  },
+  "Home": {
+    "title": "ನಮ್ಮ ಅಂಗಡಿಗೆ ಸ್ವಾಗತ",
+    "subtitle": "ನಮ್ಮ ಆನ್‌ಲೈನ್ ಅಂಗಡಿ ಸಿದ್ಧವಾಗುತ್ತಿದೆ. ಶೀಘ್ರದಲ್ಲೇ ಮತ್ತೆ ಭೇಟಿ ನೀಡಿ."
+  },
+  "NotFound": {
+    "title": "ಪುಟ ಕಂಡುಬಂದಿಲ್ಲ",
+    "description": "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪುಟ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ ಅಥವಾ ಸ್ಥಳಾಂತರಗೊಂಡಿದೆ.",
+    "backHome": "ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ"
+  }
+}

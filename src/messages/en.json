@@ -1,0 +1,33 @@
+{
+  "Metadata": {
+    "description": "Shop online"
+  },
+  "Common": {
+    "storeNamePlaceholder": "Your Store",
+    "skipToContent": "Skip to main content"
+  },
+  "Header": {
+    "home": "Home",
+    "account": "Account",
+    "cart": "Cart",
+    "openMenu": "Open menu",
+    "menu": "Menu",
+    "primaryNav": "Main navigation"
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "locale": "{locale, select, en {English} ta {தமிழ்} kn {ಕನ್ನಡ} other {Unknown}}"
+  },
+  "Footer": {
+    "rights": "© {year} {storeName}. All rights reserved."
+  },
+  "Home": {
+    "title": "Welcome to our store",
+    "subtitle": "Our online store is being set up. Please check back soon."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to home"
+  }
+}
