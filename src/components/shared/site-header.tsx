@@ -1,14 +1,13 @@
 import { ShoppingCart, User } from "lucide-react";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { LocaleSwitcher } from "@/components/shared/locale-switcher";
 import { MobileNav } from "@/components/shared/mobile-nav";
 import { Link } from "@/i18n/navigation";
+import { getStoreSettings } from "@/lib/services/settings.service";
 
 export async function SiteHeader() {
-  const t = await getTranslations("Header");
-  const tCommon = await getTranslations("Common");
-  // TODO(phase-1): read store name and logo from StoreSettings.
-  const storeName = tCommon("storeNamePlaceholder");
+  const [t, settings] = await Promise.all([getTranslations("Header"), getStoreSettings()]);
 
   const links = [
     { href: "/", label: t("home") },
@@ -19,8 +18,20 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto flex h-16 items-center gap-4 px-4">
         <MobileNav links={links} />
-        <Link href="/" className="text-lg font-bold tracking-tight">
-          {storeName}
+        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          {settings.logoUrl ? (
+            <Image
+              src={settings.logoUrl}
+              alt={settings.name}
+              width={160}
+              height={40}
+              className="h-9 w-auto object-contain"
+              priority
+              unoptimized={settings.logoUrl.startsWith("/uploads/")}
+            />
+          ) : (
+            settings.name
+          )}
         </Link>
 
         <nav aria-label={t("primaryNav")} className="ml-6 hidden md:block">
@@ -36,7 +47,7 @@ export async function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <LocaleSwitcher />
+          <LocaleSwitcher supported={settings.supportedLocales} />
           <Link
             href="/account"
             aria-label={t("account")}

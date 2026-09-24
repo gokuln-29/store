@@ -25,6 +25,8 @@ export const storeSettings = {
   ),
   primaryColor: "#0f766e",
   secondaryColor: "#f59e0b",
+  headingFont: "Noto Sans",
+  bodyFont: "Noto Sans",
   contactEmail: "support@example.com",
   contactPhone: "+919876543210",
   whatsappNumber: "+919876543210",

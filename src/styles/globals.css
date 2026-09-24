@@ -133,3 +133,13 @@
     line-height: 1.7;
   }
 }
+
+/* Storefront brand theme (variables set by StoreShell from StoreSettings). */
+@layer base {
+  [data-store-theme] {
+    font-family: var(--store-font-body);
+  }
+  [data-store-theme] :is(h1, h2, h3, h4) {
+    font-family: var(--store-font-heading);
+  }
+}

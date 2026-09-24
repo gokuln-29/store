@@ -3,6 +3,7 @@ import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdminLoginForm } from "@/components/auth/admin-login-form";
 import { LocaleSwitcher } from "@/components/shared/locale-switcher";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { firstParam } from "@/lib/utils/search-params";
@@ -19,7 +20,10 @@ export default async function AdminLoginPage({
   const { locale } = await params;
   setRequestLocale(locale as Locale);
   const t = await getTranslations("AdminLogin");
-  const callbackUrl = firstParam((await searchParams).callbackUrl);
+  const query = await searchParams;
+  const callbackUrl = firstParam(query.callbackUrl);
+  const passwordChanged = firstParam(query.passwordChanged) === "1";
+  const tPassword = await getTranslations("ChangePassword");
 
   return (
     <main
@@ -36,7 +40,12 @@ export default async function AdminLoginPage({
           </CardTitle>
           <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid gap-4">
+          {passwordChanged && (
+            <Alert role="status">
+              <AlertDescription>{tPassword("done")}</AlertDescription>
+            </Alert>
+          )}
           <AdminLoginForm callbackUrl={callbackUrl} />
         </CardContent>
       </Card>

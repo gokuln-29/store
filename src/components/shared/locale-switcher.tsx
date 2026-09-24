@@ -7,7 +7,8 @@ import { useTransition, type ChangeEvent } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 
-export function LocaleSwitcher() {
+/** `supported` limits the list to the store's enabled languages (default: all). */
+export function LocaleSwitcher({ supported }: { supported?: readonly string[] }) {
   const t = useTranslations("LocaleSwitcher");
   const locale = useLocale();
   const router = useRouter();
@@ -36,11 +37,13 @@ export function LocaleSwitcher() {
         disabled={isPending}
         className="cursor-pointer bg-transparent outline-none disabled:opacity-50"
       >
-        {routing.locales.map((l) => (
-          <option key={l} value={l}>
-            {t("locale", { locale: l })}
-          </option>
-        ))}
+        {routing.locales
+          .filter((l) => !supported || supported.includes(l) || l === locale)
+          .map((l) => (
+            <option key={l} value={l}>
+              {t("locale", { locale: l })}
+            </option>
+          ))}
       </select>
     </label>
   );

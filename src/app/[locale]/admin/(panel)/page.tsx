@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -21,8 +22,8 @@ export default async function AdminDashboardPage({ params }: PageProps<"/[locale
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="text-2xl font-bold">{t("dashboardTitle")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground" data-testid="admin-identity">
+        <AdminPageHeader title={t("dashboardTitle")} />
+        <p className="-mt-4 text-sm text-muted-foreground" data-testid="admin-identity">
           {t("signedInAs", { email: user.email ?? "", role: tRoles(user.role) })}
         </p>
       </div>

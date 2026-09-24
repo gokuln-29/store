@@ -5,6 +5,8 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
+import { getStoreSettings } from "@/lib/services/settings.service";
+import { localize } from "@/lib/utils/localized";
 import "@/styles/globals.css";
 
 const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-noto-sans", display: "swap" });
@@ -26,12 +28,13 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale });
-  // TODO(phase-1): read store name and branding from StoreSettings.
-  const storeName = t("Common.storeNamePlaceholder");
+  const [t, settings] = await Promise.all([getTranslations({ locale }), getStoreSettings()]);
+  const storeName = settings.name;
   return {
     title: { default: storeName, template: `%s | ${storeName}` },
-    description: t("Metadata.description"),
+    description:
+      localize(settings.tagline, locale, settings.defaultLocale) || t("Metadata.description"),
+    ...(settings.faviconUrl ? { icons: { icon: settings.faviconUrl } } : {}),
   };
 }
 
