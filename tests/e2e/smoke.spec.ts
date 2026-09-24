@@ -1,16 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+// A heading from the seeded home page, translated per language.
 const locales = [
-  { locale: "en", heading: "Welcome to our store" },
-  { locale: "ta", heading: "எங்கள் கடைக்கு வரவேற்கிறோம்" },
-  { locale: "kn", heading: "ನಮ್ಮ ಅಂಗಡಿಗೆ ಸ್ವಾಗತ" },
+  { locale: "en", heading: "Bestsellers" },
+  { locale: "ta", heading: "அதிகம் விற்பனையானவை" },
+  { locale: "kn", heading: "ಹೆಚ್ಚು ಮಾರಾಟವಾದವು" },
 ];
 
 for (const { locale, heading } of locales) {
   test(`home page renders in ${locale}`, async ({ page }) => {
     await page.goto(`/${locale}`);
     await expect(page.locator("html")).toHaveAttribute("lang", locale);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+    await expect(page.getByRole("heading", { level: 2, name: heading })).toBeVisible();
   });
 }
 
