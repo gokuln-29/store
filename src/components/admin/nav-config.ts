@@ -1,7 +1,17 @@
-import { History, KeyRound, LayoutDashboard, Settings, Users, type LucideIcon } from "lucide-react";
+import {
+  FolderTree,
+  History,
+  KeyRound,
+  LayoutDashboard,
+  Package,
+  Settings,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import type { Permission } from "@/lib/permissions";
 
-export type AdminNavKey = "dashboard" | "settings" | "staff" | "auditLog" | "changePassword";
+export type AdminNavKey =
+  "dashboard" | "products" | "categories" | "settings" | "staff" | "auditLog" | "changePassword";
 
 export type AdminNavItem = {
   href: string;
@@ -24,6 +34,17 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         icon: LayoutDashboard,
         permission: "admin:access",
         exact: true,
+      },
+    ],
+  },
+  {
+    items: [
+      { href: "/admin/products", key: "products", icon: Package, permission: "catalog:read" },
+      {
+        href: "/admin/categories",
+        key: "categories",
+        icon: FolderTree,
+        permission: "catalog:read",
       },
     ],
   },

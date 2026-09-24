@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { get, useFormContext, useWatch } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,7 +34,10 @@ export function LocalizedInput({
   const { register, formState, control } = useFormContext();
   const [active, setActive] = useState<string>(routing.defaultLocale);
   const values = (useWatch({ control, name }) ?? {}) as Record<string, string | undefined>;
-  const errors = (formState.errors[name] ?? {}) as Record<string, { message?: string } | undefined>;
+  const errors = (get(formState.errors, name) ?? {}) as Record<
+    string,
+    { message?: string } | undefined
+  >;
   const baseId = `field-${name.replace(/\./g, "-")}`;
 
   return (

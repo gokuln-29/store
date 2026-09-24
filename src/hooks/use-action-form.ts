@@ -39,7 +39,16 @@ export function useActionForm<TInput extends FieldValues, TOutput, TData>(
         );
       });
     },
-    () => toast.error(errorText("validation")),
+    (errors) => {
+      if (process.env.NODE_ENV !== "production") {
+        // Helps spot errors on fields that have no visible message.
+        console.warn(
+          "[form] invalid fields:",
+          JSON.stringify(errors, (key, value) => (key === "ref" ? undefined : value)),
+        );
+      }
+      toast.error(errorText("validation"));
+    },
   );
 
   return { onSubmit, isPending };
