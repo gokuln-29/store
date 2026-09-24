@@ -93,6 +93,18 @@ without saving; **Import** then saves each product separately, so one bad produc
 the others. Image URLs must be `/uploads/...` or Cloudinary. Exports include a UTF-8 BOM so Excel
 shows Tamil and Kannada correctly, and cells starting with `= + - @` are escaped.
 
+## Cart and checkout
+
+- The cart lives in the browser (item ids and quantities only) and is saved to the account
+  for logged-in customers; a guest cart is merged into the account cart on login.
+- **All prices, discounts, shipping, GST and totals are computed on the server**
+  (`src/lib/services/pricing.ts`, the single source of truth, all amounts in paise).
+- Checkout asks guests to verify their mobile number by OTP, then places the order in one
+  database transaction: stock is reserved atomically (it can never go negative), coupon limits
+  are enforced under a row lock, and order numbers come from a Postgres sequence.
+- With `PAYMENT_PROVIDER=mock`, "Pay online" opens a local test page where you can simulate a
+  successful or failed payment.
+
 ## Project structure
 
 ```
