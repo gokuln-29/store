@@ -21,4 +21,7 @@ export const postgresRateLimitStore: RateLimitStore = {
     }
     return { count: Number(row.count), resetAt: row.expiresAt };
   },
+  async reset(key) {
+    await db.rateLimit.deleteMany({ where: { key } });
+  },
 };

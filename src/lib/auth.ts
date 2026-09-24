@@ -98,6 +98,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await verifyStaffCredentials(email, password);
         if (!user) throw new LoginError("invalid_credentials");
+        // Only failed attempts should count towards locking an account's email.
+        await postgresRateLimitStore.reset(RATE_LIMITS.adminLoginByEmail(email).key);
         return toUser(user);
       },
     }),

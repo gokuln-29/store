@@ -29,3 +29,14 @@ describe("rateLimit", () => {
     expect((await rateLimit(store, { ...rule, key: "other" })).allowed).toBe(true);
   });
 });
+
+describe("rateLimit reset", () => {
+  it("clears a bucket so the next hit starts fresh", async () => {
+    const store = createMemoryRateLimitStore();
+    const rule = { key: "login:a", limit: 1, windowMs: 60_000 };
+    await rateLimit(store, rule);
+    expect((await rateLimit(store, rule)).allowed).toBe(false);
+    await store.reset(rule.key);
+    expect((await rateLimit(store, rule)).allowed).toBe(true);
+  });
+});

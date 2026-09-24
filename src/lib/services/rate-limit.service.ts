@@ -14,6 +14,8 @@ export type RateLimitResult = {
 export interface RateLimitStore {
   /** Atomically increments the counter for `key`, starting a new window if the old one expired. */
   hit(key: string, windowMs: number, now: Date): Promise<{ count: number; resetAt: Date }>;
+  /** Clears a bucket, e.g. after a successful login. */
+  reset(key: string): Promise<void>;
 }
 
 /** Fixed-window rate limiter. Each call counts as one attempt. */
@@ -46,6 +48,9 @@ export function createMemoryRateLimitStore(): RateLimitStore {
       }
       bucket.count += 1;
       return { ...bucket };
+    },
+    async reset(key) {
+      buckets.delete(key);
     },
   };
 }
