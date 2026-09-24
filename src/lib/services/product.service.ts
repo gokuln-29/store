@@ -165,12 +165,19 @@ async function findSkuConflicts(tx: Tx, skus: string[], productId: string | null
   return new Set(rows.map((r) => r.sku));
 }
 
-export async function saveProduct(
+/**
+ * Creates or updates a product using the caller's transaction (used directly by CSV import,
+ * which can roll back a whole file). Image files that are no longer used are added to
+ * `removedPublicIds` so the caller can delete them after committing.
+ */
+export async function saveProductInTx(
+  tx: Tx,
   id: string | null,
   data: ProductFormData,
   actorId: string,
+  removedPublicIds: string[] = [],
 ): Promise<SaveProductResult> {
-  const category = await db.category.findUnique({
+  const category = await tx.category.findUnique({
     where: { id: data.categoryId },
     include: { attributes: { orderBy: { sortOrder: "asc" } } },
   });
@@ -186,8 +193,7 @@ export async function saveProduct(
   if (!attributes.ok)
     return { ok: false, error: "validation", fieldErrors: attributes.fieldErrors };
 
-  const removedPublicIds: string[] = [];
-  const result = await db.$transaction(async (tx): Promise<SaveProductResult> => {
+  {
     const existing = id
       ? await tx.product.findUnique({ where: { id }, include: { variants: true, images: true } })
       : null;
@@ -335,7 +341,21 @@ export async function saveProduct(
       tx,
     );
     return { ok: true, id: product.id, slug };
-  });
+  }
+}
+
+export async function saveProduct(
+  id: string | null,
+  data: ProductFormData,
+  actorId: string,
+): Promise<SaveProductResult> {
+  const removedPublicIds: string[] = [];
+  const result = await db.$transaction(
+    (tx) => saveProductInTx(tx, id, data, actorId, removedPublicIds),
+    {
+      timeout: 20_000,
+    },
+  );
 
   // Best effort: remove files no longer used (after the transaction committed).
   if (result.ok && removedPublicIds.length) {
