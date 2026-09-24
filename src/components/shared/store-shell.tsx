@@ -5,8 +5,9 @@ import { readableForeground } from "@/lib/utils/color";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
+// "Rupee Local" (see globals.css) supplies only ₹, so prices don't download Latin Extended.
 const INDIC_FALLBACK =
-  "var(--font-noto-sans), var(--font-noto-tamil), var(--font-noto-kannada), sans-serif";
+  '"Rupee Local", var(--font-noto-sans), var(--font-noto-tamil), var(--font-noto-kannada), sans-serif';
 
 function fontStack(name: string): string {
   const font = STORE_FONTS.find((f) => f.name === name);

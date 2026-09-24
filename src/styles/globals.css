@@ -174,13 +174,13 @@
 
 /*
  * The ₹ sign isn't in Noto Sans' basic Latin subset, so it would pull in the 160 KB
- * "latin-ext" file. Take ₹ from the device's own font instead; if none has it, the
- * browser falls through to Noto Sans as usual.
+ * "latin-ext" file on every page with a price. This 1 KB font contains only ₹ (cut from
+ * Noto Sans, variable weight), so prices render in the same design without that download.
  */
 @font-face {
   font-family: "Rupee Local";
-  src:
-    local("Roboto"), local("SF Pro Text"), local(".SF NS Text"), local("Segoe UI"),
-    local("Helvetica Neue"), local("Arial");
+  src: url("/fonts/noto-sans-rupee.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
   unicode-range: U+20B9;
 }
