@@ -28,6 +28,12 @@ export const generalSettingsSchema = z
     supportedLocales: z.array(localeEnum).min(1, "localeRequired"),
     defaultLocale: localeEnum,
     minOrderValue: rupeesSchema,
+    orderNumberPrefix: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .refine((v) => v === "" || /^[A-Z0-9]{1,6}$/.test(v), "prefixInvalid")
+      .transform((v) => v || null),
   })
   .superRefine((v, ctx) => {
     if (!v.supportedLocales.includes(v.defaultLocale)) {

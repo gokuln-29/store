@@ -99,6 +99,21 @@ export function GeneralSettingsForm({ defaults }: { defaults: GeneralSettingsInp
             />
           )}
         </FormField>
+        <FormField
+          id="orderNumberPrefix"
+          label={t("orderNumberPrefix")}
+          hint={t("orderNumberPrefixHint")}
+          error={errorText(errors.orderNumberPrefix?.message)}
+        >
+          {(aria) => (
+            <Input
+              className="max-w-[8rem] font-mono uppercase"
+              maxLength={6}
+              {...aria}
+              {...form.register("orderNumberPrefix")}
+            />
+          )}
+        </FormField>
         <div>
           <Button type="submit" disabled={isPending}>
             {isPending ? tCommon("saving") : tCommon("save")}

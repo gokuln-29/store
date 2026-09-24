@@ -147,6 +147,8 @@ model StoreSettings {
   codMaxOrderValue       Int? /// paise
   /// Minutes an unpaid online order holds stock before it expires.
   pendingOrderTtlMinutes Int     @default(30)
+  /// Order numbers look like "<prefix>-1001". Null = the store name's initials.
+  orderNumberPrefix      String?
 
   // SEO
   metaTitle       Json? /// localized
@@ -405,6 +407,8 @@ model Product {
   @@index([categoryId, status])
   @@index([status, createdAt])
   @@index([isFeatured, status])
+  /// Trigram search (pg_trgm) across names, brand and SKUs.
+  @@index([searchText(ops: raw("gin_trgm_ops"))], type: Gin, map: "Product_searchText_trgm_idx")
 }
 
 /// Every product has at least one variant (simple products have a single default variant).
@@ -434,6 +438,8 @@ model ProductVariant {
 
   @@index([productId, sortOrder])
   @@index([stock])
+  /// Storefront listings aggregate price/stock over active variants.
+  @@index([productId, isActive, price])
 }
 
 model ProductImage {

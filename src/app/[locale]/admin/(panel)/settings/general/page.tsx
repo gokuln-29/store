@@ -25,6 +25,7 @@ export default async function GeneralSettingsPage({
     supportedLocales: s.supportedLocales as GeneralSettingsInput["supportedLocales"],
     defaultLocale: s.defaultLocale as GeneralSettingsInput["defaultLocale"],
     minOrderValue: paiseToRupeeInput(s.minOrderValue),
+    orderNumberPrefix: s.orderNumberPrefix ?? "",
   };
   return <GeneralSettingsForm defaults={defaults} />;
 }

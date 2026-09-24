@@ -15,10 +15,15 @@ describe("settings validators", () => {
       supportedLocales: ["en", "ta"],
       defaultLocale: "en",
       minOrderValue: "99",
+      orderNumberPrefix: "ds",
     };
     const parsed = generalSettingsSchema.parse(base);
     expect(parsed.minOrderValue).toBe(9900);
     expect(parsed.tagline).toBeNull();
+    expect(parsed.orderNumberPrefix).toBe("DS");
+    expect(
+      generalSettingsSchema.safeParse({ ...base, orderNumberPrefix: "TOO-LONG" }).success,
+    ).toBe(false);
     expect(generalSettingsSchema.safeParse({ ...base, defaultLocale: "kn" }).success).toBe(false);
     expect(generalSettingsSchema.safeParse({ ...base, supportedLocales: [] }).success).toBe(false);
   });

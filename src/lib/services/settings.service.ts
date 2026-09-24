@@ -45,6 +45,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   codMinOrderValue: null,
   codMaxOrderValue: null,
   pendingOrderTtlMinutes: 30,
+  orderNumberPrefix: null,
   metaTitle: null,
   metaDescription: null,
   features: {},

@@ -27,6 +27,7 @@ describe("settings service", () => {
         supportedLocales: ["en", "ta"],
         defaultLocale: "ta",
         minOrderValue: 9900,
+        orderNumberPrefix: "KM",
       },
       actor.id,
     );
@@ -48,7 +49,14 @@ describe("settings service", () => {
   it("updates only its own section", async () => {
     const actor = await owner();
     await updateGeneralSettings(
-      { name: "A", tagline: null, supportedLocales: ["en"], defaultLocale: "en", minOrderValue: 0 },
+      {
+        name: "A",
+        tagline: null,
+        supportedLocales: ["en"],
+        defaultLocale: "en",
+        minOrderValue: 0,
+        orderNumberPrefix: null,
+      },
       actor.id,
     );
     await updatePaymentSettings(
