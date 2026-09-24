@@ -1,4 +1,12 @@
-// Prisma schema. Domain models are added in Phase 1 (see CLAUDE.md section 9).
+// Prisma schema for the universal e-commerce template.
+//
+// Conventions (see CLAUDE.md):
+// - Money is Int in paise (₹1 = 100). Never floats.
+// - Tax rates are Int in basis points (1800 = 18%).
+// - Translatable text is Json shaped as { "en": "...", "ta": "...", "kn": "..." }
+//   and validated with src/lib/validators/localized.ts. Missing locales fall back to the default.
+// - Products are archived, not deleted, so past orders and reports stay intact.
+// - Stock and price columns have CHECK constraints (>= 0) added in the migration SQL.
 
 generator client {
   provider = "prisma-client"
@@ -7,4 +15,742 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─────────────────────────────── Enums ───────────────────────────────
+
+enum Role {
+  OWNER
+  STAFF
+  CUSTOMER
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AttributeType {
+  TEXT
+  NUMBER
+  SELECT
+  COLOR
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT // created, waiting for online payment; expires and releases stock
+  PLACED
+  CONFIRMED
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  PARTIALLY_REFUNDED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  ONLINE // Razorpay: UPI, cards, netbanking, wallets
+  COD
+}
+
+enum CouponType {
+  PERCENTAGE // value in basis points (1000 = 10%)
+  FLAT // value in paise
+}
+
+enum ShippingRateType {
+  FLAT
+  WEIGHT_BASED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum HomeSectionType {
+  HERO_BANNER
+  FEATURED_CATEGORIES
+  PRODUCT_CAROUSEL
+  OFFER_STRIP
+  TESTIMONIALS
+  RICH_TEXT
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// ─────────────────────────────── Store ───────────────────────────────
+
+/// Singleton row (id = "default") holding everything that makes a deployment a specific brand.
+model StoreSettings {
+  id      String @id @default("default")
+  name    String
+  tagline Json? /// localized
+
+  // Branding
+  logoUrl        String?
+  faviconUrl     String?
+  primaryColor   String  @default("#111827")
+  secondaryColor String  @default("#f59e0b")
+  headingFont    String  @default("Noto Sans")
+  bodyFont       String  @default("Noto Sans")
+
+  // Contact
+  contactEmail    String?
+  contactPhone    String?
+  whatsappNumber  String?
+  /// { line1, line2?, city, state, pincode } — printed on invoices
+  businessAddress Json?
+  socialLinks     Json    @default("{}") /// { instagram?, facebook?, youtube?, x? }
+
+  // Tax (GST)
+  legalName         String?
+  gstNumber         String?
+  /// Two-letter state code of the business (e.g. "KA"); decides CGST+SGST vs IGST.
+  stateCode         String?
+  pricesIncludeTax  Boolean @default(true)
+  defaultTaxRateBps Int     @default(1800)
+
+  // Locale & currency
+  currency         String   @default("INR")
+  supportedLocales String[] @default(["en", "ta", "kn"])
+  defaultLocale    String   @default("en")
+
+  // Checkout & payments
+  minOrderValue          Int     @default(0) /// paise
+  onlinePaymentsEnabled  Boolean @default(true)
+  codEnabled             Boolean @default(true)
+  codFee                 Int     @default(0) /// paise
+  codMinOrderValue       Int? /// paise
+  codMaxOrderValue       Int? /// paise
+  /// Minutes an unpaid online order holds stock before it expires.
+  pendingOrderTtlMinutes Int     @default(30)
+
+  // SEO
+  metaTitle       Json? /// localized
+  metaDescription Json? /// localized
+
+  /// Feature toggles, e.g. { wishlist: true, reviews: true, abandonedCart: false }
+  features Json @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShippingRule {
+  id       String  @id @default(cuid())
+  name     String
+  isActive Boolean @default(true)
+  /// Higher priority rules are checked first. First match wins.
+  priority Int     @default(0)
+
+  /// Matches when the delivery pincode starts with any prefix (e.g. "560", "600").
+  pincodePrefixes String[] @default([])
+  /// Matches when the delivery state code is listed (e.g. "KA", "TN").
+  /// A rule with no prefixes and no states is a catch-all.
+  stateCodes      String[] @default([])
+
+  rateType ShippingRateType
+  flatRate Int? /// paise, for FLAT
+
+  // WEIGHT_BASED: baseRate covers the first baseWeightGrams, then
+  // additionalRate per started additionalWeightGrams.
+  baseWeightGrams       Int?
+  baseRate              Int? /// paise
+  additionalWeightGrams Int?
+  additionalRate        Int? /// paise
+
+  freeShippingThreshold Int? /// paise; subtotal at or above this ships free
+  estimatedDaysMin      Int?
+  estimatedDaysMax      Int?
+  codAvailable          Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, priority])
+}
+
+model HomeSection {
+  id        String          @id @default(cuid())
+  type      HomeSectionType
+  title     Json? /// localized
+  /// Type-specific settings, e.g. { bannerIds: [] } or { categoryIds: [], limit: 8 }
+  config    Json            @default("{}")
+  sortOrder Int             @default(0)
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model Banner {
+  id             String    @id @default(cuid())
+  title          Json /// localized
+  subtitle       Json? /// localized
+  ctaLabel       Json? /// localized
+  imageUrl       String
+  mobileImageUrl String?
+  linkUrl        String?
+  sortOrder      Int       @default(0)
+  isActive       Boolean   @default(true)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+// ─────────────────────────────── Users ───────────────────────────────
+
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  emailVerifiedAt DateTime?
+  /// E.164 format, e.g. +919876543210
+  phone           String?   @unique
+  phoneVerifiedAt DateTime?
+  /// argon2id hash; only for OWNER/STAFF (customers use phone OTP).
+  passwordHash    String?
+  role            Role      @default(CUSTOMER)
+  isActive        Boolean   @default(true)
+  preferredLocale String?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  addresses         Address[]
+  cart              Cart?
+  orders            Order[]
+  reviews           Review[]
+  wishlistItems     WishlistItem[]
+  couponUsages      CouponUsage[]
+  pushSubscriptions PushSubscription[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  orderEvents       OrderEvent[]
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String? /// e.g. "Home", "Office"
+  name      String
+  phone     String
+  line1     String
+  line2     String?
+  landmark  String?
+  city      String
+  state     String
+  stateCode String
+  pincode   String
+  country   String   @default("IN")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─────────────────────────────── Catalog ───────────────────────────────
+
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        Json /// localized
+  description Json? /// localized
+  imageUrl    String?
+  parentId    String?
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  /// GST rate for products in this category; null = StoreSettings.defaultTaxRateBps.
+  taxRateBps Int?
+  hsnCode    String?
+
+  metaTitle       Json? /// localized
+  metaDescription Json? /// localized
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent     Category?             @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children   Category[]            @relation("CategoryTree")
+  attributes AttributeDefinition[]
+  products   Product[]
+
+  @@index([parentId])
+  @@index([isActive, sortOrder])
+}
+
+/// A product field defined per category, so any product type can be modeled without code changes.
+model AttributeDefinition {
+  id           String        @id @default(cuid())
+  categoryId   String
+  /// Stable key used in Product.attributes, e.g. "material". Lowercase, snake_case.
+  key          String
+  label        Json /// localized
+  type         AttributeType
+  /// SELECT / COLOR: [{ value: "cotton", label: { en, ta, kn } }]. COLOR values are hex.
+  options      Json?
+  unit         String? /// e.g. "g", "months", "hours" (for NUMBER)
+  isRequired   Boolean       @default(false)
+  isFilterable Boolean       @default(false)
+  sortOrder    Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, key])
+}
+
+model Product {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  name             Json /// localized
+  shortDescription Json? /// localized
+  description      Json? /// localized (rich text as HTML/markdown per locale)
+  categoryId       String
+  status           ProductStatus @default(DRAFT)
+  brand            String?
+  isFeatured       Boolean       @default(false)
+
+  /// Values for the category's AttributeDefinitions, keyed by definition key.
+  attributes Json @default("{}")
+  /// Variant axes: [{ key: "size", label: { en, ta, kn }, values: [{ value: "M", label: {...} }] }]
+  options    Json @default("[]")
+
+  /// Overrides the category tax rate when set.
+  taxRateBps Int?
+  hsnCode    String?
+
+  metaTitle       Json? /// localized
+  metaDescription Json? /// localized
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  variants      ProductVariant[]
+  images        ProductImage[]
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+  orderItems    OrderItem[]
+
+  @@index([categoryId, status])
+  @@index([status, createdAt])
+  @@index([isFeatured, status])
+}
+
+/// Every product has at least one variant (simple products have a single default variant).
+/// Stock, price and SKU always live here.
+model ProductVariant {
+  id                String   @id @default(cuid())
+  productId         String
+  sku               String   @unique
+  /// { size: "M", color: "black" } — keys match Product.options; {} for the default variant.
+  optionValues      Json     @default("{}")
+  price             Int /// paise
+  compareAtPrice    Int? /// paise, the "MRP" shown struck through
+  costPrice         Int? /// paise, for margin reports (admin only)
+  stock             Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  weightGrams       Int?
+  isDefault         Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  images     ProductImage[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([productId, sortOrder])
+  @@index([stock])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  /// Optional: image shown when this variant is selected.
+  variantId String?
+  url       String
+  /// Cloudinary public_id, used for transforms and deletion.
+  publicId  String?
+  alt       Json? /// localized
+  width     Int?
+  height    Int?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([productId, sortOrder])
+  @@index([variantId])
+}
+
+// ─────────────────────────────── Shopping ───────────────────────────────
+
+/// DB cart for logged-in users. Guests keep their cart in localStorage and it merges on login.
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  @@index([updatedAt]) // abandoned cart job
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  variantId String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart    Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, variantId])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Review {
+  id          String       @id @default(cuid())
+  productId   String
+  userId      String
+  /// Links to the purchase that makes this a verified review.
+  orderItemId String?      @unique
+  rating      Int /// 1–5
+  title       String?
+  body        String?
+  imageUrls   String[]     @default([])
+  status      ReviewStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItem OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+
+  @@unique([productId, userId])
+  @@index([productId, status])
+  @@index([status, createdAt])
+}
+
+// ─────────────────────────────── Coupons ───────────────────────────────
+
+model Coupon {
+  id           String     @id @default(cuid())
+  /// Stored uppercase.
+  code         String     @unique
+  description  Json? /// localized
+  type         CouponType
+  /// PERCENTAGE: basis points (1000 = 10%). FLAT: paise.
+  value        Int
+  minCartValue Int? /// paise
+  maxDiscount  Int? /// paise, caps PERCENTAGE discounts
+  usageLimit   Int? /// total redemptions allowed
+  perUserLimit Int? /// redemptions per customer (by user or phone)
+  usedCount    Int        @default(0)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  isActive     Boolean    @default(true)
+  /// Empty = applies to the whole cart. Otherwise only matching items count.
+  categoryIds  String[]   @default([])
+  productIds   String[]   @default([])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  usages CouponUsage[]
+  orders Order[]
+
+  @@index([isActive, endsAt])
+}
+
+model CouponUsage {
+  id             String   @id @default(cuid())
+  couponId       String
+  orderId        String   @unique
+  userId         String?
+  /// Guest checkouts are limited by phone number.
+  phone          String?
+  discountAmount Int /// paise
+  createdAt      DateTime @default(now())
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([couponId, userId])
+  @@index([couponId, phone])
+}
+
+// ─────────────────────────────── Orders ───────────────────────────────
+
+model Order {
+  id            String        @id @default(cuid())
+  /// Human-friendly, e.g. "ORD-24-000123". Generated in the order service (Phase 5).
+  orderNumber   String        @unique
+  userId        String?
+  status        OrderStatus   @default(PENDING_PAYMENT)
+  paymentStatus PaymentStatus @default(PENDING)
+  paymentMethod PaymentMethod
+
+  // Customer snapshot (guests have no userId)
+  customerName  String
+  customerPhone String
+  customerEmail String?
+
+  /// Address snapshot at purchase time: { name, phone, line1, line2?, landmark?, city, state, stateCode, pincode, country }
+  shippingAddress Json
+  billingAddress  Json?
+
+  // Totals in paise, computed by pricing.service on the server.
+  subtotal         Int
+  discountTotal    Int     @default(0)
+  shippingTotal    Int     @default(0)
+  codFee           Int     @default(0)
+  taxTotal         Int     @default(0)
+  total            Int
+  currency         String  @default("INR")
+  pricesIncludeTax Boolean
+  /// { cgst, sgst, igst } in paise
+  taxBreakup       Json?
+
+  couponId   String?
+  couponCode String?
+
+  /// Locale the customer ordered in; used for notifications and invoices.
+  locale       String  @default("en")
+  customerNote String?
+  internalNote String?
+
+  courierName    String?
+  trackingNumber String?
+  trackingUrl    String?
+
+  /// Unpaid online orders expire at this time and release stock.
+  expiresAt   DateTime?
+  placedAt    DateTime?
+  cancelledAt DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  coupon        Coupon?        @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  items         OrderItem[]
+  payments      Payment[]
+  events        OrderEvent[]
+  couponUsage   CouponUsage?
+  notifications Notification[]
+
+  @@index([status, createdAt])
+  @@index([paymentStatus])
+  @@index([userId, createdAt])
+  @@index([customerPhone])
+  @@index([createdAt])
+  @@index([expiresAt])
+}
+
+/// Line item with a snapshot of the product as it was when ordered.
+model OrderItem {
+  id             String  @id @default(cuid())
+  orderId        String
+  productId      String?
+  variantId      String?
+  productName    Json /// localized snapshot
+  sku            String
+  optionValues   Json    @default("{}")
+  imageUrl       String?
+  unitPrice      Int /// paise, as charged
+  compareAtPrice Int? /// paise
+  quantity       Int
+  taxRateBps     Int
+  hsnCode        String?
+  taxAmount      Int /// paise
+  discountAmount Int     @default(0) /// paise, this line's share of the coupon
+  lineTotal      Int /// paise
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  review  Review?
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+/// Order timeline: every status change, note or tracking update.
+model OrderEvent {
+  id         String       @id @default(cuid())
+  orderId    String
+  fromStatus OrderStatus?
+  toStatus   OrderStatus?
+  note       String?
+  /// Admin/staff who made the change; null for system or customer actions.
+  actorId    String?
+  createdAt  DateTime     @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+}
+
+// ─────────────────────────────── Payments ───────────────────────────────
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String
+  method            PaymentMethod
+  /// Adapter name: "razorpay", "cod", "mock".
+  provider          String
+  status            PaymentStatus @default(PENDING)
+  amount            Int /// paise
+  refundedAmount    Int           @default(0) /// paise
+  currency          String        @default("INR")
+  providerOrderId   String?       @unique
+  providerPaymentId String?       @unique
+  failureReason     String?
+  /// Raw provider response for debugging (no secrets).
+  metadata          Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status, createdAt])
+}
+
+/// Every processed webhook event, so replays are ignored (idempotency).
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  eventId     String
+  type        String
+  payload     Json
+  processedAt DateTime?
+  error       String?
+  createdAt   DateTime  @default(now())
+
+  @@unique([provider, eventId])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────── Notifications ───────────────────────────────
+
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String?
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  locale     String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String?
+  orderId   String?
+  channel   NotificationChannel
+  /// Template key, e.g. "order.shipped"
+  template  String
+  locale    String              @default("en")
+  /// Email address, phone number or push endpoint.
+  recipient String
+  payload   Json                @default("{}")
+  status    NotificationStatus  @default(PENDING)
+  error     String?
+  sentAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([orderId])
+  @@index([userId])
+}
+
+// ─────────────────────────────── Audit ───────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  /// e.g. "product.update", "order.status_change", "settings.update"
+  action     String
+  entityType String
+  entityId   String?
+  /// { before, after } or a diff of changed fields
+  changes    Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
 }
