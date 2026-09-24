@@ -84,6 +84,15 @@ before every test, and migrations are applied automatically.
 
 A pre-commit hook (Husky + lint-staged) lints and formats staged files.
 
+## Product CSV import / export
+
+Admin → Products → **Export CSV** / **Import**. One row per variant; rows with the same `handle`
+form one product and product-level columns come from its first row. Attribute columns are
+`attr:<key>` (e.g. `attr:material`). **Check file** validates everything (including SKU clashes)
+without saving; **Import** then saves each product separately, so one bad product doesn't block
+the others. Image URLs must be `/uploads/...` or Cloudinary. Exports include a UTF-8 BOM so Excel
+shows Tamil and Kannada correctly, and cells starting with `= + - @` are escaped.
+
 ## Project structure
 
 ```

@@ -1,4 +1,4 @@
-import { ImageIcon, Package, Plus, TriangleAlert } from "lucide-react";
+import { Download, ImageIcon, Package, Plus, TriangleAlert, Upload } from "lucide-react";
 import Image from "next/image";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -35,9 +35,10 @@ export default async function ProductsPage({
   setRequestLocale(locale as Locale);
   const user = await requirePermission("catalog:read", locale, `/${locale}/admin/products`);
   const canWrite = can(user.role, "catalog:write");
-  const [t, tData, categories] = await Promise.all([
+  const [t, tData, tImport, categories] = await Promise.all([
     getTranslations("Products"),
     getTranslations("DataTable"),
+    getTranslations("Import"),
     listCategoryTree(),
   ]);
   const tableParams = parseTableParams(await searchParams, {
@@ -166,15 +167,30 @@ export default async function ProductsPage({
         description={t("description")}
         breadcrumbs={[{ label: t("title") }]}
         actions={
-          canWrite &&
-          categories.length > 0 && (
-            <Button asChild size="sm">
-              <Link href="/admin/products/new">
-                <Plus className="size-4" aria-hidden />
-                {t("add")}
-              </Link>
+          <>
+            <Button asChild variant="outline" size="sm">
+              <a href="/api/admin/products/export" download>
+                <Download className="size-4" aria-hidden />
+                {tImport("export")}
+              </a>
             </Button>
-          )
+            {canWrite && (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/products/import">
+                  <Upload className="size-4" aria-hidden />
+                  {tImport("import")}
+                </Link>
+              </Button>
+            )}
+            {canWrite && categories.length > 0 && (
+              <Button asChild size="sm">
+                <Link href="/admin/products/new">
+                  <Plus className="size-4" aria-hidden />
+                  {t("add")}
+                </Link>
+              </Button>
+            )}
+          </>
         }
       />
       <div className="grid gap-4">

@@ -1,4 +1,5 @@
 import {
+  Boxes,
   FolderTree,
   History,
   KeyRound,
@@ -11,7 +12,14 @@ import {
 import type { Permission } from "@/lib/permissions";
 
 export type AdminNavKey =
-  "dashboard" | "products" | "categories" | "settings" | "staff" | "auditLog" | "changePassword";
+  | "dashboard"
+  | "products"
+  | "categories"
+  | "inventory"
+  | "settings"
+  | "staff"
+  | "auditLog"
+  | "changePassword";
 
 export type AdminNavItem = {
   href: string;
@@ -46,6 +54,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         icon: FolderTree,
         permission: "catalog:read",
       },
+      { href: "/admin/inventory", key: "inventory", icon: Boxes, permission: "catalog:read" },
     ],
   },
   {

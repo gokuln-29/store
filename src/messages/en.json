@@ -181,7 +181,15 @@
     "attributeInvalid": "Choose a valid value.",
     "parentInvalid": "A category can't be inside itself.",
     "has_products": "Move or archive this category's products first.",
-    "has_children": "Delete or move its sub-categories first."
+    "has_children": "Delete or move its sub-categories first.",
+    "csvMissingColumn": "Missing required column.",
+    "csvTooManyRows": "The file has more than 5,000 rows. Split it into smaller files.",
+    "csvMalformed": "This row could not be read (check quotes and commas).",
+    "csvUnknownCategory": "No category with this slug.",
+    "csvInvalidStatus": "Use draft, published or archived.",
+    "csvImageHost": "Images must be uploaded here or hosted on Cloudinary.",
+    "csvFileTooLarge": "The file is larger than 5 MB.",
+    "csvFileType": "Choose a .csv file."
   },
   "DataTable": {
     "selectAll": "Select all rows",
@@ -212,7 +220,8 @@
     "breadcrumb": "Breadcrumb",
     "userMenu": "Account menu",
     "products": "Products",
-    "categories": "Categories"
+    "categories": "Categories",
+    "inventory": "Inventory"
   },
   "Settings": {
     "title": "Store settings",
@@ -527,5 +536,56 @@
     "alt": "Image description (for screen readers)",
     "uploadingCount": "Uploading {count}…",
     "image": "Image {index}"
+  },
+  "Import": {
+    "title": "Import products",
+    "description": "Add or update many products at once from a CSV file.",
+    "import": "Import",
+    "export": "Export CSV",
+    "template": "Download empty template",
+    "howTitle": "How it works",
+    "how1": "One row per variant. Rows with the same handle belong to one product.",
+    "how2": "Product details (name, category, status…) are read from the product's first row.",
+    "how3": "An existing handle updates that product; a new handle creates one.",
+    "how4": "Tip: export your products first and edit that file.",
+    "chooseFile": "Choose CSV file",
+    "noFile": "No file chosen",
+    "check": "Check file",
+    "checking": "Checking…",
+    "importValid": "{count, plural, one {Import # product} other {Import # products}}",
+    "importing": "Importing…",
+    "checkedSummary": "{rows} rows checked: {create} new, {update} to update, {failed} with errors.",
+    "doneSummary": "Import finished: {create} created, {update} updated, {failed} failed.",
+    "fileProblems": "The file can't be imported:",
+    "product": "Product (handle)",
+    "rows": "Rows",
+    "result": "Result",
+    "willCreate": "New",
+    "willUpdate": "Update",
+    "created": "Created",
+    "updated": "Updated",
+    "failed": "Error",
+    "errorAt": "Row {row}, {column}: {message}",
+    "errorAtRow": "Row {row}: {message}",
+    "showOnlyErrors": "Show only products with errors",
+    "viewProducts": "View products",
+    "startOver": "Import another file"
+  },
+  "Inventory": {
+    "title": "Inventory",
+    "description": "Stock for every variant. Change a number and press Enter to save.",
+    "searchPlaceholder": "Search product or SKU",
+    "stockFilter": "Stock",
+    "all": "All stock levels",
+    "low": "Low stock",
+    "out": "Out of stock",
+    "product": "Product",
+    "sku": "SKU",
+    "stock": "In stock",
+    "threshold": "Low at",
+    "save": "Save stock",
+    "saved": "Stock updated",
+    "empty": "No variants match.",
+    "allGood": "Nothing is running low."
   }
 }

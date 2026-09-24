@@ -66,3 +66,54 @@ test("category fields are required when marked so", async ({ page }) => {
   await expect(page.getByText("This field is required.").first()).toBeVisible();
   await expect(page).toHaveURL(/\/products\/new$/);
 });
+
+test("CSV import check reports errors by row and writes nothing", async ({ page }, testInfo) => {
+  const handle = `e2e-${testInfo.project.name}-csv-${Date.now()}`;
+  const csv = [
+    "handle,name_en,category,status,sku,price,mrp,stock,attr:diet_type,attr:shelf_life_days",
+    `${handle},E2E CSV Coffee,food,draft,${handle.toUpperCase()},500,100,1,veg,30`,
+  ].join("\n");
+
+  await page.goto("/en/admin/products/import");
+  await page
+    .locator("#csv-file")
+    .setInputFiles({ name: "products.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await page.getByRole("button", { name: "Check file" }).click();
+  await expect(page.getByText("1 rows checked: 0 new, 0 to update, 1 with errors.")).toBeVisible();
+  await expect(page.getByText("Row 2, mrp: MRP can't be lower than the price.")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Import \d+ product/ })).toHaveCount(0);
+
+  await page.goto(`/en/admin/products?q=${handle}`);
+  await expect(page.getByText("No results match your search.")).toBeVisible();
+});
+
+test("inventory stock can be edited inline", async ({ page }, testInfo) => {
+  // Use a product created for this test so parallel runs don't touch shared data.
+  const slug = `e2e-${testInfo.project.name}-inv-${Date.now()}`;
+  test.info().annotations.push({ type: "cleanup", description: slug });
+  const sku = slug.toUpperCase();
+
+  await page.goto("/en/admin/products/new");
+  await page.locator("#field-name-en").fill(`Inventory ${slug}`);
+  await page.getByLabel("Category").selectOption({ label: "Food" });
+  await page.getByLabel("Diet type *").selectOption("veg");
+  await page.getByLabel("Shelf life (days) *").fill("30");
+  await page.getByLabel("URL slug").fill(slug);
+  await page.locator('input[name="variants.0.sku"]').fill(sku);
+  await page.locator('input[name="variants.0.price"]').fill("100");
+  await page.locator('input[name="variants.0.stock"]').fill("2");
+  await page.getByLabel("URL slug").press("Enter");
+  await expect(page).toHaveURL(/\/en\/admin\/products\/c[a-z0-9]+$/);
+
+  await page.goto(`/en/admin/inventory?q=${slug}&stock=low`);
+  const stock = page.getByLabel(new RegExp(`${sku} · In stock`));
+  await expect(stock).toHaveValue("2");
+  await stock.fill("40");
+  await stock.press("Enter");
+  await expect(page.getByText("Stock updated")).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText("Nothing is running low.")).toBeVisible();
+  await page.goto(`/en/admin/inventory?q=${slug}`);
+  await expect(page.getByLabel(new RegExp(`${sku} · In stock`))).toHaveValue("40");
+});
