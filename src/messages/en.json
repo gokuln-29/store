@@ -4,7 +4,14 @@
   },
   "Common": {
     "storeNamePlaceholder": "Your Store",
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "loading": "Please wait…",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "logout": "Log out",
+    "optional": "optional",
+    "back": "Back"
   },
   "Header": {
     "home": "Home",
@@ -12,7 +19,8 @@
     "cart": "Cart",
     "openMenu": "Open menu",
     "menu": "Menu",
-    "primaryNav": "Main navigation"
+    "primaryNav": "Main navigation",
+    "login": "Log in"
   },
   "LocaleSwitcher": {
     "label": "Language",
@@ -29,5 +37,108 @@
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has moved.",
     "backHome": "Back to home"
+  },
+  "Roles": {
+    "OWNER": "Owner",
+    "STAFF": "Staff",
+    "CUSTOMER": "Customer"
+  },
+  "AdminLogin": {
+    "title": "Admin sign in",
+    "subtitle": "Sign in to manage your store.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "customerLink": "Shopping? Log in with your mobile number"
+  },
+  "Admin": {
+    "panel": "Admin",
+    "dashboardTitle": "Dashboard",
+    "welcome": "Welcome, {name}",
+    "signedInAs": "Signed in as {email} · {role}",
+    "comingSoon": "The admin panel is being built. Catalog management arrives in the next phase.",
+    "viewStore": "View store"
+  },
+  "CustomerLogin": {
+    "title": "Log in or sign up",
+    "subtitle": "We'll send a 6-digit code to your mobile number.",
+    "phone": "Mobile number",
+    "sendCode": "Send code",
+    "sending": "Sending…",
+    "codeTitle": "Enter the code",
+    "codeSent": "We sent a 6-digit code to {phone}.",
+    "code": "6-digit code",
+    "verify": "Verify and continue",
+    "verifying": "Verifying…",
+    "resendIn": "Resend code in {seconds}s",
+    "resend": "Resend code",
+    "codeResent": "A new code has been sent.",
+    "changeNumber": "Change number"
+  },
+  "Account": {
+    "title": "My account",
+    "navLabel": "Account menu",
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "profileSubtitle": "Your personal details",
+    "name": "Full name",
+    "email": "Email",
+    "emailHint": "Used for order updates and invoices.",
+    "phone": "Mobile number",
+    "phoneHint": "This is your login number.",
+    "language": "Preferred language",
+    "languageHint": "Used for messages we send you.",
+    "profileSaved": "Profile saved"
+  },
+  "Addresses": {
+    "title": "Saved addresses",
+    "add": "Add address",
+    "empty": "You have no saved addresses yet.",
+    "emptyHint": "Add an address to check out faster.",
+    "default": "Default",
+    "setDefault": "Set as default",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete this address?",
+    "deleteDescription": "This cannot be undone.",
+    "deleted": "Address deleted",
+    "saved": "Address saved",
+    "defaultUpdated": "Default address updated",
+    "newTitle": "New address",
+    "editTitle": "Edit address",
+    "label": "Label (e.g. Home, Office)",
+    "name": "Full name",
+    "phone": "Mobile number",
+    "line1": "House / flat no., street",
+    "line2": "Area, locality",
+    "landmark": "Landmark",
+    "city": "City / town",
+    "state": "State",
+    "statePlaceholder": "Select state",
+    "pincode": "Pincode",
+    "isDefault": "Make this my default address"
+  },
+  "Errors": {
+    "required": "This field is required.",
+    "tooLong": "This is too long.",
+    "phoneInvalid": "Enter a valid 10-digit mobile number.",
+    "emailInvalid": "Enter a valid email address.",
+    "emailTaken": "This email is already used by another account.",
+    "otpInvalid": "Enter the 6-digit code.",
+    "pincodeInvalid": "Enter a valid 6-digit pincode.",
+    "invalid_credentials": "Incorrect email or password.",
+    "rate_limited": "Too many attempts. Please try again later.",
+    "otp_invalid": "That code is incorrect. Please try again.",
+    "otp_expired": "This code has expired. Request a new one.",
+    "otp_too_many_attempts": "Too many wrong attempts. Request a new code.",
+    "otp_cooldown": "Please wait {seconds} seconds before requesting a new code.",
+    "account_disabled": "This account has been disabled. Please contact support.",
+    "use_admin_login": "This number belongs to a staff account. Please use the admin sign in.",
+    "unauthorized": "Your session has ended. Please log in again.",
+    "not_found": "We couldn't find that item.",
+    "limit_reached": "You have reached the maximum number of saved addresses.",
+    "validation": "Please check the highlighted fields.",
+    "unknown": "Something went wrong. Please try again."
   }
 }

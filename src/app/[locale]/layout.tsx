@@ -3,8 +3,7 @@ import { Noto_Sans, Noto_Sans_Kannada, Noto_Sans_Tamil } from "next/font/google"
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { SiteFooter } from "@/components/shared/site-footer";
-import { SiteHeader } from "@/components/shared/site-header";
+import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import "@/styles/globals.css";
 
@@ -56,11 +55,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           >
             {t("skipToContent")}
           </a>
-          <SiteHeader />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
+          {children}
+          <Toaster richColors closeButton position="top-center" />
         </NextIntlClientProvider>
       </body>
     </html>
