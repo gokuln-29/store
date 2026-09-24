@@ -19,6 +19,7 @@ test("owner creates a product with variants", async ({ page }, testInfo) => {
   test.info().annotations.push({ type: "cleanup", description: slug });
 
   await page.goto("/en/admin/products/new");
+  await page.waitForLoadState("networkidle"); // hydrated, so Enter submits via React
   await page.locator("#field-name-en").fill("E2E Filter Coffee");
   await page.getByLabel("Category").selectOption({ label: "Food" });
   await page.getByLabel("Diet type *").selectOption("veg");
@@ -58,6 +59,7 @@ test.afterEach(({}, testInfo) => {
 
 test("category fields are required when marked so", async ({ page }) => {
   await page.goto("/en/admin/products/new");
+  await page.waitForLoadState("networkidle"); // hydrated, so Enter submits via React
   await page.locator("#field-name-en").fill("E2E Incomplete");
   await page.getByLabel("Category").selectOption({ label: "Food" });
   await page.locator('input[name="variants.0.sku"]').fill(`E2E-INCOMPLETE-${Date.now()}`);
@@ -94,6 +96,7 @@ test("inventory stock can be edited inline", async ({ page }, testInfo) => {
   const sku = slug.toUpperCase();
 
   await page.goto("/en/admin/products/new");
+  await page.waitForLoadState("networkidle"); // hydrated, so Enter submits via React
   await page.locator("#field-name-en").fill(`Inventory ${slug}`);
   await page.getByLabel("Category").selectOption({ label: "Food" });
   await page.getByLabel("Diet type *").selectOption("veg");

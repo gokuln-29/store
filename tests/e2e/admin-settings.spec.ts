@@ -22,6 +22,7 @@ test("owner can open every settings section", async ({ page }) => {
 
 test("invalid settings show translated errors and are not saved", async ({ page }) => {
   await page.goto("/ta/admin/settings/tax");
+  await page.waitForLoadState("networkidle"); // hydrated, so Enter submits via React
   await page.getByLabel("GSTIN").fill("NOTAGSTIN");
   // Submit with the keyboard (in dev, the Next.js badge can overlap the button on small screens).
   await page.getByLabel("GSTIN").press("Enter");
