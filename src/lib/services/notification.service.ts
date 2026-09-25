@@ -14,6 +14,7 @@ import {
   type OrderNotificationPayload,
   type OrderTemplate,
 } from "@/lib/notifications/render";
+import { routing } from "@/i18n/routing";
 import { formatINR } from "@/lib/utils/money";
 import { pushConfigured, sendPush } from "./push.service";
 import { getStoreSettings } from "./settings.service";
@@ -61,6 +62,7 @@ export async function enqueueOrderNotification(
     where: { id: orderId },
     select: {
       userId: true,
+      user: { select: { preferredLocale: true } },
       orderNumber: true,
       customerName: true,
       customerPhone: true,
@@ -73,14 +75,19 @@ export async function enqueueOrderNotification(
     },
   });
   const settings = await getStoreSettings();
+  // The customer's current language choice wins over the one they ordered in.
+  const locale =
+    [order.user?.preferredLocale, order.locale].find(
+      (l): l is string => !!l && (routing.locales as readonly string[]).includes(l),
+    ) ?? routing.defaultLocale;
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const payload: OrderNotificationPayload = {
     storeName: settings.name,
     brandColor: settings.primaryColor,
     orderNumber: order.orderNumber,
     customerName: order.customerName,
-    total: formatINR(order.total, order.locale),
-    orderUrl: `${appUrl}/${order.locale}/account/orders/${encodeURIComponent(order.orderNumber)}`,
+    total: formatINR(order.total, locale),
+    orderUrl: `${appUrl}/${locale}/account/orders/${encodeURIComponent(order.orderNumber)}`,
     courierName: order.courierName,
     trackingNumber: order.trackingNumber,
     trackingUrl: order.trackingUrl,
@@ -112,7 +119,7 @@ export async function enqueueOrderNotification(
       orderId,
       userId: order.userId,
       template,
-      locale: order.locale,
+      locale,
       payload: payload as Prisma.InputJsonValue,
     })),
   });

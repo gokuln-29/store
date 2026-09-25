@@ -172,6 +172,23 @@ describe("order updates by push", () => {
   });
 });
 
+describe("notification language", () => {
+  it("follows the customer's current language choice, not the one they ordered in", async () => {
+    const { user, order } = await placedOrder(); // ordered in Tamil
+    const endpoint = await device({ userId: user.id, locale: "ta" });
+    await db.user.update({ where: { id: user.id }, data: { preferredLocale: "kn" } });
+    await changeOrderStatus({
+      orderId: order.id,
+      to: "CANCELLED",
+      actor: { type: "staff", id: user.id, canRefund: false },
+    });
+    const row = await db.notification.findFirstOrThrow({ where: { recipient: endpoint } });
+    expect(row.locale).toBe("kn");
+    expect(outbox[0]!.payload).toMatchObject({ url: `/kn/account/orders/${order.orderNumber}` });
+    expect(outbox[0]!.payload.title).toContain("ರದ್ದಾಗಿದೆ"); // "cancelled" in Kannada
+  });
+});
+
 describe("push campaigns", () => {
   const input = (actorId: string) => ({
     title: { en: "Diwali sale", ta: "தீபாவளி விற்பனை" },
