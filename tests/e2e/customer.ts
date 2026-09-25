@@ -8,11 +8,20 @@ try {
   // CI provides the environment.
 }
 
-function sql(statement: string) {
-  execSync("pnpm exec prisma db execute --stdin", {
-    input: statement,
-    stdio: ["pipe", "ignore", "inherit"],
-  });
+/** Runs SQL against the app database. Retries: cleanup can deadlock with a parallel test's order. */
+function sql(statement: string, attempts = 3) {
+  for (let i = 1; ; i++) {
+    try {
+      execSync("pnpm exec prisma db execute --stdin", {
+        input: `BEGIN;\n${statement}\nCOMMIT;`,
+        stdio: ["pipe", "ignore", "pipe"],
+      });
+      return;
+    } catch (error) {
+      const message = String((error as { stderr?: Buffer }).stderr ?? error);
+      if (i >= attempts || !/deadlock|could not serialize/i.test(message)) throw error;
+    }
+  }
 }
 
 /**
@@ -58,8 +67,20 @@ export function cleanupCustomer(id: string) {
       SELECT p.id FROM "Payment" p JOIN "Order" o ON o.id = p."orderId" WHERE o."userId" = '${id}');
     DELETE FROM "Notification" WHERE "userId" = '${id}'
       OR "orderId" IN (SELECT o.id FROM "Order" o WHERE o."userId" = '${id}');
+    UPDATE "Product" p SET "ratingCount" = p."ratingCount" - r.n, "ratingTotal" = p."ratingTotal" - r.total
+    FROM (SELECT "productId", COUNT(*) AS n, SUM(rating) AS total FROM "Review"
+          WHERE "userId" = '${id}' AND status = 'APPROVED' GROUP BY "productId") r
+    WHERE p.id = r."productId";
+    DELETE FROM "AuditLog" WHERE "entityType" = 'Review' AND "entityId" IN (SELECT id FROM "Review" WHERE "userId" = '${id}');
     DELETE FROM "Order" WHERE "userId" = '${id}';
     DELETE FROM "User" WHERE id = '${id}';`);
+}
+
+/** Test shortcut: marks an order delivered (as if staff went through every step). */
+export function markDelivered(orderNumber: string) {
+  sql(
+    `UPDATE "Order" SET status = 'DELIVERED', "deliveredAt" = now() WHERE "orderNumber" = '${orderNumber.replace(/'/g, "")}';`,
+  );
 }
 
 /** Checks out one "Mysore Pak" with cash on delivery; returns the order number. */
