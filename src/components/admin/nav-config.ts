@@ -9,6 +9,7 @@ import {
   Megaphone,
   Package,
   Settings,
+  TicketPercent,
   ShoppingBag,
   Users,
   type LucideIcon,
@@ -22,6 +23,7 @@ export type AdminNavKey =
   | "inventory"
   | "orders"
   | "payments"
+  | "coupons"
   | "content"
   | "push"
   | "settings"
@@ -69,6 +71,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { href: "/admin/orders", key: "orders", icon: ShoppingBag, permission: "orders:read" },
       { href: "/admin/payments", key: "payments", icon: CreditCard, permission: "orders:read" },
+      { href: "/admin/coupons", key: "coupons", icon: TicketPercent, permission: "coupons:manage" },
     ],
   },
   {
