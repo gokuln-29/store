@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { emailSchema } from "./auth";
 
 export const PASSWORD_MIN = 10;

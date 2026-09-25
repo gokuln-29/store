@@ -1,12 +1,10 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { localizedTextSchema } from "./localized";
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 /** snake_case key used in JSON, e.g. "material", "shelf_life_days". */
-export const attributeKeySchema = z
-  .string()
-  .regex(/^[a-z][a-z0-9_]{0,39}$/, "Use lowercase letters, numbers and underscores");
+export const attributeKeySchema = z.string().regex(/^[a-z][a-z0-9_]{0,39}$/, "keyInvalid");
 
 export const attributeTypeSchema = z.enum(["TEXT", "NUMBER", "SELECT", "COLOR"]);
 export type AttributeTypeValue = z.infer<typeof attributeTypeSchema>;
@@ -150,5 +148,5 @@ export type ProductVariantInput = z.infer<typeof productVariantSchema>;
 
 export const slugSchema = z
   .string()
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and hyphens")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slugInvalid")
   .max(120);

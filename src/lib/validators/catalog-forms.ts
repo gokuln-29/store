@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { HEX_COLOR } from "@/lib/utils/color";
 import { toKey } from "@/lib/utils/slug";
 import { attributeKeySchema, attributeTypeSchema, slugSchema } from "./catalog";

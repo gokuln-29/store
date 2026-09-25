@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { optionalText, rupeesSchema } from "./common";
 
 export const refundSchema = z.object({

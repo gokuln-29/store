@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { optionalText } from "./common";
 
 export const ORDER_STATUSES = [

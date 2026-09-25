@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { locales } from "@/i18n/routing";
 import { STORE_FONT_NAMES } from "@/lib/constants/fonts";
 import { INDIAN_STATE_CODES } from "@/lib/constants/indian-states";

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { locales } from "@/i18n/routing";
 
 const localeEnum = z.enum(locales);
@@ -10,7 +10,7 @@ const localeEnum = z.enum(locales);
 export const localizedTextSchema = z
   .partialRecord(localeEnum, z.string().trim().max(10_000))
   .refine((value) => Object.values(value).some((text) => typeof text === "string" && text !== ""), {
-    message: "At least one language is required",
+    message: "anyLanguageRequired",
   });
 
 export type LocalizedText = z.infer<typeof localizedTextSchema>;

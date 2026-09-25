@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { locales } from "@/i18n/routing";
 import { INDIAN_STATE_CODES } from "@/lib/constants/indian-states";
 import { normalizeIndianMobile } from "@/lib/utils/phone";

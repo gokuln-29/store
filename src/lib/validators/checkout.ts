@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./zod";
 import { addressSchema } from "./auth";
 
 // Messages are keys in the "Errors" namespace.
