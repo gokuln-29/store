@@ -1,16 +1,17 @@
 "use server";
 
 import { hasLocale } from "next-intl";
+import { z } from "zod";
 import { routing } from "@/i18n/routing";
 import { authorize } from "@/lib/auth-guards";
 import { getClientIp } from "@/lib/request";
 import {
   buildQuote,
   placeOrder,
-  recordMockPayment,
   type CheckoutQuote,
   type PlaceOrderResult,
 } from "@/lib/services/checkout.service";
+import { confirmCheckoutPayment, recordMockPayment } from "@/lib/services/payment.service";
 import { RATE_LIMITS, rateLimit } from "@/lib/services/rate-limit.service";
 import { postgresRateLimitStore } from "@/lib/services/rate-limit.store";
 import {
@@ -72,6 +73,32 @@ export async function mockPaymentAction(
     return { ok: false, error: "validation" };
   }
   const result = await recordMockPayment(orderNumber, user.id, success);
+  if (!result.ok) return { ok: false, error: result.error };
+  return { ok: true, data: { status: result.status } };
+}
+
+const razorpayResultSchema = z.object({
+  orderNumber: z.string().min(1).max(40),
+  razorpay_order_id: z.string().min(1).max(64),
+  razorpay_payment_id: z.string().min(1).max(64),
+  razorpay_signature: z.string().regex(/^[0-9a-f]{64}$/i),
+});
+
+/** Razorpay Checkout success handler: verified by signature, then confirmed with Razorpay. */
+export async function confirmRazorpayPaymentAction(
+  input: z.input<typeof razorpayResultSchema>,
+): Promise<ActionResult<{ status: string }>> {
+  const user = await authorize("account:self");
+  if (!user) return { ok: false, error: "unauthorized" };
+  const parsed = razorpayResultSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "validation" };
+  const result = await confirmCheckoutPayment({
+    orderNumber: parsed.data.orderNumber,
+    userId: user.id,
+    providerOrderId: parsed.data.razorpay_order_id,
+    providerPaymentId: parsed.data.razorpay_payment_id,
+    signature: parsed.data.razorpay_signature,
+  });
   if (!result.ok) return { ok: false, error: result.error };
   return { ok: true, data: { status: result.status } };
 }

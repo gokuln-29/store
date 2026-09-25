@@ -6,12 +6,8 @@ import {
   mergeGuestCart,
   saveCart,
 } from "@/lib/services/cart.service";
-import {
-  buildQuote,
-  placeOrder,
-  recordMockPayment,
-  storeInitials,
-} from "@/lib/services/checkout.service";
+import { buildQuote, placeOrder, storeInitials } from "@/lib/services/checkout.service";
+import { recordMockPayment } from "@/lib/services/payment.service";
 import { addressSchema } from "@/lib/validators/auth";
 
 const address = addressSchema.parse({

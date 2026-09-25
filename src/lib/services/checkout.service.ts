@@ -11,6 +11,7 @@ import {
   type CartLine,
 } from "./cart.service";
 import { evaluateCoupon, priceOrder, type CouponRejection, type PriceResult } from "./pricing";
+import { ensurePaymentSession, expireOrder } from "./payment.service";
 import { quote as quoteShipping, type ShippingQuote } from "./shipping.service";
 import { getStoreSettingsFresh } from "./settings.service";
 
@@ -458,99 +459,32 @@ export async function placeOrder(input: {
     };
   }
 
-  // Online: open a payment session with the provider (outside the order transaction).
-  const session = await getPaymentProvider().createPayment({
-    orderId: created.id,
-    orderNumber: created.orderNumber,
-    amount: created.total,
-    currency: "INR",
-    customer: {
-      name: address.name,
-      phone: user.phone ?? address.phone,
-      email: input.customerEmail ?? user.email,
-    },
-  });
-  await db.payment.updateMany({
-    where: { orderId: created.id, status: "PENDING" },
-    data: { providerOrderId: session.providerOrderId, provider: session.provider },
-  });
-  const url =
-    session.next.type === "redirect"
-      ? session.next.url
-      : `/checkout/pay/${encodeURIComponent(created.orderNumber)}`;
+  // Online: open a payment session with the provider (outside the order transaction). If the
+  // provider is unavailable right now, the payment page retries.
+  try {
+    await ensurePaymentSession(created.id);
+  } catch (error) {
+    console.error(`[checkout] payment session for ${created.orderNumber} failed`, error);
+  }
   return {
     ok: true,
     orderId: created.id,
     orderNumber: created.orderNumber,
-    next: { type: "redirect", url },
+    next: { type: "redirect", url: `/checkout/pay/${encodeURIComponent(created.orderNumber)}` },
   };
 }
 
-// ───────────── Online payment result (mock provider; Razorpay in Phase 6) ─────────────
-
-export type PaymentOutcomeResult =
-  { ok: true; status: "paid" | "failed" | "already_paid" } | { ok: false; error: "not_found" };
-
-/** Records the result of a test payment. Idempotent: paying an already paid order is a no-op. */
-export async function recordMockPayment(
-  orderNumber: string,
-  userId: string,
-  success: boolean,
-): Promise<PaymentOutcomeResult> {
-  return db.$transaction(async (tx): Promise<PaymentOutcomeResult> => {
-    const order = await tx.order.findFirst({
-      where: { orderNumber, userId, paymentMethod: "ONLINE" },
-      select: { id: true, status: true, paymentStatus: true },
-    });
-    if (!order) return { ok: false, error: "not_found" };
-    if (order.paymentStatus === "CAPTURED") return { ok: true, status: "already_paid" };
-    if (order.status !== "PENDING_PAYMENT") return { ok: false, error: "not_found" };
-
-    const payment = await tx.payment.findFirst({
-      where: { orderId: order.id },
-      orderBy: { createdAt: "desc" },
-    });
-    const now = new Date();
-    if (success) {
-      if (payment) {
-        await tx.payment.update({
-          where: { id: payment.id },
-          data: {
-            status: "CAPTURED",
-            providerPaymentId: `mock_pay_${payment.id}`,
-            failureReason: null,
-          },
-        });
-      }
-      await tx.order.update({
-        where: { id: order.id },
-        data: { status: "PLACED", paymentStatus: "CAPTURED", placedAt: now, expiresAt: null },
-      });
-      await tx.orderEvent.create({
-        data: {
-          orderId: order.id,
-          fromStatus: "PENDING_PAYMENT",
-          toStatus: "PLACED",
-          note: "payment_captured",
-        },
-      });
-      return { ok: true, status: "paid" };
-    }
-    if (payment)
-      await tx.payment.update({
-        where: { id: payment.id },
-        data: { status: "FAILED", failureReason: "Test payment failed" },
-      });
-    await tx.order.update({ where: { id: order.id }, data: { paymentStatus: "FAILED" } });
-    await tx.orderEvent.create({ data: { orderId: order.id, note: "payment_failed" } });
-    return { ok: true, status: "failed" };
-  });
-}
-
 /** An order as its customer may see it (scoped to the customer). */
-export function getCustomerOrder(orderNumber: string, userId: string) {
-  return db.order.findFirst({
-    where: { orderNumber, userId },
-    include: { items: { orderBy: { id: "asc" } } },
-  });
+export async function getCustomerOrder(orderNumber: string, userId: string) {
+  const find = () =>
+    db.order.findFirst({
+      where: { orderNumber, userId },
+      include: { items: { orderBy: { id: "asc" } } },
+    });
+  const order = await find();
+  // Expire an overdue unpaid order on the spot, even if the cron job hasn't run yet.
+  if (order?.status === "PENDING_PAYMENT" && order.expiresAt && order.expiresAt <= new Date()) {
+    return (await expireOrder(order.id)) === "skipped" ? order : find();
+  }
+  return order;
 }
