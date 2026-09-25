@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
-import type { BrowserContext } from "@playwright/test";
+import { randomBytes, randomInt } from "node:crypto";
+import type { BrowserContext, Page } from "@playwright/test";
 
 try {
   process.loadEnvFile();
@@ -21,7 +21,7 @@ function sql(statement: string) {
  */
 export async function signInAsNewCustomer(context: BrowserContext, baseURL: string) {
   const id = `e2e_${randomBytes(6).toString("hex")}`;
-  const phone = `+919${String(Date.now()).slice(-9)}`;
+  const phone = `+919${String(randomInt(0, 1_000_000_000)).padStart(9, "0")}`;
   sql(`INSERT INTO "User" (id, phone, name, role, "phoneVerifiedAt", "createdAt", "updatedAt")
        VALUES ('${id}', '${phone}', 'E2E Customer', 'CUSTOMER', now(), now(), now());`);
 
@@ -56,6 +56,24 @@ export function cleanupCustomer(id: string) {
     WHERE c.id = u."couponId";
     DELETE FROM "AuditLog" WHERE "entityType" = 'Payment' AND "entityId" IN (
       SELECT p.id FROM "Payment" p JOIN "Order" o ON o.id = p."orderId" WHERE o."userId" = '${id}');
+    DELETE FROM "Notification" WHERE "userId" = '${id}'
+      OR "orderId" IN (SELECT o.id FROM "Order" o WHERE o."userId" = '${id}');
     DELETE FROM "Order" WHERE "userId" = '${id}';
     DELETE FROM "User" WHERE id = '${id}';`);
+}
+
+/** Checks out one "Mysore Pak" with cash on delivery; returns the order number. */
+export async function placeCodOrder(page: Page): Promise<string> {
+  await page.goto("/en/p/mysore-pak");
+  await page.getByRole("button", { name: "Add to cart" }).click();
+  await page.goto("/en/checkout");
+  await page.getByLabel("Full name").fill("E2E Orders");
+  await page.getByLabel("House / flat no., street").fill("1 Test Street");
+  await page.getByLabel("City / town").fill("Chennai");
+  await page.getByLabel("State").selectOption("TN");
+  await page.getByLabel("Pincode").fill("600020");
+  await page.getByText("Cash on delivery", { exact: true }).click();
+  await page.getByRole("button", { name: "Place order" }).click();
+  await page.waitForURL(/\/en\/order\/[A-Z0-9]+-\d+$/);
+  return decodeURIComponent(page.url().split("/").pop()!);
 }
