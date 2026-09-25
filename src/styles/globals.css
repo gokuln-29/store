@@ -184,3 +184,19 @@
   font-display: swap;
   unicode-range: U+20B9;
 }
+
+/* Dashboard charts: one validated accent (see dataviz palette), recessive grid and axis. */
+@layer components {
+  .viz {
+    --viz-accent: #2a78d6;
+    --viz-accent-soft: #86b6ef;
+    --viz-grid: #e1e0d9;
+    --viz-axis: #c3c2b7;
+  }
+  .dark .viz {
+    --viz-accent: #3987e5;
+    --viz-accent-soft: #184f95;
+    --viz-grid: #2c2c2a;
+    --viz-axis: #383835;
+  }
+}

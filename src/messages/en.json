@@ -64,11 +64,7 @@
   },
   "Admin": {
     "panel": "Admin",
-    "dashboardTitle": "Dashboard",
-    "welcome": "Welcome, {name}",
-    "signedInAs": "Signed in as {email} · {role}",
-    "comingSoon": "The admin panel is being built. Catalog management arrives in the next phase.",
-    "viewStore": "View store"
+    "dashboardTitle": "Dashboard"
   },
   "CustomerLogin": {
     "title": "Log in or sign up",
@@ -271,7 +267,8 @@
     "orders": "Orders",
     "push": "Push campaigns",
     "coupons": "Coupons",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "customers": "Customers"
   },
   "Settings": {
     "title": "Store settings",
@@ -1420,5 +1417,72 @@
     "rejected": "Review rejected.",
     "deleted": "Review deleted.",
     "featureOff": "Reviews are switched off in Settings → Features: nothing is shown on the store and customers can't write new ones."
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "signedInAs": "Signed in as {email} · {role}",
+    "range": "Period",
+    "summary": "Summary",
+    "ranges": {
+      "today": "Today",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days"
+    },
+    "vs": {
+      "today": "vs yesterday",
+      "7d": "vs previous 7 days",
+      "30d": "vs previous 30 days"
+    },
+    "revenue": "Revenue",
+    "orders": "Orders",
+    "aov": "Average order value",
+    "conversion": "Conversion",
+    "conversionHint": "orders per visit",
+    "analyticsOff": "Visit statistics are switched off (Settings → Features).",
+    "definitions": "Orders count once placed (cash on delivery) or paid (online), excluding cancelled orders. Revenue includes GST and shipping. India time.",
+    "revenueChart": "Revenue",
+    "ordersChart": "Orders",
+    "hour": "Hour",
+    "day": "Day",
+    "showTable": "Show as table",
+    "funnel": "Conversion funnel",
+    "stages": {
+      "visits": "Visits",
+      "carts": "Added to cart",
+      "checkouts": "Started checkout",
+      "orders": "Ordered"
+    },
+    "ofPrevious": "{percent}% of previous step",
+    "topProducts": "Top products",
+    "product": "Product",
+    "sold": "Sold",
+    "noSales": "No sales in this period.",
+    "lowStock": "Low stock",
+    "inStock": "In stock",
+    "soldOut": "Sold out",
+    "noLowStock": "All products are well stocked.",
+    "needsAttention": "Needs attention",
+    "toConfirm": "Orders to confirm",
+    "pendingReviews": "Reviews to moderate",
+    "exportOrders": "Orders (CSV)",
+    "exportCustomers": "Customers (CSV)"
+  },
+  "Customers": {
+    "title": "Customers",
+    "description": "Everyone who has signed in to shop, with their orders and lifetime value.",
+    "detailTitle": "Customer",
+    "searchPlaceholder": "Name, phone or email",
+    "empty": "No customers yet.",
+    "customer": "Customer",
+    "noName": "No name",
+    "orders": "Orders",
+    "ltv": "Lifetime value",
+    "lastOrder": "Last order",
+    "aov": "Average order",
+    "joined": "Joined",
+    "summary": "Summary",
+    "contact": "Contact",
+    "orderHistory": "Order history",
+    "noOrders": "No orders yet."
   }
 }
