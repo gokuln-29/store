@@ -222,7 +222,11 @@
     "invalid": "This value isn't valid.",
     "tooShort": "This is too short.",
     "invalidOption": "Choose one of the options.",
-    "anyLanguageRequired": "Fill this in for at least one language."
+    "anyLanguageRequired": "Fill this in for at least one language.",
+    "feature_disabled": "This feature is turned off.",
+    "couponCodeInvalid": "Use 3–20 capital letters, numbers, - or _.",
+    "couponCodeTaken": "Another coupon already uses this code.",
+    "coupon_used": "This coupon has been used, so it can't be deleted. Disable it instead."
   },
   "DataTable": {
     "selectAll": "Select all rows",
@@ -259,7 +263,8 @@
     "banners": "Banners",
     "payments": "Payments",
     "orders": "Orders",
-    "push": "Push campaigns"
+    "push": "Push campaigns",
+    "coupons": "Coupons"
   },
   "Settings": {
     "title": "Store settings",
@@ -318,7 +323,43 @@
     "pendingTtl": "Hold stock for unpaid orders (minutes)",
     "pendingTtlHint": "After this, unpaid online orders are cancelled and stock is released.",
     "orderNumberPrefix": "Order number prefix",
-    "orderNumberPrefixHint": "Up to 6 letters or numbers, e.g. DS gives DS-1001. Leave empty to use your store's initials."
+    "orderNumberPrefixHint": "Up to 6 letters or numbers, e.g. DS gives DS-1001. Leave empty to use your store's initials.",
+    "features": "Features",
+    "featuresHint": "Switch optional features on or off. A feature that is off is hidden everywhere: store, admin and background jobs.",
+    "feature": {
+      "wishlist": {
+        "label": "Wishlist",
+        "hint": "Customers save products for later. Guests keep it on their device; it moves to their account when they sign in."
+      },
+      "reviews": {
+        "label": "Reviews and ratings",
+        "hint": "Customers who received a product can rate and review it. Reviews appear after you approve them."
+      },
+      "reviewPhotos": {
+        "label": "Photos in reviews",
+        "hint": "Allow up to 3 photos per review."
+      },
+      "recentlyViewed": {
+        "label": "Recently viewed",
+        "hint": "Shows products the customer looked at recently (kept on their device)."
+      },
+      "relatedProducts": {
+        "label": "Related products",
+        "hint": "Shows similar products and items often bought together on product pages."
+      },
+      "coupons": {
+        "label": "Coupons",
+        "hint": "Customers can enter coupon codes at checkout."
+      },
+      "abandonedCart": {
+        "label": "Abandoned cart reminders",
+        "hint": "One reminder 3 hours after a signed-in customer leaves items in their cart (email, WhatsApp, push for offers)."
+      },
+      "analytics": {
+        "label": "Visit statistics",
+        "hint": "Counts visits, add-to-cart and checkout starts anonymously for the dashboard funnel. No cookies or personal data."
+      }
+    }
   },
   "Shipping": {
     "title": "Shipping rules",
@@ -704,7 +745,9 @@
     "previousImage": "Previous image",
     "nextImage": "Next image",
     "unavailable": "{value} (unavailable)",
-    "brand": "Brand"
+    "brand": "Brand",
+    "recentlyViewed": "Recently viewed",
+    "boughtTogether": "Frequently bought together"
   },
   "Content": {
     "title": "Home page",
@@ -1233,5 +1276,80 @@
     "confirmTitle": "Send this campaign?",
     "confirmBody": "{count, plural, =1 {It will be sent to # device} other {It will be sent to # devices}} right away. This can't be undone.",
     "queued": "{count, plural, =1 {Sending to # device…} other {Sending to # devices…}}"
+  },
+  "Wishlist": {
+    "title": "Wishlist",
+    "add": "Save {name} to your wishlist",
+    "remove": "Remove {name} from your wishlist",
+    "added": "Saved {name} to your wishlist.",
+    "removed": "Removed {name} from your wishlist.",
+    "save": "Save",
+    "saved": "Saved",
+    "linkWithCount": "{count, plural, =1 {Wishlist, # item} other {Wishlist, # items}}",
+    "empty": "Your wishlist is empty.",
+    "emptyHint": "Tap the heart on any product to save it for later.",
+    "browse": "Browse products"
+  },
+  "Coupons": {
+    "title": "Coupons",
+    "description": "Description",
+    "new": "New coupon",
+    "edit": "Edit coupon",
+    "searchPlaceholder": "Search by code",
+    "empty": "No coupons yet.",
+    "allStates": "All",
+    "status": "Status",
+    "actions": "Actions",
+    "code": "Code",
+    "codeHint": "What customers type, e.g. DIWALI20.",
+    "type": "Discount type",
+    "types": {
+      "PERCENTAGE": "Percentage off",
+      "FLAT": "Fixed amount off"
+    },
+    "percent": "Percent off (%)",
+    "amount": "Amount off (₹)",
+    "maxDiscount": "Maximum discount (₹)",
+    "minCartValue": "Minimum cart value (₹)",
+    "optional": "Optional.",
+    "usageLimit": "Total uses",
+    "usageLimitHint": "Optional. Empty = unlimited.",
+    "perUserLimit": "Uses per customer",
+    "perUserLimitHint": "Optional. Counted per account and phone number.",
+    "startsAt": "Starts on",
+    "endsAt": "Ends on",
+    "endsAtHint": "Optional. Valid until the end of that day (India time).",
+    "descriptionHint": "Optional, for your team.",
+    "categories": "Only for these categories",
+    "products": "Only for these products",
+    "restrictHint": "Leave both empty for the whole cart. Sub-categories are included.",
+    "searchProducts": "Search products",
+    "search": "Search",
+    "addProduct": "Add",
+    "removeProduct": "Remove {name}",
+    "active": "Active",
+    "activeHint": "Customers can use it (within its dates and limits).",
+    "saved": "Coupon saved.",
+    "enabled": "Coupon enabled.",
+    "disabled": "Coupon disabled.",
+    "deleted": "Coupon deleted.",
+    "enable": "Enable",
+    "disable": "Disable",
+    "delete": "Delete",
+    "discount": "Discount",
+    "uses": "Uses",
+    "discountGiven": "Discount given",
+    "revenue": "Revenue",
+    "states": {
+      "active": "Active",
+      "scheduled": "Scheduled",
+      "expired": "Expired",
+      "used_up": "Used up",
+      "disabled": "Disabled"
+    },
+    "performance": "Performance",
+    "recentOrders": "Recent orders",
+    "noOrders": "Not used yet.",
+    "featureOff": "Coupons are switched off in Settings → Features, so customers can't use any code right now."
   }
 }

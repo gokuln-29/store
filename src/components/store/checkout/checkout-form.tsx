@@ -45,12 +45,15 @@ export function CheckoutForm({
   name,
   email,
   codFee,
+  couponsEnabled,
 }: {
   addresses: SavedAddress[];
   phone: string | null;
   name: string | null;
   email: string | null;
   codFee: number;
+  /** Settings → Features: hides the coupon field when off. */
+  couponsEnabled: boolean;
 }) {
   const t = useTranslations("Checkout");
   const tAddr = useTranslations("Addresses");
@@ -549,7 +552,7 @@ export function CheckoutForm({
               <X className="size-4" aria-hidden />
             </Button>
           </div>
-        ) : (
+        ) : couponsEnabled ? (
           <form
             className="grid gap-1"
             onSubmit={(e) => {
@@ -578,7 +581,7 @@ export function CheckoutForm({
               </p>
             )}
           </form>
-        )}
+        ) : null}
 
         {price && (
           <dl className="grid gap-2 border-t pt-4 text-sm">

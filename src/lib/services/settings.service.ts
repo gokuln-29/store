@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { Prisma, type StoreSettings } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { resolveFeatures, type Features } from "@/lib/features";
 import type { z } from "zod";
 import type {
   brandingSettingsSchema,
@@ -82,7 +83,7 @@ async function applyPatch(section: string, patch: SettingsPatch, actorId: string
         "socialLinks" in patch ? (patch.socialLinks as Prisma.InputJsonValue) : undefined,
       metaTitle: undefined,
       metaDescription: undefined,
-      features: undefined,
+      features: "features" in patch ? (patch.features as Prisma.InputJsonValue) : undefined,
     };
     const { id: _id, createdAt: _c, updatedAt: _u, ...createBase } = DEFAULT_SETTINGS;
     await tx.storeSettings.upsert({
@@ -152,6 +153,15 @@ export async function updatePaymentSettings(
   actorId: string,
 ) {
   await applyPatch("payments", data, actorId);
+}
+
+export async function updateFeatureSettings(data: Features, actorId: string) {
+  await applyPatch("features", { features: data }, actorId);
+}
+
+/** Which optional features are on (per request). */
+export async function getFeatures(): Promise<Features> {
+  return resolveFeatures((await getStoreSettings()).features);
 }
 
 // ───────────── Shipping rules ─────────────

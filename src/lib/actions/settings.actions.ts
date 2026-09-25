@@ -9,6 +9,7 @@ import {
   updateBrandingSettings,
   updateContactSettings,
   updateGeneralSettings,
+  updateFeatureSettings,
   updatePaymentSettings,
   updateTaxSettings,
 } from "@/lib/services/settings.service";
@@ -16,12 +17,14 @@ import {
   brandingSettingsSchema,
   contactSettingsSchema,
   generalSettingsSchema,
+  featureSettingsSchema,
   paymentSettingsSchema,
   shippingRuleSchema,
   taxSettingsSchema,
   type BrandingSettingsInput,
   type ContactSettingsInput,
   type GeneralSettingsInput,
+  type FeatureSettingsInput,
   type PaymentSettingsInput,
   type ShippingRuleInput,
   type TaxSettingsInput,
@@ -63,6 +66,10 @@ export async function updateContactSettingsAction(input: ContactSettingsInput) {
 
 export async function updateTaxSettingsAction(input: TaxSettingsInput) {
   return saveSection(taxSettingsSchema, input, updateTaxSettings);
+}
+
+export async function updateFeatureSettingsAction(input: FeatureSettingsInput) {
+  return saveSection(featureSettingsSchema, input, updateFeatureSettings);
 }
 
 export async function updatePaymentSettingsAction(input: PaymentSettingsInput) {

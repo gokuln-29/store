@@ -5,6 +5,7 @@ import { OtpLoginForm } from "@/components/auth/otp-login-form";
 import { CheckoutForm } from "@/components/store/checkout/checkout-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth-guards";
+import { resolveFeatures } from "@/lib/features";
 import { listAddresses } from "@/lib/services/address.service";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { getProfile } from "@/lib/services/user.service";
@@ -65,6 +66,7 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
         name={profile?.name ?? null}
         email={profile?.email ?? null}
         codFee={settings.codFee}
+        couponsEnabled={resolveFeatures(settings.features).coupons}
       />
     </div>
   );

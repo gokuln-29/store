@@ -4,7 +4,15 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-const SECTIONS = ["general", "branding", "contact", "tax", "payments", "shipping"] as const;
+const SECTIONS = [
+  "general",
+  "branding",
+  "contact",
+  "tax",
+  "payments",
+  "shipping",
+  "features",
+] as const;
 
 export function SettingsNav() {
   const t = useTranslations("Settings");

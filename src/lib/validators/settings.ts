@@ -1,3 +1,4 @@
+import { FEATURES, type Feature } from "@/lib/features";
 import { z } from "./zod";
 import { locales } from "@/i18n/routing";
 import { STORE_FONT_NAMES } from "@/lib/constants/fonts";
@@ -190,6 +191,11 @@ export const shippingRuleSchema = z
         }
       : { ...v, flatRate: null },
   );
+
+export const featureSettingsSchema = z.object(
+  Object.fromEntries(FEATURES.map((f) => [f, z.boolean()])) as Record<Feature, z.ZodBoolean>,
+);
+export type FeatureSettingsInput = z.input<typeof featureSettingsSchema>;
 
 export type GeneralSettingsInput = z.input<typeof generalSettingsSchema>;
 export type BrandingSettingsInput = z.input<typeof brandingSettingsSchema>;

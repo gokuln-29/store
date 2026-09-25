@@ -1,5 +1,6 @@
 import { Prisma, type PaymentMethod } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { resolveFeatures } from "@/lib/features";
 import { stateNameFromCode } from "@/lib/constants/indian-states";
 import { getPaymentProvider } from "@/lib/providers/payment";
 import type { AddressData } from "@/lib/validators/auth";
@@ -84,10 +85,12 @@ export async function buildQuote(
   // Coupon
   let coupon: CouponStatus | null = null;
   let lineDiscounts: number[] | undefined;
-  if (input.couponCode) {
-    const row = await client.coupon.findUnique({ where: { code: input.couponCode } });
+  // Coupons switched off in Settings → Features: codes are ignored, never applied.
+  const couponCode = resolveFeatures(settings.features).coupons ? input.couponCode : null;
+  if (couponCode) {
+    const row = await client.coupon.findUnique({ where: { code: couponCode } });
     if (!row) {
-      coupon = { code: input.couponCode, status: "rejected", reason: "not_found" };
+      coupon = { code: couponCode, status: "rejected", reason: "not_found" };
     } else {
       const result = evaluateCoupon(
         row,
