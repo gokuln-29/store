@@ -7,16 +7,18 @@ test.use({ storageState: OWNER_STATE });
 test("owner can open every settings section", async ({ page }) => {
   await page.goto("/en/admin/settings");
   await expect(page).toHaveURL(/\/en\/admin\/settings\/general$/);
+  // The settings section menu (the sidebar has its own "Payments" link).
+  const sections = page.getByRole("navigation", { name: "Settings sections" });
   for (const [tab, field] of [
     ["Branding", "Primary colour"],
     ["Contact", "Support email"],
     ["Tax (GST)", "GSTIN"],
     ["Payments", "COD fee (₹)"],
   ] as const) {
-    await page.getByRole("link", { name: tab }).click();
+    await sections.getByRole("link", { name: tab }).click();
     await expect(page.getByLabel(field)).toBeVisible();
   }
-  await page.getByRole("link", { name: "Shipping" }).click();
+  await sections.getByRole("link", { name: "Shipping" }).click();
   await expect(page.getByRole("heading", { name: "Shipping rules" })).toBeVisible();
 });
 

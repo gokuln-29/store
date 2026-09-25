@@ -47,11 +47,15 @@ export function cleanupCustomer(id: string) {
   sql(`
     UPDATE "ProductVariant" v SET stock = v.stock + oi.qty
     FROM (SELECT oi."variantId", SUM(oi.quantity) AS qty FROM "OrderItem" oi
-          JOIN "Order" o ON o.id = oi."orderId" WHERE o."userId" = '${id}' GROUP BY oi."variantId") oi
+          JOIN "Order" o ON o.id = oi."orderId"
+          WHERE o."userId" = '${id}' AND o.status <> 'CANCELLED' -- cancelled orders already released stock
+          GROUP BY oi."variantId") oi
     WHERE v.id = oi."variantId";
     UPDATE "Coupon" c SET "usedCount" = GREATEST(0, c."usedCount" - u.n)
     FROM (SELECT "couponId", COUNT(*) AS n FROM "CouponUsage" WHERE "userId" = '${id}' GROUP BY "couponId") u
     WHERE c.id = u."couponId";
+    DELETE FROM "AuditLog" WHERE "entityType" = 'Payment' AND "entityId" IN (
+      SELECT p.id FROM "Payment" p JOIN "Order" o ON o.id = p."orderId" WHERE o."userId" = '${id}');
     DELETE FROM "Order" WHERE "userId" = '${id}';
     DELETE FROM "User" WHERE id = '${id}';`);
 }
