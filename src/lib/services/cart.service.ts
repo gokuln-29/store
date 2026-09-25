@@ -216,6 +216,31 @@ export async function saveCart(
 }
 
 /**
+ * Saves the cart unless a newer change is already stored. `clientUpdatedAt` is when the browser
+ * made the change, so a save replayed after being offline never overwrites a later one.
+ */
+export async function saveCartIfNewer(
+  userId: string,
+  items: CartItemInput[],
+  clientUpdatedAt: Date,
+): Promise<boolean> {
+  return db.$transaction(async (tx) => {
+    await tx.cart.upsert({
+      where: { userId },
+      create: { userId },
+      update: {},
+      select: { id: true },
+    });
+    const [row] = await tx.$queryRaw<{ clientUpdatedAt: Date | null }[]>`
+      SELECT "clientUpdatedAt" FROM "Cart" WHERE "userId" = ${userId} FOR UPDATE`;
+    if (row?.clientUpdatedAt && row.clientUpdatedAt > clientUpdatedAt) return false;
+    await saveCart(userId, items, tx);
+    await tx.cart.update({ where: { userId }, data: { clientUpdatedAt } });
+    return true;
+  });
+}
+
+/**
  * Merges a guest cart (from the browser) into the customer's saved cart on login:
  * quantities of the same item are added (capped), new items appended.
  */

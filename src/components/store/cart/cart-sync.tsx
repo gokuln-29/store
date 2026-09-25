@@ -1,10 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { mergeCartAction, saveCartAction, savedCartAction } from "@/lib/actions/cart.actions";
-import { useCart } from "@/lib/cart-store";
+import { mergeCartAction, savedCartAction } from "@/lib/actions/cart.actions";
+import { useCart, type CartItem } from "@/lib/cart-store";
 
 type SessionResponse = { user?: { id?: string } } | null;
+
+/**
+ * Saves the cart for the logged-in customer. If the device is offline, the service worker
+ * keeps the request and sends it when the connection returns (background sync).
+ */
+function saveCart(items: CartItem[]): Promise<unknown> {
+  return fetch("/api/cart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items, clientUpdatedAt: Date.now() }),
+    keepalive: true,
+  });
+}
 
 /**
  * Keeps the browser cart and a logged-in customer's saved cart in step. Pages stay static:
@@ -48,7 +61,7 @@ export function CartSync() {
           }
         } else if (items.length > 0) {
           // This device already has the cart (maybe with changes not yet saved): push it.
-          await saveCartAction(items);
+          await saveCart(items);
         } else {
           // Empty here (e.g. new device or cleared): load what's saved for the account.
           const saved = await savedCartAction();
@@ -77,7 +90,7 @@ export function CartSync() {
         return;
       clearTimeout(timer);
       timer = setTimeout(() => {
-        saveCartAction(state.items).catch(() => undefined);
+        saveCart(state.items).catch(() => undefined);
       }, 500);
     });
     return () => {

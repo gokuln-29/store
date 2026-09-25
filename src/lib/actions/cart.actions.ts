@@ -64,11 +64,3 @@ export async function savedCartAction(): Promise<ActionResult<CartItemInput[]>> 
 }
 
 /** Saves the cart for a logged-in customer (no-op for guests). */
-export async function saveCartAction(items: CartItemInput[]): Promise<ActionResult> {
-  const user = await getCurrentUser();
-  if (!user) return { ok: true, data: undefined };
-  const parsed = cartItemsSchema.safeParse(items);
-  if (!parsed.success) return { ok: false, error: "validation" };
-  await saveCart(user.id, parsed.data);
-  return { ok: true, data: undefined };
-}

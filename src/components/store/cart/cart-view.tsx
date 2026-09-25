@@ -1,12 +1,14 @@
 "use client";
 
-import { Minus, Plus, ShoppingBag, Trash2, TriangleAlert } from "lucide-react";
+import { Minus, Plus, ShoppingBag, Trash2, TriangleAlert, WifiOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { priceCartAction, type PricedCart } from "@/lib/actions/cart.actions";
+import { cartFromSnapshot, readCartSnapshot, saveCartSnapshot } from "@/lib/cart-snapshot";
 import { useCart } from "@/lib/cart-store";
+import { formatDateTime } from "@/lib/utils/format";
 import { localize } from "@/lib/utils/localized";
 import { formatINR } from "@/lib/utils/money";
 import { LineSummary } from "./line-item";
@@ -28,7 +30,16 @@ export function CartView() {
   const [cart, setCart] = useState<PricedCart | null>(null);
   const [notices, setNotices] = useState<string[]>([]);
   const [failed, setFailed] = useState(false);
+  /** Set when showing the last known prices because the server can't be reached. */
+  const [offlineSince, setOfflineSince] = useState<number | null>(null);
   const request = useRef(0);
+
+  // Back online: price the cart again.
+  useEffect(() => {
+    const retry = () => useCart.getState().replace([...useCart.getState().items]);
+    window.addEventListener("online", retry);
+    return () => window.removeEventListener("online", retry);
+  }, []);
 
   // Re-price on every change; the server clamps quantities and drops unavailable items.
   useEffect(() => {
@@ -38,11 +49,20 @@ export function CartView() {
       const result = await priceCartAction(items).catch(() => null);
       if (id !== request.current) return;
       if (!result?.ok) {
+        const snapshot = !navigator.onLine || !result ? readCartSnapshot() : null;
+        if (snapshot) {
+          setCart(cartFromSnapshot(snapshot, items));
+          setOfflineSince(snapshot.savedAt);
+          setFailed(false);
+          return;
+        }
         setFailed(true);
         return;
       }
       setFailed(false);
+      setOfflineSince(null);
       setCart(result.data);
+      saveCartSnapshot(result.data);
       if (result.data.adjustments.length) {
         setNotices(
           result.data.adjustments.map((a) =>
@@ -93,6 +113,15 @@ export function CartView() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
       <div className="grid content-start gap-4">
+        {offlineSince !== null && (
+          <div
+            role="status"
+            className="flex gap-2 rounded-md border border-sky-300 bg-sky-50 p-3 text-sm text-sky-900 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-100"
+          >
+            <WifiOff className="size-4 shrink-0" aria-hidden />
+            <p>{t("offlinePrices", { time: formatDateTime(new Date(offlineSince), locale) })}</p>
+          </div>
+        )}
         {notices.length > 0 && (
           <div
             role="status"
@@ -177,9 +206,15 @@ export function CartView() {
           </span>
         </div>
         <p className="text-xs text-muted-foreground">{t("taxesShipping")}</p>
-        <Button asChild size="lg" disabled={lines.length === 0}>
-          <Link href="/checkout">{t("checkout")}</Link>
-        </Button>
+        {offlineSince !== null ? (
+          <Button size="lg" disabled>
+            {t("checkoutOffline")}
+          </Button>
+        ) : (
+          <Button asChild size="lg" disabled={lines.length === 0}>
+            <Link href="/checkout">{t("checkout")}</Link>
+          </Button>
+        )}
         <Button asChild variant="ghost">
           <Link href="/shop">{t("continueShopping")}</Link>
         </Button>
