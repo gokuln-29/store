@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { LocaleSwitcher } from "@/components/shared/locale-switcher";
 import { MobileNav, type NavLink } from "@/components/shared/mobile-nav";
 import { CartLink } from "@/components/store/cart/cart-link";
+import { WishlistLink } from "@/components/store/wishlist/wishlist-link";
 import { HeaderSearch } from "@/components/store/header-search";
 import { Link } from "@/i18n/navigation";
 import { getCategoryTree } from "@/lib/services/catalog-query.service";
@@ -90,6 +91,7 @@ export async function SiteHeader() {
           >
             <User className="size-5" aria-hidden />
           </Link>
+          <WishlistLink />
           <CartLink />
         </div>
       </div>

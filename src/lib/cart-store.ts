@@ -1,7 +1,8 @@
 "use client";
 
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { safeStorage } from "./safe-storage";
 
 export type CartItem = { variantId: string; quantity: number };
 
@@ -16,31 +17,6 @@ type CartState = {
   remove: (variantId: string) => void;
   replace: (items: CartItem[], syncedUserId?: string | null) => void;
   clear: () => void;
-};
-
-/** localStorage can throw (private mode, blocked storage); the cart then lives in memory only. */
-const safeStorage: StateStorage = {
-  getItem: (name) => {
-    try {
-      return localStorage.getItem(name);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (name, value) => {
-    try {
-      localStorage.setItem(name, value);
-    } catch {
-      // Ignore: the cart keeps working for this visit.
-    }
-  },
-  removeItem: (name) => {
-    try {
-      localStorage.removeItem(name);
-    } catch {
-      // Ignore.
-    }
-  },
 };
 
 /**

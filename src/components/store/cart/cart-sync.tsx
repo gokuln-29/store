@@ -3,8 +3,7 @@
 import { useEffect, useRef } from "react";
 import { mergeCartAction, savedCartAction } from "@/lib/actions/cart.actions";
 import { useCart, type CartItem } from "@/lib/cart-store";
-
-type SessionResponse = { user?: { id?: string } } | null;
+import { sessionUserId } from "@/lib/session-client";
 
 /**
  * Saves the cart for the logged-in customer. If the device is offline, the service worker
@@ -33,13 +32,7 @@ export function CartSync() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      let userId: string | null = null;
-      try {
-        const res = await fetch("/api/auth/session", { cache: "no-store" });
-        userId = ((await res.json()) as SessionResponse)?.user?.id ?? null;
-      } catch {
-        return;
-      }
+      const userId = await sessionUserId();
       if (cancelled) return;
       userIdRef.current = userId;
       const { items, syncedUserId, replace } = useCart.getState();

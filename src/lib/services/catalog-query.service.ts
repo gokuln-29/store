@@ -329,6 +329,26 @@ export async function getRelatedProducts(
   return productCards(rows.map((r) => r.id));
 }
 
+/**
+ * "Frequently bought together": other published products that appeared in the same orders
+ * (unpaid and cancelled orders excluded), most common first.
+ */
+export async function getBoughtTogether(productId: string, limit = 8): Promise<ProductCard[]> {
+  const rows = await db.$queryRaw<{ id: string }[]>`
+    SELECT other."productId" AS id
+    FROM "OrderItem" mine
+    JOIN "OrderItem" other ON other."orderId" = mine."orderId" AND other."productId" <> mine."productId"
+    JOIN "Order" o ON o.id = mine."orderId"
+    JOIN "Product" p ON p.id = other."productId"
+    WHERE mine."productId" = ${productId}
+      AND o.status NOT IN ('PENDING_PAYMENT', 'CANCELLED')
+      AND p.status = 'PUBLISHED'
+    GROUP BY other."productId"
+    ORDER BY COUNT(DISTINCT o.id) DESC, MAX(o."createdAt") DESC
+    LIMIT ${limit}`;
+  return productCards(rows.map((r) => r.id));
+}
+
 /** Slugs for the sitemap. */
 export function listPublishedSlugs() {
   return Promise.all([

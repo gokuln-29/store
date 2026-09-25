@@ -4,6 +4,9 @@ import { getStoreSettings } from "@/lib/services/settings.service";
 import { readableForeground } from "@/lib/utils/color";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CartSync } from "@/components/store/cart/cart-sync";
+import { FeaturesProvider } from "@/components/store/features-context";
+import { WishlistSync } from "@/components/store/wishlist/wishlist-sync";
+import { resolveFeatures } from "@/lib/features";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
@@ -42,15 +45,18 @@ export async function StoreShell({ children }: { children: ReactNode }) {
   return (
     <>
       {fontsHref && <link rel="stylesheet" href={fontsHref} precedence="default" />}
-      <div data-store-theme style={storeThemeStyle(settings)} className="flex flex-1 flex-col">
-        <SiteHeader />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <SiteFooter />
-        <CartSync />
-        <InstallPrompt storeName={settings.name} />
-      </div>
+      <FeaturesProvider value={resolveFeatures(settings.features)}>
+        <div data-store-theme style={storeThemeStyle(settings)} className="flex flex-1 flex-col">
+          <SiteHeader />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <SiteFooter />
+          <CartSync />
+          <WishlistSync />
+          <InstallPrompt storeName={settings.name} />
+        </div>
+      </FeaturesProvider>
     </>
   );
 }

@@ -7,9 +7,13 @@ import { JsonLd } from "@/components/store/json-ld";
 import { ProductCard } from "@/components/store/product-card";
 import { ProductGallery } from "@/components/store/product/gallery";
 import { PurchasePanel, type PanelOption } from "@/components/store/product/purchase-panel";
+import { RecentlyViewedRow, RecordView } from "@/components/store/recently-viewed/recently-viewed";
+import { WishlistButton } from "@/components/store/wishlist/wishlist-button";
+import { resolveFeatures } from "@/lib/features";
 import { ScrollRow } from "@/components/store/scroll-row";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  getBoughtTogether,
   getRelatedProducts,
   getStoreCategory,
   getStoreProduct,
@@ -63,11 +67,13 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
   const product = await getStoreProduct(slug);
   if (!product) notFound();
 
-  const [t, settings, category, related] = await Promise.all([
+  const settings = await getStoreSettings();
+  const features = resolveFeatures(settings.features);
+  const [t, category, related, boughtTogether] = await Promise.all([
     getTranslations("Product"),
-    getStoreSettings(),
     getStoreCategory(product.category.slug),
-    getRelatedProducts(product.id, product.categoryId),
+    features.relatedProducts ? getRelatedProducts(product.id, product.categoryId) : [],
+    features.relatedProducts ? getBoughtTogether(product.id) : [],
   ]);
   const name = localize(product.name, locale);
   const shortDescription = localize(product.shortDescription, locale);
@@ -148,6 +154,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
             options={options}
             pricesIncludeTax={settings.pricesIncludeTax}
           />
+          <WishlistButton productId={product.id} name={name} variant="full" className="w-fit" />
         </div>
       </div>
 
@@ -189,6 +196,19 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
         </Tabs>
       )}
 
+      {boughtTogether.length > 0 && (
+        <section className="grid gap-4">
+          <h2 className="text-xl font-bold">{t("boughtTogether")}</h2>
+          <ScrollRow label={t("boughtTogether")}>
+            {boughtTogether.map((p) => (
+              <li key={p.id} className="w-[45%] shrink-0 snap-start sm:w-[30%] lg:w-[22%]">
+                <ProductCard product={p} />
+              </li>
+            ))}
+          </ScrollRow>
+        </section>
+      )}
+
       {related.length > 0 && (
         <section className="grid gap-4">
           <h2 className="text-xl font-bold">{t("related")}</h2>
@@ -201,6 +221,9 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
           </ScrollRow>
         </section>
       )}
+
+      <RecentlyViewedRow excludeId={product.id} />
+      <RecordView productId={product.id} />
 
       <JsonLd
         data={{

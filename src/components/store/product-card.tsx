@@ -5,6 +5,7 @@ import type { ProductCard as Card } from "@/lib/services/catalog-query.service";
 import { isLocalUpload } from "@/lib/utils/images";
 import { localize } from "@/lib/utils/localized";
 import { Price, discountPercent } from "./price";
+import { WishlistButton } from "./wishlist/wishlist-button";
 
 export function ProductCard({ product, priority = false }: { product: Card; priority?: boolean }) {
   const locale = useLocale();
@@ -13,44 +14,48 @@ export function ProductCard({ product, priority = false }: { product: Card; prio
   const off = discountPercent(product.price, product.compareAtPrice);
 
   return (
-    <Link
-      href={`/p/${product.slug}`}
-      className="group flex h-full flex-col gap-2 rounded-lg focus-visible:outline-2"
-    >
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
-        {product.image ? (
-          <Image
-            src={product.image.url}
-            alt={localize(product.image.alt, locale) || name}
-            fill
-            sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 50vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            priority={priority}
-            unoptimized={isLocalUpload(product.image.url)}
+    <div className="group relative h-full">
+      <Link
+        href={`/p/${product.slug}`}
+        className="flex h-full flex-col gap-2 rounded-lg focus-visible:outline-2"
+      >
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+          {product.image ? (
+            <Image
+              src={product.image.url}
+              alt={localize(product.image.alt, locale) || name}
+              fill
+              sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 50vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              priority={priority}
+              unoptimized={isLocalUpload(product.image.url)}
+            />
+          ) : null}
+          {!product.inStock ? (
+            <span className="absolute top-2 left-2 rounded bg-background/90 px-2 py-0.5 text-xs font-medium">
+              {t("outOfStock")}
+            </span>
+          ) : off ? (
+            <span className="absolute top-2 left-2 rounded bg-[var(--brand-secondary,#f59e0b)] px-2 py-0.5 text-xs font-semibold text-[var(--brand-secondary-foreground,#0a0a0a)]">
+              {t("off", { percent: off })}
+            </span>
+          ) : null}
+        </div>
+        <div className="grid gap-1 px-0.5">
+          <h3 className="line-clamp-2 text-sm leading-snug font-medium group-hover:underline">
+            {name}
+          </h3>
+          <Price
+            price={product.price}
+            compareAtPrice={product.compareAtPrice}
+            from={product.maxPrice > product.price}
+            locale={locale}
           />
-        ) : null}
-        {!product.inStock ? (
-          <span className="absolute top-2 left-2 rounded bg-background/90 px-2 py-0.5 text-xs font-medium">
-            {t("outOfStock")}
-          </span>
-        ) : off ? (
-          <span className="absolute top-2 left-2 rounded bg-[var(--brand-secondary,#f59e0b)] px-2 py-0.5 text-xs font-semibold text-[var(--brand-secondary-foreground,#0a0a0a)]">
-            {t("off", { percent: off })}
-          </span>
-        ) : null}
-      </div>
-      <div className="grid gap-1 px-0.5">
-        <h3 className="line-clamp-2 text-sm leading-snug font-medium group-hover:underline">
-          {name}
-        </h3>
-        <Price
-          price={product.price}
-          compareAtPrice={product.compareAtPrice}
-          from={product.maxPrice > product.price}
-          locale={locale}
-        />
-      </div>
-    </Link>
+        </div>
+      </Link>
+      {/* A sibling of the link: buttons can't be nested inside links. */}
+      <WishlistButton productId={product.id} name={name} className="absolute top-2 right-2" />
+    </div>
   );
 }
 

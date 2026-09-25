@@ -3,6 +3,7 @@ import type { Locale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { HomeBlocks } from "@/components/store/home/home-blocks";
+import { RecentlyViewedRow } from "@/components/store/recently-viewed/recently-viewed";
 import { JsonLd } from "@/components/store/json-ld";
 import { getHomeBlocks } from "@/lib/services/home.service";
 import { getStoreSettings } from "@/lib/services/settings.service";
@@ -46,6 +47,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     <>
       <h1 className="sr-only">{settings.name}</h1>
       {blocks.length ? <HomeBlocks blocks={blocks} locale={locale} /> : <ComingSoon />}
+      <div className="container mx-auto px-4 pb-10">
+        <RecentlyViewedRow />
+      </div>
       <JsonLd
         data={[
           {
