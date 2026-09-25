@@ -11,6 +11,7 @@ import {
   type CartLine,
 } from "./cart.service";
 import { evaluateCoupon, priceOrder, type CouponRejection, type PriceResult } from "./pricing";
+import { enqueueOrderNotification, scheduleNotificationDelivery } from "./notification.service";
 import { ensurePaymentSession, expireOrder } from "./payment.service";
 import { quote as quoteShipping, type ShippingQuote } from "./shipping.service";
 import { getStoreSettingsFresh } from "./settings.service";
@@ -441,6 +442,8 @@ export async function placeOrder(input: {
         }
 
         await tx.cartItem.deleteMany({ where: { cart: { userId: user.id } } });
+        // Online orders are announced once the payment is captured.
+        if (isCod) await enqueueOrderNotification(tx, order.id, "order_placed");
         return order;
       },
       { timeout: 20_000, maxWait: 10_000 },
@@ -451,6 +454,7 @@ export async function placeOrder(input: {
   }
 
   if (input.paymentMethod === "COD") {
+    await scheduleNotificationDelivery(created.id);
     return {
       ok: true,
       orderId: created.id,

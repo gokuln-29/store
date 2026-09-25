@@ -12,6 +12,7 @@ import {
   type ProviderRefund,
 } from "@/lib/providers/payment";
 import { audit } from "./audit.service";
+import { enqueueOrderNotification, scheduleNotificationDelivery } from "./notification.service";
 
 /**
  * Online payment lifecycle: capture, failure and retry, expiry of unpaid orders, refunds.
@@ -221,12 +222,20 @@ export async function markPaymentCaptured(input: {
           note: "payment_captured",
         },
       });
+      await enqueueOrderNotification(tx, order.id, "order_placed");
     } else {
       await tx.order.update({ where: { id: order.id }, data: { paymentStatus: "CAPTURED" } });
     }
     return { outcome: "paid" };
   });
 
+  if (result.outcome === "paid") {
+    const { orderId } = await db.payment.findUniqueOrThrow({
+      where: { providerOrderId: input.providerOrderId },
+      select: { orderId: true },
+    });
+    await scheduleNotificationDelivery(orderId);
+  }
   if (result.outcome === "refund_required") {
     const refund = await createRefund({
       paymentId: result.paymentId,
