@@ -23,7 +23,8 @@
     "postinstall": "prisma generate",
     "prepare": "husky",
     "test:unit": "vitest run --project unit",
-    "test:integration": "vitest run --project integration"
+    "test:integration": "vitest run --project integration",
+    "i18n:check": "tsx scripts/i18n-check.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -91,6 +92,9 @@
     ],
     "*.{json,md,css,yml,yaml}": [
       "prettier --write"
+    ],
+    "src/messages/*.json": [
+      "bash -c 'pnpm i18n:check'"
     ]
   }
 }
