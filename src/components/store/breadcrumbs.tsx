@@ -8,11 +8,11 @@ export type StoreCrumb = { label: string; href?: string };
 
 /** Visible breadcrumbs plus BreadcrumbList structured data. */
 export async function StoreBreadcrumbs({ items, locale }: { items: StoreCrumb[]; locale: string }) {
-  const t = await getTranslations("Header");
+  const [t, tCommon] = await Promise.all([getTranslations("Header"), getTranslations("Common")]);
   const trail: StoreCrumb[] = [{ label: t("home"), href: "/" }, ...items];
   return (
     <>
-      <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+      <nav aria-label={tCommon("breadcrumb")} className="text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1">
           {trail.map((crumb, i) => {
             const last = i === trail.length - 1;

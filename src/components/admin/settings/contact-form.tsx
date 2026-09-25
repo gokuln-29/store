@@ -127,6 +127,7 @@ export function ContactSettingsForm({ defaults }: { defaults: ContactSettingsInp
             {(aria) => (
               <Input
                 type="url"
+                // i18n-ignore: URL scheme hint
                 placeholder="https://"
                 {...aria}
                 {...form.register(`socialLinks.${network}`)}

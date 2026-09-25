@@ -87,7 +87,10 @@ export function CampaignForm({ audience }: { audience: number }) {
             hint={t("linkHint")}
             error={errorText(errors.url?.message)}
           >
-            {(aria) => <Input {...aria} placeholder="/c/sweets" {...form.register("url")} />}
+            {(aria) => (
+              // i18n-ignore: an example path, the same in every language
+              <Input {...aria} placeholder="/c/sweets" {...form.register("url")} />
+            )}
           </FormField>
           <FormField
             id="imageUrl"

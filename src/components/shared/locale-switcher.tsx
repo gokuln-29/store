@@ -6,6 +6,17 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTransition, type ChangeEvent } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { rememberLocaleAction } from "@/lib/actions/locale.actions";
+
+/** This device's push subscription endpoint, if any (without waiting for a service worker). */
+async function pushEndpoint(): Promise<string | null> {
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration();
+    return (await registration?.pushManager.getSubscription())?.endpoint ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /** `supported` limits the list to the store's enabled languages (default: all). */
 export function LocaleSwitcher({ supported }: { supported?: readonly string[] }) {
@@ -18,7 +29,9 @@ export function LocaleSwitcher({ supported }: { supported?: readonly string[] })
 
   function onChange(event: ChangeEvent<HTMLSelectElement>) {
     const nextLocale = event.target.value as AppLocale;
-    startTransition(() => {
+    startTransition(async () => {
+      // The cookie remembers it on this device; this also updates the account and push.
+      await rememberLocaleAction(nextLocale, await pushEndpoint()).catch(() => undefined);
       router.replace(
         // @ts-expect-error -- pathname and params always match for the current route.
         { pathname, params },

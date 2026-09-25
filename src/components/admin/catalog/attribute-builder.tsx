@@ -17,6 +17,7 @@ const TYPES = ["TEXT", "NUMBER", "SELECT", "COLOR"] as const;
 
 function ChoicesEditor({ index }: { index: number }) {
   const t = useTranslations("Categories");
+  const tLocale = useTranslations("LocaleSwitcher");
   const errorText = useErrorText();
   const { control, register, formState, setValue } = useFormContext<CategoryFormInput>();
   const { fields, append, remove } = useFieldArray({
@@ -59,20 +60,20 @@ function ChoicesEditor({ index }: { index: number }) {
               {valueError && <p className="text-xs text-destructive">{errorText(valueError)}</p>}
             </div>
             <Input
-              aria-label="English"
-              placeholder="English"
+              aria-label={tLocale("locale", { locale: "en" })}
+              placeholder={tLocale("locale", { locale: "en" })}
               lang="en"
               {...register(`attributes.${index}.options.${i}.label.en`)}
             />
             <Input
-              aria-label="தமிழ்"
-              placeholder="தமிழ்"
+              aria-label={tLocale("locale", { locale: "ta" })}
+              placeholder={tLocale("locale", { locale: "ta" })}
               lang="ta"
               {...register(`attributes.${index}.options.${i}.label.ta`)}
             />
             <Input
-              aria-label="ಕನ್ನಡ"
-              placeholder="ಕನ್ನಡ"
+              aria-label={tLocale("locale", { locale: "kn" })}
+              placeholder={tLocale("locale", { locale: "kn" })}
               lang="kn"
               {...register(`attributes.${index}.options.${i}.label.kn`)}
             />

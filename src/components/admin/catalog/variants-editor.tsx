@@ -19,6 +19,7 @@ type VariantInput = ProductFormInput["variants"][number];
 function OptionValues({ optionIndex }: { optionIndex: number }) {
   const t = useTranslations("Variants");
   const tCat = useTranslations("Categories");
+  const tLocale = useTranslations("LocaleSwitcher");
   const { control, register } = useFormContext<ProductFormInput>();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -91,15 +92,15 @@ function OptionValues({ optionIndex }: { optionIndex: number }) {
                   <span className="truncate text-sm">{field.value}</span>
                   <Input
                     lang="ta"
-                    placeholder="தமிழ்"
-                    aria-label={`${field.value} தமிழ்`}
+                    placeholder={tLocale("locale", { locale: "ta" })}
+                    aria-label={`${field.value} ${tLocale("locale", { locale: "ta" })}`}
                     className="h-8"
                     {...register(`options.${optionIndex}.values.${i}.label.ta`)}
                   />
                   <Input
                     lang="kn"
-                    placeholder="ಕನ್ನಡ"
-                    aria-label={`${field.value} ಕನ್ನಡ`}
+                    placeholder={tLocale("locale", { locale: "kn" })}
+                    aria-label={`${field.value} ${tLocale("locale", { locale: "kn" })}`}
                     className="h-8"
                     {...register(`options.${optionIndex}.values.${i}.label.kn`)}
                   />
@@ -116,6 +117,7 @@ function OptionValues({ optionIndex }: { optionIndex: number }) {
 /** Options (size, colour, …) and the variant matrix generated from them. */
 export function VariantsEditor({ skuPrefix }: { skuPrefix: string }) {
   const t = useTranslations("Variants");
+  const tLocale = useTranslations("LocaleSwitcher");
   const errorText = useErrorText();
   const { control, register, setValue, getValues, formState, clearErrors } =
     useFormContext<ProductFormInput>();
@@ -187,19 +189,19 @@ export function VariantsEditor({ skuPrefix }: { skuPrefix: string }) {
                 <Input
                   id={`option-${index}-en`}
                   lang="en"
-                  placeholder="English"
+                  placeholder={tLocale("locale", { locale: "en" })}
                   {...register(`options.${index}.label.en`)}
                 />
                 <Input
                   lang="ta"
-                  placeholder="தமிழ்"
-                  aria-label={`${t("optionName")} தமிழ்`}
+                  placeholder={tLocale("locale", { locale: "ta" })}
+                  aria-label={`${t("optionName")} ${tLocale("locale", { locale: "ta" })}`}
                   {...register(`options.${index}.label.ta`)}
                 />
                 <Input
                   lang="kn"
-                  placeholder="ಕನ್ನಡ"
-                  aria-label={`${t("optionName")} ಕನ್ನಡ`}
+                  placeholder={tLocale("locale", { locale: "kn" })}
+                  aria-label={`${t("optionName")} ${tLocale("locale", { locale: "kn" })}`}
                   {...register(`options.${index}.label.kn`)}
                 />
               </div>

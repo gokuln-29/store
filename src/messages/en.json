@@ -10,7 +10,10 @@
     "cancel": "Cancel",
     "logout": "Log out",
     "optional": "optional",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close",
+    "more": "More",
+    "breadcrumb": "Breadcrumb"
   },
   "Header": {
     "home": "Home",
@@ -215,7 +218,11 @@
     "invalid_transition": "The order can't move to that status from where it is now.",
     "refund_permission": "Only the store owner can cancel a paid order, because cancelling refunds the customer.",
     "cannot_cancel": "This order can no longer be cancelled. Please contact us for help.",
-    "pathInvalid": "Enter a page on this store starting with /, e.g. /c/sweets."
+    "pathInvalid": "Enter a page on this store starting with /, e.g. /c/sweets.",
+    "invalid": "This value isn't valid.",
+    "tooShort": "This is too short.",
+    "invalidOption": "Choose one of the options.",
+    "anyLanguageRequired": "Fill this in for at least one language."
   },
   "DataTable": {
     "selectAll": "Select all rows",
