@@ -48,3 +48,51 @@ export const INDIAN_STATE_CODES = INDIAN_STATES.map((s) => s.code) as [
 export function stateNameFromCode(code: string): string | undefined {
   return INDIAN_STATES.find((s) => s.code === code)?.name;
 }
+
+/** GST state codes (first two digits of a GSTIN), used for "Place of supply" on invoices. */
+export const GST_STATE_CODES: Record<IndianStateCode, string> = {
+  JK: "01",
+  HP: "02",
+  PB: "03",
+  CH: "04",
+  UT: "05",
+  HR: "06",
+  DL: "07",
+  RJ: "08",
+  UP: "09",
+  BR: "10",
+  SK: "11",
+  AR: "12",
+  NL: "13",
+  MN: "14",
+  MZ: "15",
+  TR: "16",
+  ML: "17",
+  AS: "18",
+  WB: "19",
+  JH: "20",
+  OR: "21",
+  CT: "22",
+  MP: "23",
+  GJ: "24",
+  DH: "26",
+  MH: "27",
+  KA: "29",
+  GA: "30",
+  LD: "31",
+  KL: "32",
+  TN: "33",
+  PY: "34",
+  AN: "35",
+  TG: "36",
+  AP: "37",
+  LA: "38",
+};
+
+/** "Karnataka (29)" — state name with its GST code. */
+export function gstStateLabel(code: string | null | undefined): string {
+  if (!code) return "";
+  const name = stateNameFromCode(code) ?? code;
+  const gst = GST_STATE_CODES[code as IndianStateCode];
+  return gst ? `${name} (${gst})` : name;
+}
