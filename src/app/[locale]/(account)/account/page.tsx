@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { hasLocale, type Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProfileForm } from "@/components/account/profile-form";
+import { CartRemindersToggle } from "@/components/account/cart-reminders-toggle";
 import { NotificationSettings } from "@/components/pwa/notification-settings";
 import { routing } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth-guards";
 import { vapidPublicKey } from "@/lib/services/push.service";
+import { getFeatures } from "@/lib/services/settings.service";
 import { getProfile } from "@/lib/services/user.service";
 import { formatIndianMobile } from "@/lib/utils/phone";
 
@@ -19,7 +21,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/accou
   setRequestLocale(locale as Locale);
   const user = await requireUser(locale, `/${locale}/account`);
   const t = await getTranslations("Account");
-  const profile = await getProfile(user.id);
+  const [profile, features] = await Promise.all([getProfile(user.id), getFeatures()]);
   const preferred =
     profile?.preferredLocale && hasLocale(routing.locales, profile.preferredLocale)
       ? profile.preferredLocale
@@ -42,6 +44,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/accou
         }}
       />
       <NotificationSettings vapidPublicKey={vapidPublicKey()} />
+      {features.abandonedCart && profile && <CartRemindersToggle initial={profile.cartReminders} />}
     </section>
   );
 }

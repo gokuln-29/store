@@ -248,6 +248,8 @@ model User {
   role            Role      @default(CUSTOMER)
   isActive        Boolean   @default(true)
   preferredLocale String?
+  /// Customer's choice: remind me about items left in my cart.
+  cartReminders   Boolean   @default(true)
   lastLoginAt     DateTime?
   /// Bump to invalidate every existing session ("log out everywhere", deactivation, role change).
   sessionVersion  Int       @default(0)
@@ -483,6 +485,8 @@ model Cart {
   /// When the browser made the change being saved; older saves (e.g. replayed after being
   /// offline) never overwrite newer ones.
   clientUpdatedAt DateTime?
+  /// Last abandoned-cart reminder; at most one per 7 days.
+  reminderSentAt  DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { authorize } from "@/lib/auth-guards";
 import { deleteAddress, saveAddress, setDefaultAddress } from "@/lib/services/address.service";
+import { setCartReminders } from "@/lib/services/cart-reminder.service";
 import { updateProfile } from "@/lib/services/user.service";
 import {
   addressSchema,
@@ -67,6 +68,16 @@ export async function deleteAddressAction(id: string): Promise<ActionResult> {
 
   const result = await deleteAddress(user.id, id);
   if (!result.ok) return { ok: false, error: result.error };
+  revalidateAccount();
+  return { ok: true, data: undefined };
+}
+
+/** "Remind me about items left in my cart" (abandoned cart reminders). */
+export async function setCartRemindersAction(on: boolean): Promise<ActionResult> {
+  const user = await authorize("account:self");
+  if (!user) return UNAUTHORIZED;
+  if (typeof on !== "boolean") return { ok: false, error: "validation" };
+  await setCartReminders(user.id, on);
   revalidateAccount();
   return { ok: true, data: undefined };
 }

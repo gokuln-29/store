@@ -6,7 +6,15 @@ import type { profileSchema } from "@/lib/validators/auth";
 export function getProfile(userId: string) {
   return db.user.findUnique({
     where: { id: userId },
-    select: { id: true, name: true, email: true, phone: true, preferredLocale: true, role: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      preferredLocale: true,
+      role: true,
+      cartReminders: true,
+    },
   });
 }
 

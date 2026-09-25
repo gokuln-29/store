@@ -64,17 +64,55 @@ function safeUrl(value: string | null | undefined): string | null {
   }
 }
 
+/** The shared email layout: store name, greeting, paragraphs, buttons, footer. */
+function emailHtml(input: {
+  lang: string;
+  subject: string;
+  storeName: string;
+  brandColor: string;
+  greeting: string;
+  lines: string[];
+  buttons: { href: string; label: string }[];
+  footer: string;
+}): string {
+  const button = (href: string, label: string, primary: boolean) =>
+    `<a href="${escapeHtml(href)}" style="display:inline-block;margin:4px 8px 4px 0;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;${
+      primary
+        ? `background:${input.brandColor};color:#ffffff`
+        : `border:1px solid ${input.brandColor};color:${input.brandColor}`
+    }">${escapeHtml(label)}</a>`;
+  return `<!doctype html>
+<html lang="${input.lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(input.subject)}</title></head>
+<body style="margin:0;background:#f4f4f5;font-family:'Noto Sans','Noto Sans Tamil','Noto Sans Kannada',Arial,sans-serif;color:#18181b">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px">
+<tr><td style="padding:24px">
+<p style="margin:0 0 16px;font-size:18px;font-weight:700">${escapeHtml(input.storeName)}</p>
+<p style="margin:0 0 12px">${escapeHtml(input.greeting)}</p>
+${input.lines.map((l) => `<p style="margin:0 0 12px;line-height:1.5">${escapeHtml(l)}</p>`).join("\n")}
+<p style="margin:20px 0">${input.buttons.map((b, i) => button(b.href, b.label, i === 0)).join("")}</p>
+<p style="margin:16px 0 0;font-size:12px;color:#71717a">${escapeHtml(input.footer)}</p>
+</td></tr></table></td></tr></table></body></html>`;
+}
+
+function translator(locale: string) {
+  const lang = (locale in MESSAGES ? locale : "en") as keyof typeof MESSAGES;
+  return {
+    lang,
+    t: createTranslator({
+      locale: lang,
+      messages: MESSAGES[lang] as typeof en,
+      namespace: "Notifications",
+    }),
+  };
+}
+
 export function renderOrderNotification(
   template: OrderTemplate,
   locale: string,
   payload: OrderNotificationPayload,
 ): RenderedNotification {
-  const lang = (locale in MESSAGES ? locale : "en") as keyof typeof MESSAGES;
-  const t = createTranslator({
-    locale: lang,
-    messages: MESSAGES[lang] as typeof en,
-    namespace: "Notifications",
-  });
+  const { lang, t } = translator(locale);
   const values = {
     store: payload.storeName,
     name: payload.customerName || t("customerFallback"),
@@ -108,26 +146,77 @@ export function renderOrderNotification(
     t("footer", values),
   ].join("\n");
 
-  const button = (href: string, label: string, primary: boolean) =>
-    `<a href="${escapeHtml(href)}" style="display:inline-block;margin:4px 8px 4px 0;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;${
-      primary
-        ? `background:${payload.brandColor};color:#ffffff`
-        : `border:1px solid ${payload.brandColor};color:${payload.brandColor}`
-    }">${escapeHtml(label)}</a>`;
-
-  const html = `<!doctype html>
-<html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(subject)}</title></head>
-<body style="margin:0;background:#f4f4f5;font-family:'Noto Sans','Noto Sans Tamil','Noto Sans Kannada',Arial,sans-serif;color:#18181b">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px">
-<tr><td style="padding:24px">
-<p style="margin:0 0 16px;font-size:18px;font-weight:700">${escapeHtml(payload.storeName)}</p>
-<p style="margin:0 0 12px">${escapeHtml(t("greeting", values))}</p>
-${lines.map((l) => `<p style="margin:0 0 12px;line-height:1.5">${escapeHtml(l)}</p>`).join("\n")}
-<p style="margin:20px 0">${button(orderUrl, t("viewOrder"), true)}${trackingUrl ? button(trackingUrl, t("trackParcel"), false) : ""}</p>
-<p style="margin:16px 0 0;font-size:12px;color:#71717a">${escapeHtml(t("footer", values))}</p>
-</td></tr></table></td></tr></table></body></html>`;
+  const html = emailHtml({
+    lang,
+    subject,
+    storeName: payload.storeName,
+    brandColor: payload.brandColor,
+    greeting: t("greeting", values),
+    lines,
+    buttons: [
+      { href: orderUrl, label: t("viewOrder") },
+      ...(trackingUrl ? [{ href: trackingUrl, label: t("trackParcel") }] : []),
+    ],
+    footer: t("footer", values),
+  });
 
   const short = [t(`${template}.sms`, values), trackingUrl ?? orderUrl].join(" ");
+  return { subject, text, html, short, push: { title: subject, body: lines.join(" ") } };
+}
+
+// ───────────── Abandoned cart reminder ─────────────
+
+export const CART_REMINDER = "cart_reminder";
+
+export const cartPayloadSchema = z.object({
+  storeName: z.string(),
+  brandColor: z
+    .string()
+    .regex(/^#[0-9a-f]{6}$/i)
+    .catch("#111827"),
+  customerName: z.string(),
+  /** Up to three product names, already in the customer's language. */
+  items: z.array(z.string()).max(3),
+  itemCount: z.int().min(1),
+  cartUrl: z.string(),
+  accountUrl: z.string(),
+});
+export type CartReminderPayload = z.infer<typeof cartPayloadSchema>;
+
+export function renderCartReminder(
+  locale: string,
+  payload: CartReminderPayload,
+): RenderedNotification {
+  const { lang, t } = translator(locale);
+  const values = {
+    store: payload.storeName,
+    name: payload.customerName || t("customerFallback"),
+    count: payload.itemCount,
+    items: payload.items.join(", "),
+  };
+  const subject = t("cart_reminder.subject", values);
+  const lines = [t("cart_reminder.body", values), t("cart_reminder.items", values)];
+  const cartUrl = safeUrl(payload.cartUrl) ?? payload.cartUrl;
+  const footer = `${t("cart_reminder.optOut")} ${safeUrl(payload.accountUrl) ?? payload.accountUrl}`;
+  const text = [
+    t("greeting", values),
+    "",
+    ...lines,
+    "",
+    `${t("viewCart")}: ${cartUrl}`,
+    "",
+    footer,
+  ].join("\n");
+  const html = emailHtml({
+    lang,
+    subject,
+    storeName: payload.storeName,
+    brandColor: payload.brandColor,
+    greeting: t("greeting", values),
+    lines,
+    buttons: [{ href: cartUrl, label: t("viewCart") }],
+    footer,
+  });
+  const short = [t("cart_reminder.sms", values), cartUrl].join(" ");
   return { subject, text, html, short, push: { title: subject, body: lines.join(" ") } };
 }

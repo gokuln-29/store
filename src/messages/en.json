@@ -100,7 +100,9 @@
     "language": "Preferred language",
     "languageHint": "Used for messages we send you.",
     "profileSaved": "Profile saved",
-    "orders": "Orders"
+    "orders": "Orders",
+    "cartReminders": "Cart reminders",
+    "cartRemindersHint": "One reminder if you leave items in your cart."
   },
   "Addresses": {
     "title": "Saved addresses",
@@ -1050,6 +1052,14 @@
       "subject": "Return received for order {number}",
       "body": "We've received the return of your order {number}. If a refund is due, we'll process it shortly.",
       "sms": "{store}: Return received for order {number}."
+    },
+    "viewCart": "View your cart",
+    "cart_reminder": {
+      "subject": "You left something in your cart",
+      "body": "Your cart at {store} is waiting for you.",
+      "items": "{count, plural, =1 {# item} other {# items}}: {items}",
+      "sms": "{store}: You left {count, plural, =1 {# item} other {# items}} in your cart.",
+      "optOut": "Don't want these reminders? Turn them off in your account:"
     }
   },
   "OrderTimeline": {

@@ -8,9 +8,13 @@ import {
   orderSmsEnabled,
 } from "@/lib/providers/notify";
 import {
+  CART_REMINDER,
+  cartPayloadSchema,
   orderPayloadSchema,
+  renderCartReminder,
   renderOrderNotification,
   ORDER_TEMPLATES,
+  type RenderedNotification,
   type OrderNotificationPayload,
   type OrderTemplate,
 } from "@/lib/notifications/render";
@@ -135,19 +139,45 @@ type Row = {
   payload: Prisma.JsonValue;
 };
 
-async function send(n: Row): Promise<void> {
-  if (!(ORDER_TEMPLATES as readonly string[]).includes(n.template)) {
-    throw new Error(`Unknown template "${n.template}"`);
+type Prepared = {
+  message: RenderedNotification;
+  params: Record<string, string>;
+  push: { url: string; tag: string; consent: "orderUpdates" | "offers" };
+};
+
+/** Renders a stored notification (any template) in its language. */
+function prepare(n: Row): Prepared {
+  if (n.template === CART_REMINDER) {
+    const payload = cartPayloadSchema.parse(n.payload);
+    return {
+      message: renderCartReminder(n.locale, payload),
+      params: { storeName: payload.storeName, itemCount: String(payload.itemCount) },
+      push: { url: `/${n.locale}/cart`, tag: "cart-reminder", consent: "offers" },
+    };
   }
-  const template = n.template as OrderTemplate;
+  if (!(ORDER_TEMPLATES as readonly string[]).includes(n.template)) {
+    throw new PermanentDeliveryError(`Unknown template "${n.template}"`);
+  }
   const payload = orderPayloadSchema.parse(n.payload);
-  const message = renderOrderNotification(template, n.locale, payload);
-  const params: Record<string, string> = {
-    orderNumber: payload.orderNumber,
-    total: payload.total,
-    storeName: payload.storeName,
-    ...(payload.trackingNumber ? { trackingNumber: payload.trackingNumber } : {}),
+  return {
+    message: renderOrderNotification(n.template as OrderTemplate, n.locale, payload),
+    params: {
+      orderNumber: payload.orderNumber,
+      total: payload.total,
+      storeName: payload.storeName,
+      ...(payload.trackingNumber ? { trackingNumber: payload.trackingNumber } : {}),
+    },
+    push: {
+      url: `/${n.locale}/account/orders/${encodeURIComponent(payload.orderNumber)}`,
+      tag: `order-${payload.orderNumber}`,
+      consent: "orderUpdates",
+    },
   };
+}
+
+async function send(n: Row): Promise<void> {
+  const { message, params, push } = prepare(n);
+  const template = n.template;
 
   switch (n.channel) {
     case "EMAIL": {
@@ -184,19 +214,16 @@ async function send(n: Row): Promise<void> {
     }
     case "PUSH": {
       const device = await db.pushSubscription.findUnique({ where: { endpoint: n.recipient } });
-      if (!device || !device.orderUpdates) {
+      // Consent is checked again at send time: the customer may have changed it meanwhile.
+      if (!device || !device[push.consent]) {
         throw new PermanentDeliveryError("Push subscription removed or turned off");
       }
-      const result = await sendPush(device, {
-        ...message.push,
-        url: `/${n.locale}/account/orders/${encodeURIComponent(payload.orderNumber)}`,
-        tag: `order-${payload.orderNumber}`,
-      });
+      const result = await sendPush(device, { ...message.push, url: push.url, tag: push.tag });
       if (result === "gone") throw new PermanentDeliveryError("Push subscription expired");
       return;
     }
     default:
-      throw new Error(`Channel ${n.channel} is not supported for order notifications`);
+      throw new Error(`Channel ${n.channel} is not supported`);
   }
 }
 
