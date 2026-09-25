@@ -11,6 +11,7 @@ export const PERMISSIONS = [
   "catalog:write",
   "orders:read",
   "orders:manage",
+  "payments:refund", // issue refunds (owner only by default)
   "customers:read",
   "coupons:manage",
   "content:manage", // home sections, banners

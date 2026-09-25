@@ -1,5 +1,6 @@
 import {
   Boxes,
+  CreditCard,
   FolderTree,
   History,
   KeyRound,
@@ -17,6 +18,7 @@ export type AdminNavKey =
   | "products"
   | "categories"
   | "inventory"
+  | "payments"
   | "content"
   | "settings"
   | "staff"
@@ -57,6 +59,11 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         permission: "catalog:read",
       },
       { href: "/admin/inventory", key: "inventory", icon: Boxes, permission: "catalog:read" },
+    ],
+  },
+  {
+    items: [
+      { href: "/admin/payments", key: "payments", icon: CreditCard, permission: "orders:read" },
     ],
   },
   {
