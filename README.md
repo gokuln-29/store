@@ -121,6 +121,14 @@ cancel until the order is packed (paid orders are refunded automatically), buy a
 download invoices. Customers are notified by email / SMS / WhatsApp in their language.
 Details: **[docs/orders.md](docs/orders.md)**.
 
+## Languages
+
+English, Tamil and Kannada throughout: interface, validation errors, emails, SMS and push. Store
+content is edited per language, with English as the fallback. `pnpm i18n:check` (also in CI)
+fails on missing or mismatched translations and hard-coded text. Details:
+**[docs/i18n.md](docs/i18n.md)**; translations for a native speaker to review:
+**[docs/i18n-review.md](docs/i18n-review.md)**.
+
 ## PWA and push notifications
 
 The storefront installs as an app (Android and iOS), keeps browsed pages and the cart available
