@@ -627,12 +627,19 @@ model Order {
   trackingUrl    String?
 
   /// Unpaid online orders expire at this time and release stock.
-  expiresAt   DateTime?
-  placedAt    DateTime?
-  cancelledAt DateTime?
-  deliveredAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  expiresAt    DateTime?
+  placedAt     DateTime?
+  shippedAt    DateTime?
+  cancelledAt  DateTime?
+  deliveredAt  DateTime?
+  returnedAt   DateTime?
+  cancelReason String?
+
+  /// GST invoice serial, assigned when the order ships, e.g. "DS2627-0001". Unique per store.
+  invoiceNumber String?   @unique
+  invoicedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   coupon        Coupon?        @relation(fields: [couponId], references: [id], onDelete: SetNull)
@@ -688,6 +695,8 @@ model OrderEvent {
   note       String?
   /// Admin/staff who made the change; null for system or customer actions.
   actorId    String?
+  /// Free-text staff note: shown in the admin timeline only, never to the customer.
+  isInternal Boolean      @default(false)
   createdAt  DateTime     @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -745,6 +754,12 @@ model Refund {
   @@index([paymentId, createdAt])
 }
 
+/// Last GST invoice number used per financial year ("2026-27"), so invoices are consecutive.
+model InvoiceCounter {
+  financialYear String @id
+  lastNumber    Int    @default(0)
+}
+
 /// Every processed webhook event, so replays are ignored (idempotency).
 model WebhookEvent {
   id          String    @id @default(cuid())
@@ -779,20 +794,24 @@ model PushSubscription {
 }
 
 model Notification {
-  id        String              @id @default(cuid())
-  userId    String?
-  orderId   String?
-  channel   NotificationChannel
+  id          String              @id @default(cuid())
+  userId      String?
+  orderId     String?
+  channel     NotificationChannel
   /// Template key, e.g. "order.shipped"
-  template  String
-  locale    String              @default("en")
+  template    String
+  locale      String              @default("en")
   /// Email address, phone number or push endpoint.
-  recipient String
-  payload   Json                @default("{}")
-  status    NotificationStatus  @default(PENDING)
-  error     String?
-  sentAt    DateTime?
-  createdAt DateTime            @default(now())
+  recipient   String
+  payload     Json                @default("{}")
+  status      NotificationStatus  @default(PENDING)
+  /// Delivery attempts so far; retried by the cron job until MAX_ATTEMPTS.
+  attempts    Int                 @default(0)
+  /// Set while a sender is delivering it, so two runs never send the same message twice.
+  lockedUntil DateTime?
+  error       String?
+  sentAt      DateTime?
+  createdAt   DateTime            @default(now())
 
   user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
   order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
