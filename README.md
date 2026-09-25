@@ -121,6 +121,13 @@ cancel until the order is packed (paid orders are refunded automatically), buy a
 download invoices. Customers are notified by email / SMS / WhatsApp in their language.
 Details: **[docs/orders.md](docs/orders.md)**.
 
+## PWA and push notifications
+
+The storefront installs as an app (Android and iOS), keeps browsed pages and the cart available
+offline, and sends push notifications for order updates and admin push campaigns (offers
+are opt-in). The service worker only runs in production builds. Setup, caching rules and a
+manual test checklist: **[docs/pwa.md](docs/pwa.md)**.
+
 ## Project structure
 
 ```
