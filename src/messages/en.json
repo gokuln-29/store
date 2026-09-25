@@ -96,7 +96,8 @@
     "phoneHint": "This is your login number.",
     "language": "Preferred language",
     "languageHint": "Used for messages we send you.",
-    "profileSaved": "Profile saved"
+    "profileSaved": "Profile saved",
+    "orders": "Orders"
   },
   "Addresses": {
     "title": "Saved addresses",
@@ -209,7 +210,11 @@
     "order_expired": "The payment window for this order has closed. Any amount paid will be refunded.",
     "provider_error": "The payment service didn't respond. Please try again in a moment.",
     "not_refundable": "This payment can't be refunded.",
-    "amount_exceeds": "The amount is more than what can be refunded ({amount})."
+    "amount_exceeds": "The amount is more than what can be refunded ({amount}).",
+    "stale": "This order was just changed by someone else. The page has been refreshed.",
+    "invalid_transition": "The order can't move to that status from where it is now.",
+    "refund_permission": "Only the store owner can cancel a paid order, because cancelling refunds the customer.",
+    "cannot_cancel": "This order can no longer be cancelled. Please contact us for help."
   },
   "DataTable": {
     "selectAll": "Select all rows",
@@ -244,7 +249,8 @@
     "inventory": "Inventory",
     "content": "Home page",
     "banners": "Banners",
-    "payments": "Payments"
+    "payments": "Payments",
+    "orders": "Orders"
   },
   "Settings": {
     "title": "Store settings",
@@ -885,7 +891,8 @@
     "lateRefundHint": "The payment arrived after the payment window closed, so this order was cancelled. The amount is being refunded to your original payment method.",
     "paymentRefunded": "Refunded",
     "paymentPartiallyRefunded": "Partly refunded",
-    "notPaid": "Not paid"
+    "notPaid": "Not paid",
+    "viewDetails": "View order details"
   },
   "Payments": {
     "title": "Payments",
@@ -950,5 +957,205 @@
       "PROCESSED": "Refunded",
       "FAILED": "Failed"
     }
+  },
+  "Notifications": {
+    "customerFallback": "there",
+    "courierFallback": "our courier partner",
+    "greeting": "Hi {name},",
+    "trackingLine": "Courier: {courier}. Tracking number: {tracking}.",
+    "refundLine": "Your payment is being refunded to your original payment method. Banks usually take 5–7 working days.",
+    "trackParcel": "Track your parcel",
+    "viewOrder": "View your order",
+    "footer": "You're receiving this because you ordered from {store}.",
+    "order_placed": {
+      "subject": "Order {number} placed",
+      "body": "Thank you for shopping with {store}! We've received your order {number} of {total}. We'll let you know when it ships.",
+      "sms": "{store}: Your order {number} of {total} is placed. Thank you!"
+    },
+    "order_shipped": {
+      "subject": "Your order {number} has shipped",
+      "body": "Good news! Your order {number} is on its way.",
+      "sms": "{store}: Your order {number} has shipped."
+    },
+    "order_delivered": {
+      "subject": "Order {number} delivered",
+      "body": "Your order {number} has been delivered. We hope you love it!",
+      "sms": "{store}: Your order {number} has been delivered. Thank you!"
+    },
+    "order_cancelled": {
+      "subject": "Order {number} cancelled",
+      "body": "Your order {number} has been cancelled.",
+      "sms": "{store}: Your order {number} has been cancelled."
+    },
+    "order_returned": {
+      "subject": "Return received for order {number}",
+      "body": "We've received the return of your order {number}. If a refund is due, we'll process it shortly.",
+      "sms": "{store}: Return received for order {number}."
+    }
+  },
+  "OrderTimeline": {
+    "empty": "Nothing has happened yet.",
+    "moved": "{from} → {to}",
+    "internal": "Internal note",
+    "system": "System",
+    "notes": {
+      "payment_captured": "Payment received",
+      "payment_failed": "A payment attempt failed",
+      "payment_expired": "Payment window expired",
+      "refund_requested": "Refund requested",
+      "refund_processed": "Refund completed",
+      "refund_failed": "Refund failed",
+      "late_payment_refunding": "Payment arrived after the order expired; refunding it",
+      "payment_duplicate_refunding": "Duplicate payment received; refunding it",
+      "payment_amount_mismatch": "Payment amount didn't match the order",
+      "tracking_updated": "Tracking details updated",
+      "cancelled_by_customer": "Cancelled by the customer",
+      "not_restocked": "Items not put back into stock"
+    }
+  },
+  "AdminOrders": {
+    "title": "Orders",
+    "description": "Confirm, pack, ship and track customer orders.",
+    "searchPlaceholder": "Order or invoice number, phone or name",
+    "empty": "No orders yet.",
+    "order": "Order",
+    "customer": "Customer",
+    "items": "Items",
+    "itemCount": "{count, plural, =1 {# item} other {# items}}",
+    "total": "Total",
+    "payment": "Payment",
+    "status": "Status",
+    "method": "Method",
+    "allStatuses": "All statuses",
+    "allPayments": "All payments",
+    "allMethods": "All methods",
+    "methods": {
+      "ONLINE": "Online",
+      "COD": "Cash on delivery"
+    },
+    "from": "From",
+    "to": "To",
+    "applyDates": "Apply dates",
+    "clearDates": "Clear dates",
+    "detailTitle": "Order",
+    "heading": "Order {number}",
+    "placedOn": "Placed {date}",
+    "downloadInvoice": "Invoice (PDF)",
+    "packingSlip": "Packing slip (PDF)",
+    "customerNote": "Customer note",
+    "timeline": "Timeline",
+    "cancelReason": "Reason",
+    "readOnly": "You can view this order but not change it.",
+    "shipping": "Shipping",
+    "invoiceNumber": "Invoice",
+    "invoiceAfterShipping": "The GST invoice is created when the order ships.",
+    "noTracking": "No tracking details.",
+    "noActions": "This order has no further steps.",
+    "updated": "Order marked as {status}.",
+    "refundIssued": "Refund of {amount} started.",
+    "refundFailed": "The order was cancelled, but the refund failed. Refund it from the payment page.",
+    "courierName": "Courier",
+    "trackingNumber": "Tracking number",
+    "trackingUrl": "Tracking link",
+    "trackingUrlHint": "Optional. A link where the customer can follow the parcel.",
+    "cancelNeedsOwner": "This order was paid online, so cancelling it refunds the customer. Only the store owner can do that.",
+    "cancelRefund": "This order was paid online: {amount} will be refunded to the customer automatically.",
+    "restock": "Put the items back into stock",
+    "restockHint": "Untick if the returned goods can't be sold again.",
+    "returnNote": "Note (optional)",
+    "trackingSaved": "Tracking details saved.",
+    "saveTracking": "Save tracking",
+    "noteAdded": "Note added.",
+    "noteLabel": "Add a note",
+    "noteHint": "Only staff can see notes.",
+    "addNote": "Add note",
+    "statusShort": {
+      "PENDING_PAYMENT": "awaiting payment",
+      "PLACED": "placed",
+      "CONFIRMED": "confirmed",
+      "PACKED": "packed",
+      "SHIPPED": "shipped",
+      "DELIVERED": "delivered",
+      "CANCELLED": "cancelled",
+      "RETURNED": "returned"
+    },
+    "action": {
+      "PENDING_PAYMENT": "Update",
+      "PLACED": "Update",
+      "CONFIRMED": "Confirm order",
+      "PACKED": "Mark as packed",
+      "SHIPPED": "Mark as shipped",
+      "DELIVERED": "Mark as delivered",
+      "CANCELLED": "Cancel order",
+      "RETURNED": "Mark as returned"
+    },
+    "dialog": {
+      "PENDING_PAYMENT": {
+        "title": "Update order?",
+        "description": ""
+      },
+      "PLACED": {
+        "title": "Update order?",
+        "description": ""
+      },
+      "CONFIRMED": {
+        "title": "Confirm this order?",
+        "description": "Let the team know the order is accepted and can be packed."
+      },
+      "PACKED": {
+        "title": "Mark as packed?",
+        "description": "The parcel is packed and ready to hand over to the courier."
+      },
+      "SHIPPED": {
+        "title": "Ship this order",
+        "description": "Add the courier details so the customer can track the parcel. The GST invoice number is assigned now, and the customer is notified."
+      },
+      "DELIVERED": {
+        "title": "Mark as delivered?",
+        "description": "The customer has received the parcel. Cash on delivery is recorded as collected."
+      },
+      "CANCELLED": {
+        "title": "Cancel this order?",
+        "description": "The items go back into stock, any coupon can be used again, and the customer is notified. This can't be undone."
+      },
+      "RETURNED": {
+        "title": "Mark as returned?",
+        "description": "The parcel came back to you. Refunds for returns are issued from the payment page."
+      }
+    }
+  },
+  "MyOrders": {
+    "title": "My orders",
+    "empty": "You haven't placed any orders yet.",
+    "startShopping": "Start shopping",
+    "placedOn": "Placed on {date}",
+    "itemCount": "{count, plural, =1 {# item} other {# items}}",
+    "moreItems": "+{count} more",
+    "pagination": "Order pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}",
+    "back": "All orders",
+    "cancelledOn": "This order was cancelled on {date}.",
+    "reason": "Reason: {reason}",
+    "progress": "Order progress",
+    "tracking": "Tracking",
+    "trackingNumber": "Tracking number {number}",
+    "trackParcel": "Track your parcel",
+    "invoice": "Download invoice",
+    "invoiceSoon": "Your invoice will be ready when the order ships.",
+    "cancel": "Cancel order",
+    "cancelTitle": "Cancel this order?",
+    "cancelDescription": "You can cancel until the order is packed. This can't be undone.",
+    "cancelRefund": "Your payment of {amount} will be refunded to your original payment method. This can't be undone.",
+    "cancelReason": "Reason (optional)",
+    "keepOrder": "Keep order",
+    "cancelConfirm": "Yes, cancel order",
+    "cancelled": "Your order has been cancelled.",
+    "cancelledRefund": "Your order has been cancelled and your refund has started.",
+    "reorder": "Buy again",
+    "reorderNone": "None of these items are available right now.",
+    "reordered": "Added {count, plural, =1 {# item} other {# items}} to your cart.",
+    "reorderPartial": "{count, plural, =1 {# item is} other {# items are}} no longer available."
   }
 }

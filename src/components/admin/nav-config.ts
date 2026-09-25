@@ -8,6 +8,7 @@ import {
   LayoutTemplate,
   Package,
   Settings,
+  ShoppingBag,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -18,6 +19,7 @@ export type AdminNavKey =
   | "products"
   | "categories"
   | "inventory"
+  | "orders"
   | "payments"
   | "content"
   | "settings"
@@ -63,6 +65,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   },
   {
     items: [
+      { href: "/admin/orders", key: "orders", icon: ShoppingBag, permission: "orders:read" },
       { href: "/admin/payments", key: "payments", icon: CreditCard, permission: "orders:read" },
     ],
   },
