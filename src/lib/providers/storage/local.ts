@@ -3,7 +3,10 @@ import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { IMAGE_TYPES, type StorageProvider } from "./types";
 
-export const LOCAL_UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR ?? "uploads");
+// Runtime directory, not part of the build output (turbopackIgnore stops whole-project tracing).
+export const LOCAL_UPLOAD_DIR = path.resolve(
+  /*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? "uploads",
+);
 
 /** Resolves a public id to a path inside the upload dir, rejecting path traversal. */
 export function resolveLocalUpload(publicId: string): string | null {

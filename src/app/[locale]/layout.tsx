@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans, Noto_Sans_Kannada, Noto_Sans_Tamil } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { PwaProvider } from "@/components/pwa/pwa-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { localize } from "@/lib/utils/localized";
+import { iconVersion } from "@/lib/pwa/icon-meta";
+import { shortName } from "@/lib/pwa/manifest";
 import { siteUrl } from "@/lib/seo";
 import "@/styles/globals.css";
 
@@ -40,9 +43,22 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     title: { default: storeName, template: `%s | ${storeName}` },
     description:
       localize(settings.tagline, locale, settings.defaultLocale) || t("Metadata.description"),
-    ...(settings.faviconUrl ? { icons: { icon: settings.faviconUrl } } : {}),
+    icons: {
+      ...(settings.faviconUrl ? { icon: settings.faviconUrl } : {}),
+      apple: `/icons/apple-touch-icon.png?v=${iconVersion(settings)}`,
+    },
+    appleWebApp: { capable: true, title: shortName(storeName), statusBarStyle: "default" },
   };
 }
+
+export async function generateViewport(): Promise<Viewport> {
+  const settings = await getStoreSettings();
+  return { themeColor: settings.primaryColor };
+}
+
+/** The service worker runs in production builds (or when explicitly enabled for testing). */
+const serviceWorkerEnabled =
+  process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_SW === "true";
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
@@ -64,8 +80,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           >
             {t("skipToContent")}
           </a>
-          {children}
-          <Toaster richColors closeButton position="top-center" />
+          <PwaProvider enabled={serviceWorkerEnabled}>
+            {children}
+            <Toaster richColors closeButton position="top-center" />
+          </PwaProvider>
         </NextIntlClientProvider>
       </body>
     </html>
