@@ -204,7 +204,12 @@
     "prefixInvalid": "Use up to 6 capital letters or numbers.",
     "cartEmpty": "Your cart is empty.",
     "address_not_found": "That address was not found. Please choose another.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "invalid_signature": "We couldn't verify this payment. If money was deducted, it will be confirmed or refunded automatically.",
+    "order_expired": "The payment window for this order has closed. Any amount paid will be refunded.",
+    "provider_error": "The payment service didn't respond. Please try again in a moment.",
+    "not_refundable": "This payment can't be refunded.",
+    "amount_exceeds": "The amount is more than what can be refunded ({amount})."
   },
   "DataTable": {
     "selectAll": "Select all rows",
@@ -238,7 +243,8 @@
     "categories": "Categories",
     "inventory": "Inventory",
     "content": "Home page",
-    "banners": "Banners"
+    "banners": "Banners",
+    "payments": "Payments"
   },
   "Settings": {
     "title": "Store settings",
@@ -863,6 +869,86 @@
     "payAmount": "Pay {amount}",
     "simulateFailure": "Simulate failure",
     "paymentFailed": "The payment didn't go through. You can try again.",
-    "notFound": "We couldn't find this order."
+    "notFound": "We couldn't find this order.",
+    "paymentTitle": "Complete your payment",
+    "paymentHint": "Pay securely with UPI, card, netbanking or wallet.",
+    "payBefore": "Complete the payment by {time} to keep these items reserved.",
+    "lastAttemptFailed": "Your last payment attempt didn't go through. You can try again.",
+    "paymentCancelled": "The payment window was closed. You can try again.",
+    "paymentPending": "We're confirming your payment with the bank. This can take a minute.",
+    "paymentUnavailable": "Online payment is unavailable right now. Please try again in a few minutes.",
+    "tryAgain": "Try again",
+    "verifying": "Confirming your payment…",
+    "scriptFailed": "Couldn't load the payment window. Check your connection and try again.",
+    "cancelledTitle": "Order cancelled",
+    "expiredHint": "The payment wasn't completed in time, so this order was cancelled. You haven't been charged.",
+    "lateRefundHint": "The payment arrived after the payment window closed, so this order was cancelled. The amount is being refunded to your original payment method.",
+    "paymentRefunded": "Refunded",
+    "paymentPartiallyRefunded": "Partly refunded",
+    "notPaid": "Not paid"
+  },
+  "Payments": {
+    "title": "Payments",
+    "description": "Online and cash-on-delivery payments, and refunds.",
+    "searchPlaceholder": "Order number, phone, name or payment ID",
+    "empty": "No payments yet.",
+    "order": "Order",
+    "customer": "Customer",
+    "method": "Method",
+    "provider": "Provider",
+    "amount": "Amount",
+    "refunded": "Refunded",
+    "allStatuses": "All statuses",
+    "allMethods": "All methods",
+    "testMode": "test",
+    "methods": {
+      "ONLINE": "Online",
+      "COD": "Cash on delivery"
+    },
+    "detailTitle": "Payment",
+    "detailHeading": "Payment for {number}",
+    "details": "Details",
+    "providerOrderId": "Provider order ID",
+    "providerPaymentId": "Provider payment ID",
+    "failureReason": "Failure reason",
+    "note": "Note",
+    "duplicateNote": "A second payment for an order that was already paid. It is refunded automatically.",
+    "createdAt": "Created",
+    "refundTitle": "Refund",
+    "refunds": "Refund history",
+    "noRefunds": "No refunds.",
+    "system": "Automatic",
+    "refundAmount": "Amount to refund (₹)",
+    "refundHint": "Up to {amount} can be refunded.",
+    "refundReason": "Reason (optional)",
+    "refundReasonHint": "Kept in the refund history and activity log.",
+    "refundSubmit": "Refund…",
+    "refundConfirmTitle": "Refund this payment?",
+    "refundConfirm": "{amount} will be sent back to the customer's original payment method. This can't be undone.",
+    "refundButton": "Refund {amount}",
+    "refundStarted": "Refund started. The bank usually settles it in 5–7 working days.",
+    "refundProcessed": "Refund completed.",
+    "notRefundable": "Nothing left to refund on this payment.",
+    "refundOwnerOnly": "Only the store owner can issue refunds.",
+    "codRefundNote": "Cash-on-delivery payments are refunded outside the store, for example by UPI or bank transfer.",
+    "reasons": {
+      "order_expired": "Paid after the order expired",
+      "duplicate_payment": "Duplicate payment",
+      "provider_dashboard": "Issued from the Razorpay dashboard"
+    },
+    "status": "Status",
+    "statuses": {
+      "PENDING": "Pending",
+      "AUTHORIZED": "Authorized",
+      "CAPTURED": "Paid",
+      "FAILED": "Failed",
+      "PARTIALLY_REFUNDED": "Partly refunded",
+      "REFUNDED": "Refunded"
+    },
+    "refundStatuses": {
+      "PENDING": "Processing",
+      "PROCESSED": "Refunded",
+      "FAILED": "Failed"
+    }
   }
 }

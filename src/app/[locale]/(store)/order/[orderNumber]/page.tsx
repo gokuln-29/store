@@ -1,4 +1,4 @@
-import { CircleCheck, Clock } from "lucide-react";
+import { CircleCheck, CircleX, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -48,22 +48,46 @@ export default async function OrderPage({ params }: PageProps<"/[locale]/order/[
   const money = (paise: number) => formatINR(paise, locale);
   const address = order.shippingAddress as Snapshot;
   const pending = order.status === "PENDING_PAYMENT";
+  const cancelled = order.status === "CANCELLED";
+  // Money came in after the order was cancelled (e.g. paid after the window closed).
+  const refunding =
+    cancelled && ["CAPTURED", "PARTIALLY_REFUNDED", "REFUNDED"].includes(order.paymentStatus);
+  const heading = pending ? t("awaitingPayment") : cancelled ? t("cancelledTitle") : t("thanks");
+  const hint = pending
+    ? order.paymentStatus === "FAILED"
+      ? t("lastAttemptFailed")
+      : t("awaitingPaymentHint")
+    : cancelled
+      ? refunding
+        ? t("lateRefundHint")
+        : t("expiredHint")
+      : t("confirmationHint", { phone: formatIndianMobile(order.customerPhone) });
+  const paymentLabel =
+    order.paymentMethod === "COD"
+      ? t("methodCOD")
+      : order.paymentStatus === "REFUNDED"
+        ? t("paymentRefunded")
+        : order.paymentStatus === "PARTIALLY_REFUNDED"
+          ? t("paymentPartiallyRefunded")
+          : order.paymentStatus === "CAPTURED"
+            ? t("methodONLINE")
+            : cancelled
+              ? t("notPaid")
+              : t("awaitingPayment");
 
   return (
     <div className="container mx-auto grid max-w-3xl grid-cols-1 gap-8 px-4 py-8">
       <div className="grid justify-items-center gap-2 text-center">
         {pending ? (
           <Clock className="size-12 text-amber-600" aria-hidden />
+        ) : cancelled ? (
+          <CircleX className="size-12 text-muted-foreground" aria-hidden />
         ) : (
           <CircleCheck className="size-12 text-emerald-600" aria-hidden />
         )}
-        <h1 className="text-2xl font-bold">{pending ? t("awaitingPayment") : t("thanks")}</h1>
+        <h1 className="text-2xl font-bold">{heading}</h1>
         <p className="text-muted-foreground">{t("number", { number: order.orderNumber })}</p>
-        <p className="text-sm text-muted-foreground">
-          {pending
-            ? t("awaitingPaymentHint")
-            : t("confirmationHint", { phone: formatIndianMobile(order.customerPhone) })}
-        </p>
+        <p className="text-sm text-muted-foreground">{hint}</p>
         {pending && (
           <Button asChild className="mt-2">
             <Link href={`/checkout/pay/${order.orderNumber}`}>{t("completePayment")}</Link>
@@ -169,13 +193,7 @@ export default async function OrderPage({ params }: PageProps<"/[locale]/order/[
           <h2 id="payment-heading" className="font-semibold">
             {t("paymentMethod")}
           </h2>
-          <p className="text-muted-foreground">
-            {order.paymentMethod === "COD"
-              ? t("methodCOD")
-              : pending
-                ? t("awaitingPayment")
-                : t("methodONLINE")}
-          </p>
+          <p className="text-muted-foreground">{paymentLabel}</p>
           <p>
             {t("status")}: <Badge variant="secondary">{t(`status${order.status}`)}</Badge>
           </p>
