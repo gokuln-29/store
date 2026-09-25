@@ -58,6 +58,12 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum RefundStatus {
+  PENDING // requested from the provider, not settled yet
+  PROCESSED
+  FAILED
+}
+
 enum PaymentMethod {
   ONLINE // Razorpay: UPI, cards, netbanking, wallets
   COD
@@ -258,6 +264,7 @@ model User {
   notifications     Notification[]
   auditLogs         AuditLog[]
   orderEvents       OrderEvent[]
+  refunds           Refund[]
 
   @@index([role])
   @@index([createdAt])
@@ -709,10 +716,33 @@ model Payment {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  refunds Refund[]
 
   @@index([orderId])
   @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+/// A full or partial refund of an online payment. Payment.refundedAmount sums PROCESSED refunds.
+model Refund {
+  id               String       @id @default(cuid())
+  paymentId        String
+  amount           Int /// paise
+  status           RefundStatus @default(PENDING)
+  providerRefundId String?      @unique
+  reason           String?
+  failureReason    String?
+  /// Admin who issued it; null when it came from the provider dashboard (webhook).
+  actorId          String?
+  processedAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  actor   User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId, createdAt])
 }
 
 /// Every processed webhook event, so replays are ignored (idempotency).
