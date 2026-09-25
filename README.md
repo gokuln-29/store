@@ -112,6 +112,15 @@ signature-verified browser callback **and** an idempotent webhook; unpaid orders
 release their stock; owners issue full or partial refunds from Admin → Payments.
 Setup, local webhook testing and the expiry cron job: **[docs/payments.md](docs/payments.md)**.
 
+## Orders and fulfilment
+
+Admin → Orders: confirm → pack → ship (courier + tracking) → deliver, cancel or mark returned,
+with internal notes and a full timeline. GST invoices (numbered per financial year when the order
+ships) and packing slips are PDFs. Customers see their orders under My account → Orders, can
+cancel until the order is packed (paid orders are refunded automatically), buy again and
+download invoices. Customers are notified by email / SMS / WhatsApp in their language.
+Details: **[docs/orders.md](docs/orders.md)**.
+
 ## Project structure
 
 ```

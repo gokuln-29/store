@@ -147,6 +147,7 @@ curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://<your-domain>/api/cron
 ```
 
 Set `CRON_SECRET` (e.g. `openssl rand -hex 24`). The endpoint returns 503 until it is set.
+Schedule `/api/cron/send-notifications` the same way; see [orders.md](orders.md).
 
 - **VPS / Docker:** add a crontab entry on the host:
   `*/5 * * * * curl -fsS -H "Authorization: Bearer <secret>" https://<domain>/api/cron/expire-orders > /dev/null`
