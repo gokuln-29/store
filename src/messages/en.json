@@ -214,7 +214,8 @@
     "stale": "This order was just changed by someone else. The page has been refreshed.",
     "invalid_transition": "The order can't move to that status from where it is now.",
     "refund_permission": "Only the store owner can cancel a paid order, because cancelling refunds the customer.",
-    "cannot_cancel": "This order can no longer be cancelled. Please contact us for help."
+    "cannot_cancel": "This order can no longer be cancelled. Please contact us for help.",
+    "pathInvalid": "Enter a page on this store starting with /, e.g. /c/sweets."
   },
   "DataTable": {
     "selectAll": "Select all rows",
@@ -250,7 +251,8 @@
     "content": "Home page",
     "banners": "Banners",
     "payments": "Payments",
-    "orders": "Orders"
+    "orders": "Orders",
+    "push": "Push campaigns"
   },
   "Settings": {
     "title": "Store settings",
@@ -786,7 +788,9 @@
     "quantityReduced": "Only {available} left of one item, so we updated the quantity.",
     "loading": "Updating your cart…",
     "each": "{price} each",
-    "maxReached": "That's all we have in stock."
+    "maxReached": "That's all we have in stock.",
+    "offlinePrices": "You're offline. These prices were last checked on {time}; they are confirmed again at checkout.",
+    "checkoutOffline": "Checkout needs a connection"
   },
   "Checkout": {
     "title": "Checkout",
@@ -1157,5 +1161,70 @@
     "reorderNone": "None of these items are available right now.",
     "reordered": "Added {count, plural, =1 {# item} other {# items}} to your cart.",
     "reorderPartial": "{count, plural, =1 {# item is} other {# items are}} no longer available."
+  },
+  "Pwa": {
+    "updateAvailable": "A new version of the store is available.",
+    "reload": "Reload",
+    "installTitle": "Install the {store} app",
+    "installBody": "Add it to your home screen for quicker shopping, even on a slow connection.",
+    "install": "Install",
+    "notNow": "Not now",
+    "close": "Close",
+    "iosStep1": "Tap the Share button in Safari",
+    "iosStep2": "Choose “Add to Home Screen”",
+    "pushTitle": "Get order updates on this device",
+    "pushBody": "We'll tell you when your order ships and when it's delivered.",
+    "pushIosInstall": "On iPhone and iPad, notifications work once the store is added to your Home Screen (Share → Add to Home Screen).",
+    "offersToo": "Also send me offers and news",
+    "turnOn": "Turn on",
+    "noThanks": "No thanks",
+    "permissionDenied": "Notifications are blocked. You can allow them later in your browser settings.",
+    "pushFailed": "Couldn't turn on notifications. Please try again.",
+    "pushEnabled": "Notifications are on for this device.",
+    "pushDisabled": "Notifications are off for this device.",
+    "preferencesSaved": "Notification settings saved.",
+    "settingsTitle": "Notifications on this device",
+    "settingsHint": "Push notifications appear even when the store isn't open.",
+    "checking": "Checking this device…",
+    "unsupported": "This browser doesn't support push notifications.",
+    "blocked": "Notifications are blocked for this site. Allow them in your browser settings, then reload.",
+    "orderUpdatesLabel": "Order updates",
+    "orderUpdatesHint": "Shipped, delivered and cancelled orders.",
+    "offersLabel": "Offers and news",
+    "offersHint": "Occasional promotions. Off unless you turn it on.",
+    "turnOnDevice": "Turn on for this device",
+    "turnOffDevice": "Turn off on this device",
+    "offlineTitle": "You're offline",
+    "offlineBody": "Check your connection and try again. Pages you've opened before still work, and your cart is saved.",
+    "tryAgain": "Try again",
+    "viewCart": "View cart"
+  },
+  "PushCampaigns": {
+    "title": "Push campaigns",
+    "description": "Send a notification to customers who asked for offers and news.",
+    "notConfigured": "Push notifications aren't set up yet: add VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY to the environment (see docs/pwa.md).",
+    "newCampaign": "New campaign",
+    "audience": "{count, plural, =0 {No devices have opted in to offers yet.} =1 {# device has opted in to offers.} other {# devices have opted in to offers.}}",
+    "history": "Sent campaigns",
+    "empty": "No campaigns yet.",
+    "stats": "{sent} of {audience} delivered · {failed} failed",
+    "status": {
+      "SENDING": "Sending",
+      "SENT": "Sent"
+    },
+    "titleField": "Title",
+    "titleHint": "Up to 60 characters.",
+    "bodyField": "Message",
+    "bodyHint": "Up to 180 characters. Each customer gets their own language, or English if it's empty.",
+    "link": "Link",
+    "linkHint": "Optional. A page on this store, e.g. /c/sweets. Opens in the customer's language.",
+    "image": "Image",
+    "imageHint": "Optional. Shown large on Android and desktop Chrome.",
+    "send": "{count, plural, =0 {Send} =1 {Send to # device} other {Send to # devices}}",
+    "noAudience": "Nobody has opted in to offers yet, so there's no one to send to.",
+    "preview": "Preview",
+    "confirmTitle": "Send this campaign?",
+    "confirmBody": "{count, plural, =1 {It will be sent to # device} other {It will be sent to # devices}} right away. This can't be undone.",
+    "queued": "{count, plural, =1 {Sending to # device…} other {Sending to # devices…}}"
   }
 }

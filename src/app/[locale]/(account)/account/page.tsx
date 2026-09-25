@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { hasLocale, type Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProfileForm } from "@/components/account/profile-form";
+import { NotificationSettings } from "@/components/pwa/notification-settings";
 import { routing } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth-guards";
+import { vapidPublicKey } from "@/lib/services/push.service";
 import { getProfile } from "@/lib/services/user.service";
 import { formatIndianMobile } from "@/lib/utils/phone";
 
@@ -39,6 +41,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/accou
           preferredLocale: preferred,
         }}
       />
+      <NotificationSettings vapidPublicKey={vapidPublicKey()} />
     </section>
   );
 }

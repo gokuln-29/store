@@ -40,6 +40,8 @@ export type RenderedNotification = {
   html: string;
   /** Short text for SMS / WhatsApp. */
   short: string;
+  /** Web push notification text. */
+  push: { title: string; body: string };
 };
 
 function escapeHtml(value: string): string {
@@ -127,5 +129,5 @@ ${lines.map((l) => `<p style="margin:0 0 12px;line-height:1.5">${escapeHtml(l)}<
 </td></tr></table></td></tr></table></body></html>`;
 
   const short = [t(`${template}.sms`, values), trackingUrl ?? orderUrl].join(" ");
-  return { subject, text, html, short };
+  return { subject, text, html, short, push: { title: subject, body: lines.join(" ") } };
 }

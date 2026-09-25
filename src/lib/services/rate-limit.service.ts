@@ -79,6 +79,11 @@ export const RATE_LIMITS = {
     limit: 30,
     windowMs: 10 * MINUTE,
   }),
+  pushByIp: (ip: string): RateLimitRule => ({
+    key: `push:ip:${ip}`,
+    limit: 20,
+    windowMs: 10 * MINUTE,
+  }),
   placeOrderByUser: (userId: string): RateLimitRule => ({
     key: `place-order:user:${userId}`,
     limit: 10,

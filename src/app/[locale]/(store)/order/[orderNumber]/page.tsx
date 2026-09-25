@@ -3,12 +3,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { PushOptIn } from "@/components/pwa/push-opt-in";
 import { OrderSummary } from "@/components/store/order/order-summary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth-guards";
 import { getCustomerOrder } from "@/lib/services/checkout.service";
+import { vapidPublicKey } from "@/lib/services/push.service";
 import { formatIndianMobile } from "@/lib/utils/phone";
 
 export async function generateMetadata({
@@ -89,6 +91,8 @@ export default async function OrderPage({ params }: PageProps<"/[locale]/order/[
           </Button>
         )}
       </div>
+
+      {!pending && !cancelled && <PushOptIn vapidPublicKey={vapidPublicKey()} />}
 
       <OrderSummary order={order} locale={locale} />
 

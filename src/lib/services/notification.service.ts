@@ -15,6 +15,7 @@ import {
   type OrderTemplate,
 } from "@/lib/notifications/render";
 import { formatINR } from "@/lib/utils/money";
+import { pushConfigured, sendPush } from "./push.service";
 import { getStoreSettings } from "./settings.service";
 
 /**
@@ -29,6 +30,9 @@ export const MAX_ATTEMPTS = 5;
 const SEND_LOCK_MS = 2 * 60_000;
 /** Wait before retry n (1-based). */
 const BACKOFF_MS = [60_000, 5 * 60_000, 15 * 60_000, 60 * 60_000];
+
+/** A failure that retrying can't fix (e.g. the push subscription is gone). */
+export class PermanentDeliveryError extends Error {}
 
 /** Status changes the customer is told about. */
 export const NOTIFY_ON: Partial<Record<OrderStatus, OrderTemplate>> = {
@@ -92,6 +96,13 @@ export async function enqueueOrderNotification(
   }
   if (enabled(getWhatsAppProvider)) {
     targets.push({ channel: "WHATSAPP", recipient: order.customerPhone });
+  }
+  if (order.userId && pushConfigured()) {
+    const devices = await tx.pushSubscription.findMany({
+      where: { userId: order.userId, orderUpdates: true },
+      select: { endpoint: true },
+    });
+    for (const d of devices) targets.push({ channel: "PUSH", recipient: d.endpoint });
   }
   if (!targets.length) return 0;
 
@@ -164,6 +175,19 @@ async function send(n: Row): Promise<void> {
       });
       return;
     }
+    case "PUSH": {
+      const device = await db.pushSubscription.findUnique({ where: { endpoint: n.recipient } });
+      if (!device || !device.orderUpdates) {
+        throw new PermanentDeliveryError("Push subscription removed or turned off");
+      }
+      const result = await sendPush(device, {
+        ...message.push,
+        url: `/${n.locale}/account/orders/${encodeURIComponent(payload.orderNumber)}`,
+        tag: `order-${payload.orderNumber}`,
+      });
+      if (result === "gone") throw new PermanentDeliveryError("Push subscription expired");
+      return;
+    }
     default:
       throw new Error(`Channel ${n.channel} is not supported for order notifications`);
   }
@@ -200,7 +224,7 @@ export async function deliverNotifications(
       });
       result.sent += 1;
     } catch (error) {
-      const giveUp = attempts >= MAX_ATTEMPTS;
+      const giveUp = attempts >= MAX_ATTEMPTS || error instanceof PermanentDeliveryError;
       await db.notification.update({
         where: { id: row.id },
         data: {

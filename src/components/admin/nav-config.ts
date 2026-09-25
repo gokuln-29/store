@@ -6,6 +6,7 @@ import {
   KeyRound,
   LayoutDashboard,
   LayoutTemplate,
+  Megaphone,
   Package,
   Settings,
   ShoppingBag,
@@ -22,6 +23,7 @@ export type AdminNavKey =
   | "orders"
   | "payments"
   | "content"
+  | "push"
   | "settings"
   | "staff"
   | "auditLog"
@@ -77,6 +79,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         icon: LayoutTemplate,
         permission: "content:manage",
       },
+      { href: "/admin/push", key: "push", icon: Megaphone, permission: "content:manage" },
     ],
   },
   {
