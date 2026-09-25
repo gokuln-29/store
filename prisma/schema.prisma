@@ -265,6 +265,7 @@ model User {
   auditLogs         AuditLog[]
   orderEvents       OrderEvent[]
   refunds           Refund[]
+  pushCampaigns     PushCampaign[]
 
   @@index([role])
   @@index([createdAt])
@@ -474,10 +475,13 @@ model ProductImage {
 
 /// DB cart for logged-in users. Guests keep their cart in localStorage and it merges on login.
 model Cart {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  /// When the browser made the change being saved; older saves (e.g. replayed after being
+  /// offline) never overwrite newer ones.
+  clientUpdatedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   items CartItem[]
@@ -778,19 +782,54 @@ model WebhookEvent {
 // ─────────────────────────────── Notifications ───────────────────────────────
 
 model PushSubscription {
-  id         String    @id @default(cuid())
-  userId     String?
-  endpoint   String    @unique
-  p256dh     String
-  auth       String
-  userAgent  String?
-  locale     String?
-  createdAt  DateTime  @default(now())
-  lastUsedAt DateTime?
+  id           String    @id @default(cuid())
+  userId       String?
+  endpoint     String    @unique
+  p256dh       String
+  auth         String
+  userAgent    String?
+  locale       String?
+  /// Consent: order status updates (transactional) and offers (marketing, opt-in).
+  orderUpdates Boolean   @default(true)
+  offers       Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+  lastUsedAt   DateTime?
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([offers, id])
+}
+
+enum PushCampaignStatus {
+  SENDING
+  SENT
+}
+
+/// An admin-composed push promotion, sent to devices that opted in to offers.
+model PushCampaign {
+  id            String             @id @default(cuid())
+  title         Json /// localized
+  body          Json /// localized
+  imageUrl      String?
+  /// Same-site path opened on click, e.g. "/c/sweets".
+  url           String?
+  status        PushCampaignStatus @default(SENDING)
+  audienceCount Int                @default(0)
+  sentCount     Int                @default(0)
+  failedCount   Int                @default(0)
+  /// Last PushSubscription.id processed, so sending resumes after an interruption.
+  cursor        String?
+  /// Set while a sender is working on it, so two runs never send in parallel.
+  lockedUntil   DateTime?
+  createdById   String?
+  createdAt     DateTime           @default(now())
+  completedAt   DateTime?
+
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
 }
 
 model Notification {
