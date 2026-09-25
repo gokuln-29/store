@@ -105,6 +105,13 @@ shows Tamil and Kannada correctly, and cells starting with `= + - @` are escaped
 - With `PAYMENT_PROVIDER=mock`, "Pay online" opens a local test page where you can simulate a
   successful or failed payment.
 
+## Payments
+
+Razorpay (UPI, cards, netbanking, wallets) and cash on delivery. Payments are confirmed by a
+signature-verified browser callback **and** an idempotent webhook; unpaid orders expire and
+release their stock; owners issue full or partial refunds from Admin → Payments.
+Setup, local webhook testing and the expiry cron job: **[docs/payments.md](docs/payments.md)**.
+
 ## Project structure
 
 ```
