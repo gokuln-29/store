@@ -1,12 +1,13 @@
 "use client";
 
-import { MapPin, User } from "lucide-react";
+import { MapPin, Package, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/account", key: "profile", icon: User, exact: true },
+  { href: "/account/orders", key: "orders", icon: Package, exact: false },
   { href: "/account/addresses", key: "addresses", icon: MapPin, exact: false },
 ] as const;
 
