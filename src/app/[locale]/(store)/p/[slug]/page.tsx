@@ -8,13 +8,17 @@ import { ProductCard } from "@/components/store/product-card";
 import { ProductGallery } from "@/components/store/product/gallery";
 import { PurchasePanel, type PanelOption } from "@/components/store/product/purchase-panel";
 import { RecentlyViewedRow, RecordView } from "@/components/store/recently-viewed/recently-viewed";
+import { RatingStars } from "@/components/store/reviews/rating-stars";
+import { ReviewsSection } from "@/components/store/reviews/reviews-section";
 import { WishlistButton } from "@/components/store/wishlist/wishlist-button";
+import { productReviews } from "@/lib/services/review.service";
 import { resolveFeatures } from "@/lib/features";
 import { ScrollRow } from "@/components/store/scroll-row";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getBoughtTogether,
   getRelatedProducts,
+  ratingSummary,
   getStoreCategory,
   getStoreProduct,
 } from "@/lib/services/catalog-query.service";
@@ -76,6 +80,9 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
     features.relatedProducts ? getBoughtTogether(product.id) : [],
   ]);
   const name = localize(product.name, locale);
+  // Approved reviews only; hidden entirely when reviews are switched off.
+  const rating = features.reviews ? ratingSummary(product.ratingCount, product.ratingTotal) : null;
+  const jsonLdReviews = rating ? (await productReviews(product.id, 1, 5)).reviews : [];
   const shortDescription = localize(product.shortDescription, locale);
   const description = localize(product.description, locale);
 
@@ -140,6 +147,11 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
               </p>
             )}
             <h1 className="text-2xl font-bold sm:text-3xl">{name}</h1>
+            {rating && (
+              <a href="#reviews-heading" className="w-fit hover:underline">
+                <RatingStars value={rating.average} count={rating.count} />
+              </a>
+            )}
             {shortDescription && <p className="text-muted-foreground">{shortDescription}</p>}
           </div>
           <PurchasePanel
@@ -222,6 +234,8 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
         </section>
       )}
 
+      {features.reviews && <ReviewsSection productId={product.id} rating={rating} />}
+
       <RecentlyViewedRow excludeId={product.id} />
       <RecordView productId={product.id} />
 
@@ -252,6 +266,24 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/p/[sl
                   priceCurrency: "INR",
                   availability,
                 },
+          ...(rating
+            ? {
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: rating.average,
+                  reviewCount: rating.count,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+                review: jsonLdReviews.map((r) => ({
+                  "@type": "Review",
+                  reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+                  author: { "@type": "Person", name: r.author || "Customer" },
+                  datePublished: r.createdAt.toISOString().slice(0, 10),
+                  ...(r.body ? { reviewBody: r.body.slice(0, 500) } : {}),
+                })),
+              }
+            : {}),
         }}
       />
     </div>

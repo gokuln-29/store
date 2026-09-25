@@ -73,6 +73,14 @@ export async function getStoreCategory(slug: string) {
   };
 }
 
+/** Average rounded to one decimal (4.33 → 4.3), or null without reviews. */
+export function ratingSummary(
+  count: number,
+  total: number,
+): { average: number; count: number } | null {
+  return count > 0 ? { average: Math.round((total / count) * 10) / 10, count } : null;
+}
+
 // ───────────── Listing ─────────────
 
 export type ProductCard = {
@@ -85,6 +93,8 @@ export type ProductCard = {
   compareAtPrice: number | null;
   inStock: boolean;
   variantCount: number;
+  /** Approved reviews; null when there are none. */
+  rating: { average: number; count: number } | null;
 };
 
 type ListingScope = {
@@ -238,6 +248,8 @@ export async function productCards(ids: string[]): Promise<ProductCard[]> {
       id: true,
       slug: true,
       name: true,
+      ratingCount: true,
+      ratingTotal: true,
       images: { orderBy: { sortOrder: "asc" }, take: 1, select: { url: true, alt: true } },
       variants: {
         where: { isActive: true },
@@ -265,6 +277,7 @@ export async function productCards(ids: string[]): Promise<ProductCard[]> {
             : null,
         inStock: p.variants.some((v) => v.stock > 0),
         variantCount: p.variants.length,
+        rating: ratingSummary(p.ratingCount, p.ratingTotal),
       },
     ];
   });

@@ -1,4 +1,4 @@
-export type UploadFolder = "branding" | "products" | "categories" | "banners";
+export type UploadFolder = "branding" | "products" | "categories" | "banners" | "reviews";
 
 export type UploadInput = {
   bytes: Uint8Array;

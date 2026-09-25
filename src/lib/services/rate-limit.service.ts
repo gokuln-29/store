@@ -79,6 +79,16 @@ export const RATE_LIMITS = {
     limit: 30,
     windowMs: 10 * MINUTE,
   }),
+  reviewPhotoByUser: (userId: string): RateLimitRule => ({
+    key: `review-photo:user:${userId}`,
+    limit: 20,
+    windowMs: 60 * MINUTE,
+  }),
+  reviewByUser: (userId: string): RateLimitRule => ({
+    key: `review:user:${userId}`,
+    limit: 20,
+    windowMs: 60 * MINUTE,
+  }),
   pushByIp: (ip: string): RateLimitRule => ({
     key: `push:ip:${ip}`,
     limit: 20,

@@ -226,7 +226,11 @@
     "feature_disabled": "This feature is turned off.",
     "couponCodeInvalid": "Use 3–20 capital letters, numbers, - or _.",
     "couponCodeTaken": "Another coupon already uses this code.",
-    "coupon_used": "This coupon has been used, so it can't be deleted. Disable it instead."
+    "coupon_used": "This coupon has been used, so it can't be deleted. Disable it instead.",
+    "ratingRequired": "Choose a rating from 1 to 5 stars.",
+    "tooManyPhotos": "You can add up to 3 photos.",
+    "not_eligible": "You can review a product once it has been delivered to you.",
+    "already_reviewed": "You've already reviewed this product."
   },
   "DataTable": {
     "selectAll": "Select all rows",
@@ -264,7 +268,8 @@
     "payments": "Payments",
     "orders": "Orders",
     "push": "Push campaigns",
-    "coupons": "Coupons"
+    "coupons": "Coupons",
+    "reviews": "Reviews"
   },
   "Settings": {
     "title": "Store settings",
@@ -1351,5 +1356,59 @@
     "recentOrders": "Recent orders",
     "noOrders": "Not used yet.",
     "featureOff": "Coupons are switched off in Settings → Features, so customers can't use any code right now."
+  },
+  "Reviews": {
+    "title": "Customer reviews",
+    "ratedOutOf": "Rated {rating} out of 5",
+    "count": "{count, plural, =1 {# review} other {# reviews}}",
+    "basedOn": "Based on {count, plural, =1 {# review} other {# reviews}}",
+    "distribution": "Rating breakdown",
+    "stars": "{count, plural, =1 {# star} other {# stars}}",
+    "none": "No reviews yet.",
+    "howToReview": "Only customers who received this product can review it. Write yours from My account → Orders.",
+    "verified": "Verified purchase",
+    "customer": "Customer",
+    "photoBy": "Photo from {name}",
+    "showMore": "Show more reviews",
+    "write": "Write a review",
+    "writeFor": "Review {name}",
+    "moderationNote": "Your review appears after the store checks it.",
+    "yourRating": "Your rating",
+    "titleField": "Title (optional)",
+    "bodyField": "Your review (optional)",
+    "photos": "Photos (optional)",
+    "photosHint": "Up to 3 photos. Location data is removed.",
+    "addPhoto": "Add a photo",
+    "removePhoto": "Remove photo",
+    "submit": "Submit review",
+    "submitted": "Thanks! Your review will appear once it's approved.",
+    "reviewItems": "Review your items",
+    "statusApproved": "Reviewed",
+    "statusPending": "Review awaiting approval",
+    "statusRejected": "Review not published"
+  },
+  "AdminReviews": {
+    "title": "Reviews",
+    "description": "Approve customer reviews before they appear on the store. Newest pending reviews come first.",
+    "searchPlaceholder": "Search text or product",
+    "empty": "No reviews yet.",
+    "review": "Review",
+    "status": "Status",
+    "actions": "Actions",
+    "allStatuses": "All statuses",
+    "statuses": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "verified": "Verified purchase",
+    "photo": "Customer photo",
+    "approve": "Approve",
+    "reject": "Reject",
+    "delete": "Delete",
+    "approved": "Review approved.",
+    "rejected": "Review rejected.",
+    "deleted": "Review deleted.",
+    "featureOff": "Reviews are switched off in Settings → Features: nothing is shown on the store and customers can't write new ones."
   }
 }

@@ -5,6 +5,7 @@ import type { ProductCard as Card } from "@/lib/services/catalog-query.service";
 import { isLocalUpload } from "@/lib/utils/images";
 import { localize } from "@/lib/utils/localized";
 import { Price, discountPercent } from "./price";
+import { CardRating } from "./reviews/card-rating";
 import { WishlistButton } from "./wishlist/wishlist-button";
 
 export function ProductCard({ product, priority = false }: { product: Card; priority?: boolean }) {
@@ -45,6 +46,7 @@ export function ProductCard({ product, priority = false }: { product: Card; prio
           <h3 className="line-clamp-2 text-sm leading-snug font-medium group-hover:underline">
             {name}
           </h3>
+          <CardRating rating={product.rating} />
           <Price
             price={product.price}
             compareAtPrice={product.compareAtPrice}

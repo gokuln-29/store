@@ -8,12 +8,16 @@ import { CancelOrderButton } from "@/components/store/order/cancel-order-button"
 import { OrderProgress } from "@/components/store/order/order-progress";
 import { OrderSummary } from "@/components/store/order/order-summary";
 import { ReorderButton } from "@/components/store/order/reorder-button";
+import { ReviewDialog } from "@/components/store/reviews/review-dialog";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth-guards";
 import { getCustomerOrder } from "@/lib/services/checkout.service";
 import { getCustomerOrderDetail } from "@/lib/services/order.service";
 import { canCustomerCancel } from "@/lib/services/order-status";
+import { myReviews } from "@/lib/services/review.service";
+import { getFeatures } from "@/lib/services/settings.service";
+import { localize } from "@/lib/utils/localized";
 import { formatDateTime } from "@/lib/utils/format";
 import { formatINR } from "@/lib/utils/money";
 
@@ -59,7 +63,30 @@ export default async function MyOrderPage({
   const order = await getCustomerOrderDetail(number, user.id);
   if (!order) notFound();
 
-  const [t, tOrder] = await Promise.all([getTranslations("MyOrders"), getTranslations("Order")]);
+  const [t, tOrder, tReviews, features] = await Promise.all([
+    getTranslations("MyOrders"),
+    getTranslations("Order"),
+    getTranslations("Reviews"),
+    getFeatures(),
+  ]);
+  // Delivered items that can still be reviewed (one review per product).
+  const reviewable = [
+    ...new Map(
+      order.items
+        .filter((i): i is typeof i & { productId: string } => !!i.productId)
+        .map((i) => [
+          i.productId,
+          { productId: i.productId, name: localize(i.productName, locale) },
+        ]),
+    ).values(),
+  ];
+  const myReviewsByProduct =
+    features.reviews && order.status === "DELIVERED"
+      ? await myReviews(
+          user.id,
+          reviewable.map((i) => i.productId),
+        )
+      : new Map();
   const address = order.shippingAddress as Snapshot;
   const paidOnline =
     order.paymentMethod === "ONLINE" &&
@@ -170,6 +197,42 @@ export default async function MyOrderPage({
           )
         )}
       </div>
+
+      {features.reviews && order.status === "DELIVERED" && reviewable.length > 0 && (
+        <section aria-labelledby="review-heading" className="grid gap-3 rounded-lg border p-4">
+          <h3 id="review-heading" className="font-semibold">
+            {tReviews("reviewItems")}
+          </h3>
+          <ul className="divide-y">
+            {reviewable.map((item) => {
+              const mine = myReviewsByProduct.get(item.productId);
+              return (
+                <li
+                  key={item.productId}
+                  className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm"
+                >
+                  <span>{item.name}</span>
+                  {mine ? (
+                    <span className="text-muted-foreground">
+                      {mine.status === "APPROVED"
+                        ? tReviews("statusApproved")
+                        : mine.status === "PENDING"
+                          ? tReviews("statusPending")
+                          : tReviews("statusRejected")}
+                    </span>
+                  ) : (
+                    <ReviewDialog
+                      productId={item.productId}
+                      productName={item.name}
+                      photosEnabled={features.reviewPhotos}
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <OrderSummary order={order} locale={locale} />
 

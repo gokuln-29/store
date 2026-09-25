@@ -384,6 +384,9 @@ model Product {
   status           ProductStatus @default(DRAFT)
   brand            String?
   isFeatured       Boolean       @default(false)
+  /// Approved reviews only; average = ratingTotal / ratingCount (kept in step on moderation).
+  ratingCount      Int           @default(0)
+  ratingTotal      Int           @default(0)
 
   /// Values for the category's AttributeDefinitions, keyed by definition key.
   attributes Json @default("{}")

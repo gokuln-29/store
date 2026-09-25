@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LayoutTemplate,
   Megaphone,
+  MessageSquareText,
   Package,
   Settings,
   TicketPercent,
@@ -21,6 +22,7 @@ export type AdminNavKey =
   | "products"
   | "categories"
   | "inventory"
+  | "reviews"
   | "orders"
   | "payments"
   | "coupons"
@@ -65,6 +67,12 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         permission: "catalog:read",
       },
       { href: "/admin/inventory", key: "inventory", icon: Boxes, permission: "catalog:read" },
+      {
+        href: "/admin/reviews",
+        key: "reviews",
+        icon: MessageSquareText,
+        permission: "catalog:write",
+      },
     ],
   },
   {
