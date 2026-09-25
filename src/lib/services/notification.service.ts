@@ -1,0 +1,234 @@
+import { after } from "next/server";
+import type { NotificationChannel, OrderStatus, Prisma } from "@/generated/prisma/client";
+import { db } from "@/lib/db";
+import {
+  getEmailProvider,
+  getSmsProvider,
+  getWhatsAppProvider,
+  orderSmsEnabled,
+} from "@/lib/providers/notify";
+import {
+  orderPayloadSchema,
+  renderOrderNotification,
+  ORDER_TEMPLATES,
+  type OrderNotificationPayload,
+  type OrderTemplate,
+} from "@/lib/notifications/render";
+import { formatINR } from "@/lib/utils/money";
+import { getStoreSettings } from "./settings.service";
+
+/**
+ * Customer notifications (email / SMS / WhatsApp) use an outbox: rows are written in the same
+ * transaction as the change they announce, then delivered after the response. Failures are
+ * retried with backoff by the cron job, so a slow provider never blocks an order update.
+ */
+
+type Tx = Prisma.TransactionClient;
+
+export const MAX_ATTEMPTS = 5;
+const SEND_LOCK_MS = 2 * 60_000;
+/** Wait before retry n (1-based). */
+const BACKOFF_MS = [60_000, 5 * 60_000, 15 * 60_000, 60 * 60_000];
+
+/** Status changes the customer is told about. */
+export const NOTIFY_ON: Partial<Record<OrderStatus, OrderTemplate>> = {
+  PLACED: "order_placed",
+  SHIPPED: "order_shipped",
+  DELIVERED: "order_delivered",
+  CANCELLED: "order_cancelled",
+  RETURNED: "order_returned",
+};
+
+function enabled(check: () => unknown): boolean {
+  try {
+    return !!check();
+  } catch {
+    return false; // misconfigured provider: skip that channel rather than fail the order
+  }
+}
+
+export async function enqueueOrderNotification(
+  tx: Tx,
+  orderId: string,
+  template: OrderTemplate,
+  extra: { refund?: boolean } = {},
+): Promise<number> {
+  const order = await tx.order.findUniqueOrThrow({
+    where: { id: orderId },
+    select: {
+      userId: true,
+      orderNumber: true,
+      customerName: true,
+      customerPhone: true,
+      customerEmail: true,
+      total: true,
+      locale: true,
+      courierName: true,
+      trackingNumber: true,
+      trackingUrl: true,
+    },
+  });
+  const settings = await getStoreSettings();
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const payload: OrderNotificationPayload = {
+    storeName: settings.name,
+    brandColor: settings.primaryColor,
+    orderNumber: order.orderNumber,
+    customerName: order.customerName,
+    total: formatINR(order.total, order.locale),
+    orderUrl: `${appUrl}/${order.locale}/account/orders/${encodeURIComponent(order.orderNumber)}`,
+    courierName: order.courierName,
+    trackingNumber: order.trackingNumber,
+    trackingUrl: order.trackingUrl,
+    ...(extra.refund ? { refund: true } : {}),
+  };
+
+  const targets: { channel: NotificationChannel; recipient: string }[] = [];
+  if (order.customerEmail && enabled(getEmailProvider)) {
+    targets.push({ channel: "EMAIL", recipient: order.customerEmail });
+  }
+  if (orderSmsEnabled() && enabled(getSmsProvider)) {
+    targets.push({ channel: "SMS", recipient: order.customerPhone });
+  }
+  if (enabled(getWhatsAppProvider)) {
+    targets.push({ channel: "WHATSAPP", recipient: order.customerPhone });
+  }
+  if (!targets.length) return 0;
+
+  await tx.notification.createMany({
+    data: targets.map((target) => ({
+      ...target,
+      orderId,
+      userId: order.userId,
+      template,
+      locale: order.locale,
+      payload: payload as Prisma.InputJsonValue,
+    })),
+  });
+  return targets.length;
+}
+
+type Row = {
+  id: string;
+  channel: NotificationChannel;
+  template: string;
+  locale: string;
+  recipient: string;
+  payload: Prisma.JsonValue;
+};
+
+async function send(n: Row): Promise<void> {
+  if (!(ORDER_TEMPLATES as readonly string[]).includes(n.template)) {
+    throw new Error(`Unknown template "${n.template}"`);
+  }
+  const template = n.template as OrderTemplate;
+  const payload = orderPayloadSchema.parse(n.payload);
+  const message = renderOrderNotification(template, n.locale, payload);
+  const params: Record<string, string> = {
+    orderNumber: payload.orderNumber,
+    total: payload.total,
+    storeName: payload.storeName,
+    ...(payload.trackingNumber ? { trackingNumber: payload.trackingNumber } : {}),
+  };
+
+  switch (n.channel) {
+    case "EMAIL": {
+      const email = getEmailProvider();
+      if (!email) throw new Error("Email is switched off");
+      await email.send({
+        to: n.recipient,
+        subject: message.subject,
+        html: message.html,
+        text: message.text,
+      });
+      return;
+    }
+    case "SMS":
+      await getSmsProvider().sendMessage({
+        to: n.recipient,
+        template,
+        params,
+        locale: n.locale,
+        text: message.short,
+      });
+      return;
+    case "WHATSAPP": {
+      const whatsapp = getWhatsAppProvider();
+      if (!whatsapp) throw new Error("WhatsApp is switched off");
+      await whatsapp.sendMessage({
+        to: n.recipient,
+        template,
+        params,
+        locale: n.locale,
+        text: message.short,
+      });
+      return;
+    }
+    default:
+      throw new Error(`Channel ${n.channel} is not supported for order notifications`);
+  }
+}
+
+/**
+ * Sends due notifications. Each row is claimed first (attempts + lock), so concurrent runs
+ * never send the same message twice.
+ */
+export async function deliverNotifications(
+  opts: { orderId?: string; limit?: number } = {},
+): Promise<{ sent: number; failed: number; retrying: number }> {
+  const now = new Date();
+  const due = { OR: [{ lockedUntil: null }, { lockedUntil: { lte: now } }] };
+  const rows = await db.notification.findMany({
+    where: { status: "PENDING", ...(opts.orderId ? { orderId: opts.orderId } : {}), ...due },
+    orderBy: { createdAt: "asc" },
+    take: opts.limit ?? 50,
+  });
+
+  const result = { sent: 0, failed: 0, retrying: 0 };
+  for (const row of rows) {
+    const claimed = await db.notification.updateMany({
+      where: { id: row.id, status: "PENDING", ...due },
+      data: { attempts: { increment: 1 }, lockedUntil: new Date(Date.now() + SEND_LOCK_MS) },
+    });
+    if (claimed.count !== 1) continue;
+    const attempts = row.attempts + 1;
+    try {
+      await send(row);
+      await db.notification.update({
+        where: { id: row.id },
+        data: { status: "SENT", sentAt: new Date(), lockedUntil: null, error: null },
+      });
+      result.sent += 1;
+    } catch (error) {
+      const giveUp = attempts >= MAX_ATTEMPTS;
+      await db.notification.update({
+        where: { id: row.id },
+        data: {
+          status: giveUp ? "FAILED" : "PENDING",
+          error: String((error as Error).message ?? error).slice(0, 500),
+          lockedUntil: giveUp
+            ? null
+            : new Date(Date.now() + BACKOFF_MS[Math.min(attempts, BACKOFF_MS.length) - 1]!),
+        },
+      });
+      result[giveUp ? "failed" : "retrying"] += 1;
+    }
+  }
+  return result;
+}
+
+/**
+ * Delivers an order's notifications after the current response is sent (Next.js `after`).
+ * Outside a request (scripts, tests) it delivers right away.
+ */
+export async function scheduleNotificationDelivery(orderId: string): Promise<void> {
+  const run = () =>
+    deliverNotifications({ orderId }).catch((error) =>
+      console.error(`[notify] delivery for order ${orderId} failed`, error),
+    );
+  try {
+    after(run);
+  } catch {
+    await run();
+  }
+}

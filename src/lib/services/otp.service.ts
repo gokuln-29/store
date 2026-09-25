@@ -38,7 +38,7 @@ export interface OtpStore {
 
 export type OtpDeps = {
   store: OtpStore;
-  sms: SmsProvider;
+  sms: Pick<SmsProvider, "name" | "sendOtp">;
   secret: string;
   now?: () => Date;
   generateCode?: () => string;

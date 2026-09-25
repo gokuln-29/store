@@ -66,7 +66,10 @@ describe("OTP service", () => {
     sent = [];
     memory = createMemoryOtpStore();
     codes = ["111111", "222222", "333333", "444444", "555555", "666666"];
-    const sms: SmsProvider = { name: "memory", sendOtp: async (m) => void sent.push(m) };
+    const sms: Pick<SmsProvider, "name" | "sendOtp"> = {
+      name: "memory",
+      sendOtp: async (m) => void sent.push(m),
+    };
     service = createOtpService({
       store: memory.store,
       sms,
