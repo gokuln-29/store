@@ -121,6 +121,13 @@ cancel until the order is packed (paid orders are refunded automatically), buy a
 download invoices. Customers are notified by email / SMS / WhatsApp in their language.
 Details: **[docs/orders.md](docs/orders.md)**.
 
+## Growth features
+
+Wishlist, verified-purchase reviews with moderation, coupons admin, abandoned cart reminders,
+recently viewed and related products, a sales dashboard with an anonymous conversion funnel,
+customer lifetime value and CSV exports. Each can be switched off in Settings → Features.
+Details and number definitions: **[docs/growth.md](docs/growth.md)**.
+
 ## Languages
 
 English, Tamil and Kannada throughout: interface, validation errors, emails, SMS and push. Store
@@ -151,6 +158,13 @@ src/
 prisma/                # schema, migrations, seed (data model: docs/erd.md)
 tests/unit, tests/e2e  # Vitest and Playwright tests
 ```
+
+## Growth features
+
+Wishlist, verified-purchase reviews with moderation, coupons admin, abandoned cart reminders,
+recently viewed and related products, a sales dashboard with an anonymous conversion funnel,
+customer lifetime value and CSV exports. Each can be switched off in Settings → Features.
+Details and number definitions: **[docs/growth.md](docs/growth.md)**.
 
 ## Languages
 
