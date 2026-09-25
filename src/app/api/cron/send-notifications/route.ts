@@ -1,4 +1,5 @@
 import { cronGuard } from "@/lib/cron";
+import { pruneFunnelEvents } from "@/lib/services/analytics.service";
 import { processCartReminders } from "@/lib/services/cart-reminder.service";
 import { deliverNotifications } from "@/lib/services/notification.service";
 import { processCampaigns } from "@/lib/services/push.service";
@@ -16,6 +17,7 @@ async function handle(request: Request) {
   const cartReminders = await processCartReminders();
   const notifications = await deliverNotifications({ limit: 100 });
   const campaigns = await processCampaigns({ timeBudgetMs: 25_000 });
+  await pruneFunnelEvents();
   return Response.json({ ...notifications, campaigns, cartReminders });
 }
 

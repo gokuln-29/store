@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { OtpLoginForm } from "@/components/auth/otp-login-form";
+import { TrackStep } from "@/components/store/analytics-beacon";
 import { CheckoutForm } from "@/components/store/checkout/checkout-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth-guards";
@@ -49,6 +50,7 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-4 py-6">
       <h1 className="text-2xl font-bold sm:text-3xl">{t("title")}</h1>
+      <TrackStep step="checkout" />
       <CheckoutForm
         addresses={addresses.map((a) => ({
           id: a.id,

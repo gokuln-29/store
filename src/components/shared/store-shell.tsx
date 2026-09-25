@@ -3,6 +3,7 @@ import { STORE_FONTS, googleFontsHref } from "@/lib/constants/fonts";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { readableForeground } from "@/lib/utils/color";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
+import { AnalyticsBeacon } from "@/components/store/analytics-beacon";
 import { CartSync } from "@/components/store/cart/cart-sync";
 import { FeaturesProvider } from "@/components/store/features-context";
 import { WishlistSync } from "@/components/store/wishlist/wishlist-sync";
@@ -54,6 +55,7 @@ export async function StoreShell({ children }: { children: ReactNode }) {
           <SiteFooter />
           <CartSync />
           <WishlistSync />
+          <AnalyticsBeacon />
           <InstallPrompt storeName={settings.name} />
         </div>
       </FeaturesProvider>

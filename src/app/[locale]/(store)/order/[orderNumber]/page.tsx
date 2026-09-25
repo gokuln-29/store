@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PushOptIn } from "@/components/pwa/push-opt-in";
+import { TrackStep } from "@/components/store/analytics-beacon";
 import { OrderSummary } from "@/components/store/order/order-summary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,6 +94,7 @@ export default async function OrderPage({ params }: PageProps<"/[locale]/order/[
       </div>
 
       {!pending && !cancelled && <PushOptIn vapidPublicKey={vapidPublicKey()} />}
+      {!pending && !cancelled && <TrackStep step="ordered" />}
 
       <OrderSummary order={order} locale={locale} />
 

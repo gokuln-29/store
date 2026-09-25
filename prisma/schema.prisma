@@ -888,3 +888,25 @@ model AuditLog {
   @@index([actorId, createdAt])
   @@index([createdAt])
 }
+
+// ─────────────────────────────── Analytics ───────────────────────────────
+
+enum FunnelStep {
+  VISIT
+  ADD_TO_CART
+  CHECKOUT
+  ORDERED
+}
+
+/// Anonymous funnel counts: one row per browser session (random id, no cookie) per step per
+/// IST day. No personal data. Every step is session-based, so the funnel is consistent
+/// (order totals on the dashboard come from the orders themselves).
+model FunnelEvent {
+  day       DateTime   @db.Date
+  sessionId String     @db.Uuid
+  step      FunnelStep
+  createdAt DateTime   @default(now())
+
+  @@id([day, sessionId, step])
+  @@index([day, step])
+}

@@ -89,6 +89,11 @@ export const RATE_LIMITS = {
     limit: 20,
     windowMs: 60 * MINUTE,
   }),
+  analyticsByIp: (ip: string): RateLimitRule => ({
+    key: `analytics:ip:${ip}`,
+    limit: 300,
+    windowMs: 10 * MINUTE,
+  }),
   pushByIp: (ip: string): RateLimitRule => ({
     key: `push:ip:${ip}`,
     limit: 20,
