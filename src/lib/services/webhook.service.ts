@@ -11,6 +11,9 @@ import {
 } from "@/lib/providers/payment/razorpay";
 import { verifyRazorpayWebhookSignature } from "@/lib/providers/payment/signature";
 import { applyRefundUpdate, markPaymentCaptured, markPaymentFailed } from "./payment.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("webhook");
 
 const PROVIDER = "razorpay";
 
@@ -93,7 +96,7 @@ export async function handleRazorpayWebhook(input: {
     });
     return { status: 200, result: handled ? "processed" : "ignored" };
   } catch (error) {
-    console.error(`[webhook] razorpay ${parsed.data.event} ${eventId} failed`, error);
+    log.error("razorpay webhook failed", { event: parsed.data.event, eventId }, error);
     await db.webhookEvent.update({
       where: { id: recordId },
       data: { error: String((error as Error).message ?? error).slice(0, 1000) },

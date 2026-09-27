@@ -285,7 +285,8 @@ export async function listOrders(query: OrderListQuery) {
   const toStart = query.to ? istDayStart(query.to) : null;
   const to = toStart ? new Date(toStart.getTime() + 24 * 60 * 60_000) : null;
   const q = query.q?.trim();
-  const digits = q?.replace(/\D/g, "") ?? "";
+  // Only a query without letters can be a phone number ("DS-1234" is an order number).
+  const digits = q && !/\p{L}/u.test(q) ? q.replace(/\D/g, "") : "";
   const where: Prisma.OrderWhereInput = {
     ...(query.status ? { status: query.status } : {}),
     ...(query.paymentStatus ? { paymentStatus: query.paymentStatus } : {}),
@@ -299,7 +300,12 @@ export async function listOrders(query: OrderListQuery) {
             { orderNumber: { contains: q, mode: "insensitive" } },
             { customerName: { contains: q, mode: "insensitive" } },
             { invoiceNumber: { contains: q, mode: "insensitive" } },
-            ...(digits.length >= 4 ? [{ customerPhone: { contains: digits.slice(-10) } }] : []),
+            // A full mobile number is an exact (indexed) match; fewer digits search within.
+            ...(digits.length >= 10
+              ? [{ customerPhone: `+91${digits.slice(-10)}` }]
+              : digits.length >= 4
+                ? [{ customerPhone: { contains: digits } }]
+                : []),
           ],
         }
       : {}),

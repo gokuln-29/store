@@ -15,6 +15,9 @@ import {
   type RowError,
 } from "./product-csv";
 import { saveProductInTx } from "./product.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("import");
 
 // ───────────── Export ─────────────
 
@@ -198,7 +201,7 @@ export async function importProductsCsv(
       try {
         await db.$transaction((tx) => saveOne(tx, item), { timeout: 20_000 });
       } catch (error) {
-        console.error(`[import] ${item.group.handle} failed`, error);
+        log.error("product import row failed", { handle: item.group.handle }, error);
         item.entry.ok = false;
         item.entry.errors = [{ row: item.entry.firstRow, column: null, message: "unknown" }];
       }

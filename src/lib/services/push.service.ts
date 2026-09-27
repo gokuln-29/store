@@ -5,6 +5,9 @@ import { db } from "@/lib/db";
 import { localize } from "@/lib/utils/localized";
 import { audit } from "./audit.service";
 import { getStoreSettings } from "./settings.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("push");
 
 /**
  * Web push: subscriptions (one per browser/device), delivery via VAPID, and promotional
@@ -294,7 +297,7 @@ export async function processCampaigns(
 /** Sends campaigns after the current response (the cron job picks up anything left). */
 export async function scheduleCampaignSending(): Promise<void> {
   const run = () =>
-    processCampaigns().catch((error) => console.error("[push] campaign sending failed", error));
+    processCampaigns().catch((error) => log.error("campaign sending failed", {}, error));
   try {
     after(run);
   } catch {

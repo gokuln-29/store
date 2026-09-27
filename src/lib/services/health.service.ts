@@ -1,4 +1,7 @@
 import { db } from "@/lib/db";
+import { logger } from "@/lib/logger";
+
+const log = logger("health");
 
 export type HealthStatus = {
   status: "ok" | "error";
@@ -12,7 +15,7 @@ export async function checkHealth(): Promise<HealthStatus> {
     await db.$queryRaw`SELECT 1`;
     return { status: "ok", db: "ok", timestamp };
   } catch (error) {
-    console.error("[health] database check failed", error);
+    log.error("database check failed", {}, error);
     return { status: "error", db: "error", timestamp };
   }
 }

@@ -22,6 +22,9 @@ import { routing } from "@/i18n/routing";
 import { formatINR } from "@/lib/utils/money";
 import { pushConfigured, sendPush } from "./push.service";
 import { getStoreSettings } from "./settings.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("notify");
 
 /**
  * Customer notifications (email / SMS / WhatsApp) use an outbox: rows are written in the same
@@ -282,7 +285,7 @@ export async function deliverNotifications(
 export async function scheduleNotificationDelivery(orderId: string): Promise<void> {
   const run = () =>
     deliverNotifications({ orderId }).catch((error) =>
-      console.error(`[notify] delivery for order ${orderId} failed`, error),
+      log.error("delivery failed", { orderId }, error),
     );
   try {
     after(run);

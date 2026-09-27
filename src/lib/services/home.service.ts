@@ -7,6 +7,9 @@ import {
   type NavCategory,
   type ProductCard,
 } from "./catalog-query.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("home");
 
 type Json = Prisma.JsonValue;
 
@@ -80,7 +83,7 @@ export async function getHomeBlocks(locale: string): Promise<HomeBlock[]> {
       const type = section.type as SectionType;
       const parsed = storedSectionConfig[type].safeParse(section.config);
       if (!parsed.success) {
-        console.warn(`[home] skipping section ${section.id}: invalid config`);
+        log.warn("skipping section with invalid config", { sectionId: section.id });
         return null;
       }
       const base = { id: section.id, title: section.title };

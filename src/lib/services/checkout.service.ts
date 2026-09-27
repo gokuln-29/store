@@ -16,6 +16,9 @@ import { enqueueOrderNotification, scheduleNotificationDelivery } from "./notifi
 import { ensurePaymentSession, expireOrder } from "./payment.service";
 import { quote as quoteShipping, type ShippingQuote } from "./shipping.service";
 import { getStoreSettingsFresh } from "./settings.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("checkout");
 
 type Tx = Prisma.TransactionClient;
 type Client = Tx | typeof db;
@@ -471,7 +474,7 @@ export async function placeOrder(input: {
   try {
     await ensurePaymentSession(created.id);
   } catch (error) {
-    console.error(`[checkout] payment session for ${created.orderNumber} failed`, error);
+    log.error("payment session failed", { orderNumber: created.orderNumber }, error);
   }
   return {
     ok: true,

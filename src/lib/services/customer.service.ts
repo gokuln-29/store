@@ -27,10 +27,14 @@ export type CustomerRow = {
 
 function searchSql(q: string | undefined): Prisma.Sql {
   if (!q) return Prisma.sql`TRUE`;
-  const digits = q.replace(/\D/g, "");
+  const digits = /\p{L}/u.test(q) ? "" : q.replace(/\D/g, ""); // letters: not a phone number
   const like = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
   return Prisma.sql`(u.name ILIKE ${like} OR u.email ILIKE ${like}${
-    digits.length >= 4 ? Prisma.sql` OR u.phone LIKE ${`%${digits.slice(-10)}%`}` : Prisma.empty
+    digits.length >= 10
+      ? Prisma.sql` OR u.phone = ${`+91${digits.slice(-10)}`}`
+      : digits.length >= 4
+        ? Prisma.sql` OR u.phone LIKE ${`%${digits}%`}`
+        : Prisma.empty
   })`;
 }
 

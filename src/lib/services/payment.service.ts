@@ -13,6 +13,9 @@ import {
 } from "@/lib/providers/payment";
 import { audit } from "./audit.service";
 import { enqueueOrderNotification, scheduleNotificationDelivery } from "./notification.service";
+import { logger } from "@/lib/logger";
+
+const log = logger("payments");
 
 /**
  * Online payment lifecycle: capture, failure and retry, expiry of unpaid orders, refunds.
@@ -244,7 +247,7 @@ export async function markPaymentCaptured(input: {
       actorId: null,
     });
     if (!refund.ok) {
-      console.error(`[payments] automatic refund of ${result.paymentId} failed: ${refund.error}`);
+      log.error("automatic refund failed", { paymentId: result.paymentId, reason: refund.error });
     }
   }
   return result;
@@ -355,7 +358,7 @@ export async function confirmCheckoutPayment(input: {
     return { ok: true, status: "pending" };
   } catch (error) {
     if (error instanceof PaymentProviderError) {
-      console.error(`[payments] ${error.message}`);
+      log.error("provider error", {}, error);
       return { ok: false, error: "provider_error" };
     }
     throw error;
@@ -448,7 +451,7 @@ export async function expireOrder(orderId: string, now = new Date()): Promise<Ex
       }
     } catch (error) {
       if (error instanceof PaymentProviderError) {
-        console.error(`[payments] expiry check for ${orderId} postponed: ${error.message}`);
+        log.warn("expiry check postponed", { orderId }, error);
         return "skipped";
       }
       throw error;
@@ -518,7 +521,7 @@ export async function expireDueOrders(
     try {
       counts[await expireOrder(id, now)] += 1;
     } catch (error) {
-      console.error(`[payments] expiring ${id} failed`, error);
+      log.error("expiring order failed", { orderId: id }, error);
       counts.skipped += 1;
     }
   }
@@ -607,7 +610,7 @@ export async function createRefund(input: {
     });
   } catch (error) {
     if (!(error instanceof PaymentProviderError)) throw error;
-    console.error(`[payments] refund ${pending.refundId} failed: ${error.message}`);
+    log.error("refund failed", { refundId: pending.refundId }, error);
     // If the provider did accept it after all, its refund webhook moves this to PROCESSED.
     await db.refund.update({
       where: { id: pending.refundId },

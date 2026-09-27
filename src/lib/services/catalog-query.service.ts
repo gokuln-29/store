@@ -116,10 +116,9 @@ function scopeWhere(scope: ListingScope): Prisma.Sql[] {
     where.push(Prisma.sql`p.id NOT IN (${Prisma.join(scope.excludeIds)})`);
   if (scope.q) {
     const q = scope.q.toLowerCase();
-    // Substring match (uses the trigram index) or fuzzy word match for typos.
-    where.push(
-      Prisma.sql`(p."searchText" ILIKE ${`%${q}%`} OR word_similarity(${q}, p."searchText") > 0.5)`,
-    );
+    // Substring match or fuzzy word match for typos. Both operators use the trigram index;
+    // `<%` applies pg_trgm.word_similarity_threshold (0.5, set in a migration).
+    where.push(Prisma.sql`(p."searchText" ILIKE ${`%${q}%`} OR ${q} <% p."searchText")`);
   }
   return where;
 }

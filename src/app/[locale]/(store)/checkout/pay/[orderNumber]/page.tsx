@@ -13,6 +13,9 @@ import { getCustomerOrder } from "@/lib/services/checkout.service";
 import { ensurePaymentSession } from "@/lib/services/payment.service";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { formatTime } from "@/lib/utils/format";
+import { logger } from "@/lib/logger";
+
+const log = logger("pay");
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Order");
@@ -37,7 +40,7 @@ export default async function PayPage({
   try {
     session = await ensurePaymentSession(order.id);
   } catch (error) {
-    console.error(`[pay] payment session for ${order.orderNumber} failed`, error);
+    log.error("payment session failed", { orderNumber: order.orderNumber }, error);
     unavailable = true;
   }
   if (!session && !unavailable) redirect(`/${locale}/order/${order.orderNumber}`);
