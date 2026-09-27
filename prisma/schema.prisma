@@ -666,6 +666,10 @@ model Order {
   @@index([customerPhone])
   @@index([createdAt])
   @@index([expiresAt])
+  /// Admin search ("contains") on order number, customer name and invoice number.
+  @@index([orderNumber(ops: raw("gin_trgm_ops"))], type: Gin, map: "Order_orderNumber_trgm_idx")
+  @@index([customerName(ops: raw("gin_trgm_ops"))], type: Gin, map: "Order_customerName_trgm_idx")
+  @@index([invoiceNumber(ops: raw("gin_trgm_ops"))], type: Gin, map: "Order_invoiceNumber_trgm_idx")
 }
 
 /// Line item with a snapshot of the product as it was when ordered.
