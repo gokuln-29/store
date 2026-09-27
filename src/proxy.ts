@@ -46,5 +46,5 @@ export default auth((req) => {
 
 export const config = {
   // Skip API routes, Next internals, Vercel internals and files with an extension.
-  matcher: "/((?!api|_next|_vercel|.*\\..*).*)",
+  matcher: "/((?!api|_next|_vercel|monitoring|.*\\..*).*)",
 };

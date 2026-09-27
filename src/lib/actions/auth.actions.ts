@@ -64,7 +64,10 @@ export async function requestOtpAction(
   const { phone } = parsed.data;
 
   const ip = await getClientIp();
-  const limit = await rateLimit(postgresRateLimitStore, RATE_LIMITS.otpSendByIp(ip));
+  const byIp = await rateLimit(postgresRateLimitStore, RATE_LIMITS.otpSendByIp(ip));
+  const limit = byIp.allowed
+    ? await rateLimit(postgresRateLimitStore, RATE_LIMITS.otpSendByPhone(phone))
+    : byIp;
   if (!limit.allowed) {
     return { ok: false, error: "rate_limited", retryAfterSeconds: limit.retryAfterSeconds };
   }

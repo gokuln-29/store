@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sameOriginGuard } from "@/lib/csrf";
 import { authorize } from "@/lib/auth-guards";
 import type { Permission } from "@/lib/permissions";
 import { uploadImage } from "@/lib/services/upload.service";
@@ -13,6 +14,8 @@ const FOLDER_PERMISSION = {
 const folderSchema = z.enum(["branding", "products", "categories", "banners"]);
 
 export async function POST(request: Request) {
+  const forbidden = sameOriginGuard(request);
+  if (forbidden) return forbidden;
   const form = await request.formData().catch(() => null);
   const folder = folderSchema.safeParse(form?.get("folder"));
   const file = form?.get("file");

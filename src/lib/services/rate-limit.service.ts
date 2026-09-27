@@ -74,6 +74,12 @@ export const RATE_LIMITS = {
     limit: 20,
     windowMs: 60 * MINUTE,
   }),
+  /** Stops the login form being used to flood one phone with SMS (and run up SMS costs). */
+  otpSendByPhone: (phone: string): RateLimitRule => ({
+    key: `otp-send:phone:${phone}`,
+    limit: 5,
+    windowMs: 60 * MINUTE,
+  }),
   couponByIp: (ip: string): RateLimitRule => ({
     key: `coupon:ip:${ip}`,
     limit: 30,

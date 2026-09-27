@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sameOriginGuard } from "@/lib/csrf";
 import { getCurrentUser } from "@/lib/auth-guards";
 import { can } from "@/lib/permissions";
 import { saveCartIfNewer } from "@/lib/services/cart.service";
@@ -17,6 +18,8 @@ const bodySchema = z.object({
  * service worker can queue it while offline and replay it later (background sync).
  */
 export async function POST(request: Request) {
+  const forbidden = sameOriginGuard(request);
+  if (forbidden) return forbidden;
   const user = await getCurrentUser();
   if (!user || !can(user.role, "account:self")) {
     // Guests keep their cart in the browser only; nothing to retry.

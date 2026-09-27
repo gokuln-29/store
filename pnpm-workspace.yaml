@@ -7,3 +7,9 @@ allowBuilds:
   esbuild: true
   "@parcel/watcher": true
   "@swc/core": true
+
+# Security: patched versions of vulnerable transitive dependencies (pnpm audit).
+overrides:
+  mysql2: ">=3.23.1"
+  deepmerge-ts: ">=8.0.0"
+  browserslist: ">=4.28.7"

@@ -1,4 +1,5 @@
 import { authorize } from "@/lib/auth-guards";
+import { sameOriginGuard } from "@/lib/csrf";
 import { RATE_LIMITS, rateLimit } from "@/lib/services/rate-limit.service";
 import { postgresRateLimitStore } from "@/lib/services/rate-limit.store";
 import { uploadReviewPhoto } from "@/lib/services/review.service";
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 
 /** Photo for a review (signed-in customers only; re-encoded before storing). */
 export async function POST(request: Request) {
+  const forbidden = sameOriginGuard(request);
+  if (forbidden) return forbidden;
   const features = await getFeatures();
   if (!features.reviews || !features.reviewPhotos) {
     return Response.json({ ok: false, error: "feature_disabled" }, { status: 403 });

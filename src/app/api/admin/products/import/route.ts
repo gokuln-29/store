@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { sameOriginGuard } from "@/lib/csrf";
 import { authorize } from "@/lib/auth-guards";
 import { importProductsCsv } from "@/lib/services/product-import.service";
 
@@ -6,6 +7,8 @@ const MAX_BYTES = 5 * 1024 * 1024;
 
 /** POST multipart: file (CSV), dryRun ("1" = only validate). Returns an ImportReport. */
 export async function POST(request: Request) {
+  const forbidden = sameOriginGuard(request);
+  if (forbidden) return forbidden;
   const user = await authorize("catalog:write");
   if (!user) return Response.json({ ok: false, error: "forbidden" }, { status: 403 });
 
