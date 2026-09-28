@@ -26,7 +26,7 @@
 2. Serve the site over **HTTPS**. Service workers and push only work on HTTPS (or `localhost`).
 3. Schedule `/api/cron/send-notifications` every 5 minutes (see [orders.md](orders.md)). It
    retries order pushes and continues campaigns that didn't finish.
-4. Upload a square logo (at least 512×512, PNG or SVG) in **Store Settings → Branding**. The
+4. Upload a square logo (at least 512×512, PNG or WebP) in **Store Settings → Branding**. The
    app icons are generated from it. Without a logo, a shopping-bag icon in the brand colour is
    used.
 

@@ -69,6 +69,8 @@ DATABASE_URL="postgresql://ecom:ecom@localhost:5440/ecom?schema=public"
 | `pnpm db:up` / `db:down`   | Start / stop the local PostgreSQL container       |
 | `pnpm db:migrate`          | Create/apply migrations and regenerate the client |
 | `pnpm db:seed`             | Seed demo data (safe to re-run)                   |
+| `pnpm db:deploy`           | Apply migrations without prompts (production)     |
+| `pnpm setup:store`         | First-run setup of a real store (no demo data)    |
 | `pnpm db:reset`            | Drop the database, re-apply migrations and seed   |
 | `pnpm db:studio`           | Browse data in Prisma Studio                      |
 
@@ -143,6 +145,15 @@ The storefront installs as an app (Android and iOS), keeps browsed pages and the
 offline, and sends push notifications for order updates and admin push campaigns (offers
 are opt-in). The service worker only runs in production builds. Setup, caching rules and a
 manual test checklist: **[docs/pwa.md](docs/pwa.md)**.
+
+## Deployment and handover
+
+- **[docs/deployment.md](docs/deployment.md):** production on a VPS with Docker (Postgres,
+  HTTPS via Caddy, cron jobs, backups) or on Vercel; custom domain; Razorpay live mode; CI/CD.
+- **[docs/backups.md](docs/backups.md):** daily backups (optionally copied to S3) and restore.
+- **[docs/sms.md](docs/sms.md):** login codes and order SMS with MSG91 (DLT templates).
+- **[docs/CLIENT_ONBOARDING.md](docs/CLIENT_ONBOARDING.md):** a new client store in under an hour.
+- **[docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md):** a guide for the store owner.
 
 ## Security, monitoring and performance
 

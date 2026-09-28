@@ -15,6 +15,8 @@ and what each deployment must still do before going live.
       Serverless: pooled URL plus `DATABASE_POOL_MAX=1`–`3` (see [Database](#database)).
 - [ ] `TRUSTED_PROXY_HOPS` matches the number of proxies in front of the app (see [Rate limits](#rate-limits)).
 - [ ] VAPID keys generated once for this store ([pwa.md](pwa.md)).
+- [ ] `SMS_PROVIDER=msg91` with the OTP template ([sms.md](sms.md)); customers can't sign in
+      without it.
 - [ ] Optional: `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` set, with a separate Sentry project per store.
 - [ ] Run `pnpm audit --prod` and, against the deployed URL, the Lighthouse check in [Performance](#performance).
 - [ ] If the store embeds a third-party service (chat widget, analytics), add its domains to the
@@ -62,7 +64,9 @@ Stored in Postgres (`RateLimit` table), so they work across several server insta
 The client IP comes from `clientIpFromHeaders()` in `lib/request.ts`. It prefers `X-Real-IP`,
 otherwise it takes the entry `TRUSTED_PROXY_HOPS` from the **right** of `X-Forwarded-For`,
 because the left side can be forged by the client. Default: 1 hop (Vercel, or nginx directly in
-front). Use 2 behind a CDN plus a load balancer.
+front). Use 2 behind a CDN plus a load balancer. Any proxy in front must **overwrite**
+`X-Real-IP`. Vercel does, and so does the Caddy config in `docker/Caddyfile`. With nginx, use
+`proxy_set_header X-Real-IP $remote_addr;`.
 
 ## Security headers and CSP
 
