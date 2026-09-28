@@ -130,8 +130,9 @@ Details and number definitions: **[docs/growth.md](docs/growth.md)**.
 
 ## Languages
 
-English, Tamil and Kannada throughout: interface, validation errors, emails, SMS and push. Store
-content is edited per language, with English as the fallback. `pnpm i18n:check` (also in CI)
+English, Tamil and Kannada throughout: interface, validation errors, emails, SMS and push. Routes
+are always prefixed with the locale (`/en`, `/ta`, `/kn`). Store content is edited per language,
+with English as the fallback. `pnpm i18n:check` (also in CI)
 fails on missing or mismatched translations and hard-coded text. Details:
 **[docs/i18n.md](docs/i18n.md)**; translations for a native speaker to review:
 **[docs/i18n-review.md](docs/i18n-review.md)**.
@@ -142,6 +143,20 @@ The storefront installs as an app (Android and iOS), keeps browsed pages and the
 offline, and sends push notifications for order updates and admin push campaigns (offers
 are opt-in). The service worker only runs in production builds. Setup, caching rules and a
 manual test checklist: **[docs/pwa.md](docs/pwa.md)**.
+
+## Security, monitoring and performance
+
+Security headers and a Content Security Policy are set in `next.config.ts`; mutating API routes
+check the request origin, login and OTP are rate limited per IP and per phone, and `pnpm audit`
+is kept clean. Errors are logged as JSON lines and, when `SENTRY_DSN` is set, sent to Sentry with
+personal data scrubbed. Behind a load balancer set `TRUSTED_PROXY_HOPS`; on serverless hosts use
+a pooled `DATABASE_URL` and a small `DATABASE_POOL_MAX`. Checklist, findings and the go-live
+steps: **[docs/security-checklist.md](docs/security-checklist.md)**.
+
+`pnpm test:e2e` includes an axe accessibility audit and the full browse → checkout → fulfil
+journey. The PWA tests need a production server:
+`pnpm build && ALLOW_MOCK_PAYMENTS=true PORT=3100 pnpm start`, then
+`PLAYWRIGHT_BASE_URL=http://localhost:3100 pnpm test:e2e`.
 
 ## Project structure
 
@@ -158,15 +173,3 @@ src/
 prisma/                # schema, migrations, seed (data model: docs/erd.md)
 tests/unit, tests/e2e  # Vitest and Playwright tests
 ```
-
-## Growth features
-
-Wishlist, verified-purchase reviews with moderation, coupons admin, abandoned cart reminders,
-recently viewed and related products, a sales dashboard with an anonymous conversion funnel,
-customer lifetime value and CSV exports. Each can be switched off in Settings → Features.
-Details and number definitions: **[docs/growth.md](docs/growth.md)**.
-
-## Languages
-
-Routes are always prefixed with the locale: `/en`, `/ta`, `/kn`. Add every new UI string to all three
-files in `src/messages/`. A unit test fails if the files have different keys.
