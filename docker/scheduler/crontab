@@ -1,0 +1,5 @@
+# Times are in TZ (Asia/Kolkata by default). Jobs read the container environment from
+# /run/scheduler.env, because crond starts them with an empty environment.
+*/5 * * * *  . /run/scheduler.env; cron-call.sh expire-orders
+*/5 * * * *  . /run/scheduler.env; cron-call.sh send-notifications
+30 2 * * *   . /run/scheduler.env; backup.sh

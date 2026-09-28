@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm prisma migrate deploy && pnpm build",
+  "regions": ["bom1"],
+  "crons": [
+    { "path": "/api/cron/expire-orders", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/send-notifications", "schedule": "30 3 * * *" }
+  ]
+}

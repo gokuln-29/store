@@ -1,0 +1,18 @@
+# HTTPS reverse proxy. Caddy gets and renews Let's Encrypt certificates for DOMAIN automatically;
+# DNS A/AAAA records must point to this server and ports 80 and 443 must be open.
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000 {
+		# Overwrite any client-sent value: the app trusts X-Real-IP for rate limits.
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+# To also serve www (needs its own DNS record), uncomment:
+# www.{$DOMAIN} {
+# 	redir https://{$DOMAIN}{uri} permanent
+# }

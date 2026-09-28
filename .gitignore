@@ -63,3 +63,6 @@ next-env.d.ts
 # local image uploads (storage provider fallback)
 /uploads/
 /playwright/.auth/
+
+# database/upload backups made by the scheduler container
+/backups/

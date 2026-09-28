@@ -1,0 +1,21 @@
+# Keep the build context small and never send secrets or local data to the Docker daemon.
+.git
+.github
+.husky
+.next
+node_modules
+.env
+.env.*
+!.env.example
+uploads
+backups
+test-results
+playwright-report
+playwright/.auth
+coverage
+tsconfig.tsbuildinfo
+*.log
+.DS_Store
+.claude
+.agents
+.windsurf
