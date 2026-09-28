@@ -14,6 +14,7 @@ const PRIVATE_API = [
   "/api/orders",
   "/api/webhooks",
   "/api/cron",
+  "/api/internal",
   "/api/cart",
   "/api/push",
   "/serwist",

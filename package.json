@@ -24,7 +24,9 @@
     "prepare": "husky",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "i18n:check": "tsx scripts/i18n-check.ts"
+    "i18n:check": "tsx scripts/i18n-check.ts",
+    "setup:store": "tsx scripts/setup-store.ts",
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -59,6 +61,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@inquirer/prompts": "^8.7.2",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.13.6",
