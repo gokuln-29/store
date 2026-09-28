@@ -131,7 +131,9 @@ export async function productReviews(productId: string, page: number, pageSize =
   return {
     reviews: rows.map(({ user, orderItemId, ...r }) => ({
       ...r,
-      author: reviewerName(user.name),
+      // The relation is loaded by a second query; a reviewer deleted in between (account
+      // deletion cascades) comes back as null and must not break the product page.
+      author: reviewerName((user as typeof user | null)?.name ?? null),
       verified: orderItemId !== null,
     })),
     total,
