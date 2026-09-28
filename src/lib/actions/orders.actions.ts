@@ -22,8 +22,8 @@ import { invalid, type ActionResult } from "./result";
 const FORBIDDEN: ActionResult<never> = { ok: false, error: "forbidden" };
 
 function revalidateOrders() {
-  revalidatePath("/[locale]/admin/orders", "layout");
-  revalidatePath("/[locale]/admin/payments", "layout");
+  revalidatePath("/[locale]/admin/(panel)/orders", "layout");
+  revalidatePath("/[locale]/admin/(panel)/payments", "layout");
 }
 
 export async function changeOrderStatusAction(

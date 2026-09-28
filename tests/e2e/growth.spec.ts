@@ -58,8 +58,12 @@ test("a customer reviews a delivered product and it appears once approved", asyn
   await expect(admin.getByText("Review approved.")).toBeVisible();
   await owner.close();
 
-  await page.goto("/en/p/mysore-pak");
-  await expect(page.getByText(text)).toBeVisible();
+  // Cached product pages refresh on the visit after a change (Next.js revalidatePath), so the
+  // first visit may still show the cached copy.
+  await expect(async () => {
+    await page.goto("/en/p/mysore-pak");
+    await expect(page.getByText(text)).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 10_000 });
   await expect(page.getByText("Verified purchase").first()).toBeVisible();
   await expect(page.getByRole("img", { name: /Rated [\d.]+ out of 5/ }).first()).toBeVisible();
 });

@@ -18,8 +18,8 @@ import { invalid, type ActionResult } from "./result";
 const idSchema = z.string().min(1).max(64);
 
 function revalidateReviews() {
-  revalidatePath("/[locale]/admin/reviews", "layout");
-  revalidatePath("/[locale]/p/[slug]", "page");
+  revalidatePath("/[locale]/admin/(panel)/reviews", "layout");
+  revalidatePath("/[locale]/(store)/p/[slug]", "page");
 }
 
 /** A customer reviews a product they received. */
@@ -34,7 +34,7 @@ export async function submitReviewAction(
   if (!limit.allowed) return { ok: false, error: "rate_limited" };
   const result = await submitReview({ ...parsed.data, userId: user.id });
   if (!result.ok) return { ok: false, error: result.error };
-  revalidatePath("/[locale]/account", "layout");
+  revalidatePath("/[locale]/(account)/account", "layout");
   return { ok: true, data: { id: result.id } };
 }
 

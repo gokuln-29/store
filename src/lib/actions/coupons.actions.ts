@@ -16,7 +16,7 @@ const FORBIDDEN: ActionResult<never> = { ok: false, error: "forbidden" };
 const idSchema = z.string().min(1).max(64);
 
 function revalidateCoupons() {
-  revalidatePath("/[locale]/admin/coupons", "layout");
+  revalidatePath("/[locale]/admin/(panel)/coupons", "layout");
 }
 
 export async function saveCouponAction(

@@ -16,7 +16,7 @@ import { invalid, type ActionResult } from "./result";
 const UNAUTHORIZED: ActionResult<never> = { ok: false, error: "unauthorized" };
 
 function revalidateAccount() {
-  revalidatePath("/[locale]/account", "layout");
+  revalidatePath("/[locale]/(account)/account", "layout");
 }
 
 export async function updateProfileAction(input: ProfileInput): Promise<ActionResult> {

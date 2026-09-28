@@ -84,6 +84,6 @@ export async function sendPushCampaignAction(
   if (!parsed.success) return invalid(parsed.error, { nested: true });
   const result = await createCampaign({ ...parsed.data, actorId: user.id });
   if (result.audienceCount > 0) await scheduleCampaignSending();
-  revalidatePath("/[locale]/admin/push", "layout");
+  revalidatePath("/[locale]/admin/(panel)/push", "layout");
   return { ok: true, data: result };
 }

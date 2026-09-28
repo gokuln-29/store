@@ -30,7 +30,7 @@ export async function cancelMyOrderAction(
     actor: { type: "customer", id: user.id },
     note: parsed.data.reason,
   });
-  revalidatePath("/[locale]/account", "layout");
+  revalidatePath("/[locale]/(account)/account", "layout");
   if (!result.ok) {
     return {
       ok: false,

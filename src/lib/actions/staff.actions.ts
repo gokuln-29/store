@@ -26,7 +26,7 @@ const FORBIDDEN: ActionResult<never> = { ok: false, error: "forbidden" };
 const idSchema = z.string().min(1).max(64);
 
 function revalidateStaff() {
-  revalidatePath("/[locale]/admin/staff", "page");
+  revalidatePath("/[locale]/admin/(panel)/staff", "page");
 }
 
 export async function createStaffAction(

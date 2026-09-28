@@ -16,7 +16,7 @@ export async function refundPaymentAction(
   if (!parsed.success) return invalid(parsed.error);
 
   const result = await createRefund({ ...parsed.data, actorId: user.id });
-  revalidatePath("/[locale]/admin/payments", "layout");
+  revalidatePath("/[locale]/admin/(panel)/payments", "layout");
   if (!result.ok) {
     return result.error === "amount_exceeds"
       ? { ok: false, error: "validation", fieldErrors: { amount: "amount_exceeds" } }

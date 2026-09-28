@@ -90,7 +90,7 @@ export async function saveShippingRuleAction(
     user.id,
   );
   if (!result.ok) return { ok: false, error: result.error };
-  revalidatePath("/[locale]/admin/settings/shipping", "page");
+  revalidatePath("/[locale]/admin/(panel)/settings/shipping", "page");
   return { ok: true, data: { id: result.id } };
 }
 
@@ -100,6 +100,6 @@ export async function deleteShippingRuleAction(id: string): Promise<ActionResult
   if (typeof id !== "string" || !id) return { ok: false, error: "not_found" };
   const result = await deleteShippingRule(id, user.id);
   if (!result.ok) return { ok: false, error: result.error };
-  revalidatePath("/[locale]/admin/settings/shipping", "page");
+  revalidatePath("/[locale]/admin/(panel)/settings/shipping", "page");
   return { ok: true, data: undefined };
 }
