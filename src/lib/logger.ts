@@ -7,8 +7,13 @@ type Level = "debug" | "info" | "warn" | "error";
 type Fields = Record<string, unknown>;
 
 const ORDER: Record<Level, number> = { debug: 10, info: 20, warn: 30, error: 40 };
-const minLevel =
-  (process.env.LOG_LEVEL as Level) || (process.env.NODE_ENV === "production" ? "info" : "debug");
+const isLevel = (value: string | undefined): value is Level => !!value && value in ORDER;
+// An unknown LOG_LEVEL falls back to the default instead of silencing every log line.
+const minLevel: Level = isLevel(process.env.LOG_LEVEL)
+  ? process.env.LOG_LEVEL
+  : process.env.NODE_ENV === "production"
+    ? "info"
+    : "debug";
 
 function serializeError(error: unknown): Fields {
   if (error instanceof Error) {

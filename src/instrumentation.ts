@@ -8,7 +8,15 @@ export async function register() {
     dsn: process.env.SENTRY_DSN,
     environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
     tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0),
-    sendDefaultPii: false,
+    // Collect no personal data (Sentry 11 collects much of this by default).
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: { request: { allow: ["user-agent", "referer"] }, response: false },
+      httpBodies: [],
+      urlQueryParams: false,
+      databaseQueryData: false,
+    },
     beforeSend: scrubEvent,
   });
 }

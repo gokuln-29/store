@@ -12,7 +12,15 @@ if (dsn) {
         environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
         tunnel: "/monitoring",
         tracesSampleRate: 0,
-        sendDefaultPii: false,
+        // Collect no personal data (Sentry 11 collects much of this by default).
+        dataCollection: {
+          userInfo: false,
+          cookies: false,
+          httpHeaders: { request: { allow: ["user-agent", "referer"] }, response: false },
+          httpBodies: [],
+          urlQueryParams: false,
+          databaseQueryData: false,
+        },
         beforeSend: scrubEvent,
       });
     },

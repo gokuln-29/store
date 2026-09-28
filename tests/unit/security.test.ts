@@ -41,7 +41,7 @@ describe("CSRF guard for cookie-authenticated route handlers", () => {
     ).toBeNull();
   });
   it("rejects foreign, missing or malformed origins", () => {
-    for (const headers of [
+    for (const headers of <Record<string, string>[]>[
       { origin: "https://evil.example", host: "shop.example" },
       { origin: "https://shop.example.evil.example", host: "shop.example" },
       { host: "shop.example" },

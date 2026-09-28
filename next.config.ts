@@ -1,4 +1,4 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 import { withSerwist } from "@serwist/turbopack";
 import createNextIntlPlugin from "next-intl/plugin";
@@ -60,6 +60,9 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // AVIF is ~20% smaller than WebP; uploads have unique names, so long caching is safe.
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
       // Placeholder images used by the demo seed.
