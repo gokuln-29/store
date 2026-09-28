@@ -280,7 +280,7 @@ export function CheckoutForm({
                 key={a.id}
                 className={cn(
                   "flex cursor-pointer gap-3 rounded-lg border p-3 text-sm",
-                  choice === a.id && "border-primary bg-primary/5",
+                  choice === a.id && "border-primary ring-1 ring-primary",
                 )}
               >
                 <input
@@ -304,7 +304,7 @@ export function CheckoutForm({
             <label
               className={cn(
                 "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm font-medium",
-                choice === "new" && "border-primary bg-primary/5",
+                choice === "new" && "border-primary ring-1 ring-primary",
               )}
             >
               <input
@@ -463,7 +463,7 @@ export function CheckoutForm({
                 key={option.value}
                 className={cn(
                   "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm",
-                  paymentMethod === option.value && "border-primary bg-primary/5",
+                  paymentMethod === option.value && "border-primary ring-1 ring-primary",
                   !option.available && "cursor-not-allowed opacity-50",
                 )}
               >
@@ -625,12 +625,12 @@ export function CheckoutForm({
                 {money(price.total)}
               </dd>
             </div>
-            {quote.pricesIncludeTax && price.taxTotal > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {t("gstIncluded", { amount: money(price.taxTotal) })}
-              </p>
-            )}
           </dl>
+        )}
+        {price && quote?.pricesIncludeTax && price.taxTotal > 0 && (
+          <p className="-mt-2 text-xs text-muted-foreground">
+            {t("gstIncluded", { amount: money(price.taxTotal) })}
+          </p>
         )}
         {!destination && <p className="text-xs text-muted-foreground">{t("enterAddress")}</p>}
 

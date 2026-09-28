@@ -121,7 +121,7 @@ export function OtpLoginForm({ callbackUrl }: { callbackUrl: string | null }) {
         >
           {(aria) => (
             <div className="flex items-center gap-2">
-              <span className="rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground">
+              <span className="rounded-md border bg-muted px-3 py-2 text-sm text-foreground">
                 +91
               </span>
               <Input

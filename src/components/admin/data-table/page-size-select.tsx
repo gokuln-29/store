@@ -11,7 +11,7 @@ export function PageSizeSelect({ value, label }: { value: number; label: string 
 
   return (
     <label className="flex items-center gap-2 text-muted-foreground">
-      <span className="hidden sm:inline">{label}</span>
+      <span className="sr-only sm:not-sr-only">{label}</span>
       <select
         value={value}
         onChange={(e) => {

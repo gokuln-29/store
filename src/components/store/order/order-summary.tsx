@@ -103,12 +103,12 @@ export async function OrderSummary({ order, locale }: { order: OrderSummaryData;
           <dt>{tCheckout("total")}</dt>
           <dd className="tabular-nums">{money(order.total)}</dd>
         </div>
-        {order.pricesIncludeTax && order.taxTotal > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {tCheckout("gstIncluded", { amount: money(order.taxTotal) })}
-          </p>
-        )}
       </dl>
+      {order.pricesIncludeTax && order.taxTotal > 0 && (
+        <p className="text-xs text-muted-foreground">
+          {tCheckout("gstIncluded", { amount: money(order.taxTotal) })}
+        </p>
+      )}
     </section>
   );
 }

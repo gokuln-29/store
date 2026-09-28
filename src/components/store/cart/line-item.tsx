@@ -19,8 +19,11 @@ export function LineSummary({
   const size = compact ? "size-14" : "size-20";
   return (
     <div className="flex min-w-0 items-center gap-3">
+      {/* Duplicate of the name link below: hidden from screen readers and the Tab order. */}
       <Link
         href={`/p/${line.slug}`}
+        aria-hidden="true"
+        tabIndex={-1}
         className={`relative ${size} shrink-0 overflow-hidden rounded-md bg-muted`}
       >
         {line.imageUrl && (

@@ -21,7 +21,7 @@ test("category filters are read from the URL", async ({ page }) => {
 
 test("sorting by price works", async ({ page }) => {
   await page.goto("/en/c/food?sort=price_asc");
-  const names = await page.locator("main ul li h3").allTextContents();
+  const names = await page.locator("main ul li :is(h2, h3)").allTextContents();
   expect(names[0]).toBe("Organic Turmeric Powder");
 });
 

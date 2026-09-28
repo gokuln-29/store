@@ -8,7 +8,20 @@ import { Price, discountPercent } from "./price";
 import { CardRating } from "./reviews/card-rating";
 import { WishlistButton } from "./wishlist/wishlist-button";
 
-export function ProductCard({ product, priority = false }: { product: Card; priority?: boolean }) {
+/**
+ * `headingLevel`: h2 in grids directly under the page title, h3 inside sections that have
+ * their own h2 (carousels, "You may also like"), so headings never skip a level.
+ */
+export function ProductCard({
+  product,
+  priority = false,
+  headingLevel = "h3",
+}: {
+  product: Card;
+  priority?: boolean;
+  headingLevel?: "h2" | "h3";
+}) {
+  const Heading = headingLevel;
   const locale = useLocale();
   const t = useTranslations("Product");
   const name = localize(product.name, locale);
@@ -43,9 +56,9 @@ export function ProductCard({ product, priority = false }: { product: Card; prio
           ) : null}
         </div>
         <div className="grid gap-1 px-0.5">
-          <h3 className="line-clamp-2 text-sm leading-snug font-medium group-hover:underline">
+          <Heading className="line-clamp-2 text-sm leading-snug font-medium group-hover:underline">
             {name}
-          </h3>
+          </Heading>
           <CardRating rating={product.rating} />
           <Price
             price={product.price}
@@ -72,7 +85,7 @@ export function ProductGrid({
     <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((p, i) => (
         <li key={p.id}>
-          <ProductCard product={p} priority={i < priorityCount} />
+          <ProductCard product={p} priority={i < priorityCount} headingLevel="h2" />
         </li>
       ))}
     </ul>

@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import {
@@ -34,7 +35,7 @@ export async function AdminPageHeader({
             {trail.map((crumb, i) => {
               const last = i === trail.length - 1;
               return (
-                <span key={`${crumb.label}-${i}`} className="contents">
+                <Fragment key={`${crumb.label}-${i}`}>
                   <BreadcrumbItem>
                     {last || !crumb.href ? (
                       <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
@@ -45,7 +46,7 @@ export async function AdminPageHeader({
                     )}
                   </BreadcrumbItem>
                   {!last && <BreadcrumbSeparator />}
-                </span>
+                </Fragment>
               );
             })}
           </BreadcrumbList>
