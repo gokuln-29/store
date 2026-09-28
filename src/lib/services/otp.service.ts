@@ -1,5 +1,8 @@
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import type { SmsProvider } from "@/lib/providers/notify/types";
+import { logger } from "@/lib/logger";
+
+const log = logger("otp");
 
 export const OTP_CONFIG = {
   length: 6,
@@ -46,7 +49,8 @@ export type OtpDeps = {
 
 export type RequestOtpResult =
   | { ok: true; resendAfterSeconds: number; expiresInSeconds: number }
-  | { ok: false; error: "cooldown" | "too_many_requests"; retryAfterSeconds: number };
+  | { ok: false; error: "cooldown" | "too_many_requests"; retryAfterSeconds: number }
+  | { ok: false; error: "send_failed" };
 
 export type VerifyOtpResult =
   { ok: true } | { ok: false; error: "invalid_code" | "expired" | "too_many_attempts" };
@@ -104,12 +108,18 @@ export function createOtpService(deps: OtpDeps) {
       ip: input.ip,
       now: current,
     });
-    await deps.sms.sendOtp({
-      to: input.phone,
-      code,
-      locale: input.locale,
-      expiresInMinutes: OTP_CONFIG.ttlMs / 60_000,
-    });
+    try {
+      await deps.sms.sendOtp({
+        to: input.phone,
+        code,
+        locale: input.locale,
+        expiresInMinutes: OTP_CONFIG.ttlMs / 60_000,
+      });
+    } catch (error) {
+      // The attempt still counts towards the hourly limit, so failures can't be used to spam.
+      log.error("sending the login code failed", { provider: deps.sms.name }, error);
+      return { ok: false, error: "send_failed" };
+    }
 
     return {
       ok: true,

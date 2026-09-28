@@ -6,6 +6,7 @@ import {
   getSmsProvider,
   getWhatsAppProvider,
   orderSmsEnabled,
+  PermanentDeliveryError,
 } from "@/lib/providers/notify";
 import {
   CART_REMINDER,
@@ -40,7 +41,7 @@ const SEND_LOCK_MS = 2 * 60_000;
 const BACKOFF_MS = [60_000, 5 * 60_000, 15 * 60_000, 60 * 60_000];
 
 /** A failure that retrying can't fix (e.g. the push subscription is gone). */
-export class PermanentDeliveryError extends Error {}
+export { PermanentDeliveryError };
 
 /** Status changes the customer is told about. */
 export const NOTIFY_ON: Partial<Record<OrderStatus, OrderTemplate>> = {

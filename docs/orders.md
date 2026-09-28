@@ -90,9 +90,10 @@ ordered in.
 - **Email** (when the customer gave an address): Resend over its REST API. Set
   `RESEND_API_KEY` and `EMAIL_FROM`, using a sender on a domain verified in Resend. Without a
   key, development prints emails to the server log, and production sends none.
-- **SMS:** the `SMS_PROVIDER` adapter, the same one used for login OTPs. Indian SMS needs
-  DLT-registered templates, so adapters receive the template key and parameters, not free text.
-  Set `SMS_ORDER_UPDATES=false` to send order updates without SMS.
+- **SMS:** the `SMS_PROVIDER` adapter, the same one used for login OTPs (MSG91 in production,
+  see [sms.md](sms.md)). Indian SMS needs DLT-registered templates, so adapters receive the
+  template key and parameters, not free text. Set `SMS_ORDER_UPDATES=false` to send order
+  updates without SMS.
 - **WhatsApp:** `WHATSAPP_PROVIDER=console` in development. A real adapter (Gupshup, Interakt,
   Meta Cloud API, …) plugs into `src/lib/providers/notify/`.
 

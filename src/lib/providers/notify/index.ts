@@ -1,7 +1,9 @@
 import { consoleEmailProvider, consoleSmsProvider, consoleWhatsAppProvider } from "./console";
+import { createMsg91Provider } from "./msg91";
 import { createResendProvider } from "./resend";
 import type { EmailProvider, SmsProvider, WhatsAppProvider } from "./types";
 
+export { PermanentDeliveryError } from "./errors";
 export type {
   EmailMessage,
   EmailProvider,
@@ -14,12 +16,17 @@ export type {
 const isProduction = () => process.env.NODE_ENV === "production";
 
 /**
- * Picks the SMS provider from SMS_PROVIDER (default "console").
- * Real providers (MSG91, Twilio, Gupshup, …) are added here as adapters.
+ * Picks the SMS provider from SMS_PROVIDER: "msg91" or "console" (default, development only).
+ * Other providers (Twilio, Gupshup, …) are added here as adapters.
  */
 export function getSmsProvider(): SmsProvider {
   const name = process.env.SMS_PROVIDER ?? "console";
   switch (name) {
+    case "msg91": {
+      const authKey = process.env.MSG91_AUTH_KEY;
+      if (!authKey) throw new Error("SMS_PROVIDER=msg91 needs MSG91_AUTH_KEY.");
+      return createMsg91Provider({ authKey });
+    }
     case "console":
       if (isProduction() && process.env.ALLOW_CONSOLE_SMS !== "true") {
         throw new Error(

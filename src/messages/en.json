@@ -142,6 +142,7 @@
     "otp_expired": "This code has expired. Request a new one.",
     "otp_too_many_attempts": "Too many wrong attempts. Request a new code.",
     "otp_cooldown": "Please wait {seconds} seconds before requesting a new code.",
+    "otp_send_failed": "We couldn't send the code right now. Please try again in a minute.",
     "account_disabled": "This account has been disabled. Please contact support.",
     "use_admin_login": "This number belongs to a staff account. Please use the admin sign in.",
     "unauthorized": "Your session has ended. Please log in again.",

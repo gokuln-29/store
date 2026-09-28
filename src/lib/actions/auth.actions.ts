@@ -74,6 +74,7 @@ export async function requestOtpAction(
 
   const result = await getOtpService().requestOtp({ phone, locale, ip });
   if (!result.ok) {
+    if (result.error === "send_failed") return { ok: false, error: "otp_send_failed" };
     return {
       ok: false,
       error: result.error === "cooldown" ? "otp_cooldown" : "rate_limited",

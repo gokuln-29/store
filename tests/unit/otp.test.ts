@@ -87,6 +87,27 @@ describe("OTP service", () => {
     expect(memory.records[0]!.codeHash).not.toContain("111111");
   });
 
+  it("reports a failed SMS instead of throwing, and still applies the resend cooldown", async () => {
+    const failing = createOtpService({
+      store: memory.store,
+      sms: {
+        name: "down",
+        sendOtp: async () => {
+          throw new Error("gateway timeout");
+        },
+      },
+      secret: SECRET,
+      now: () => clock,
+      generateCode: () => "111111",
+    });
+    expect(await failing.requestOtp({ phone: PHONE, locale: "en", ip: null })).toEqual({
+      ok: false,
+      error: "send_failed",
+    });
+    const again = await failing.requestOtp({ phone: PHONE, locale: "en", ip: null });
+    expect(again).toMatchObject({ ok: false, error: "cooldown" });
+  });
+
   it("verifies the correct code once", async () => {
     await service.requestOtp({ phone: PHONE, locale: "en", ip: null });
     expect(await service.verifyOtp({ phone: PHONE, code: "111111" })).toEqual({ ok: true });
