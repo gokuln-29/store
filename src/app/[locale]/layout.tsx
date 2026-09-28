@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans, Noto_Sans_Kannada, Noto_Sans_Tamil } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { PwaProvider } from "@/components/pwa/pwa-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { pickNamespaces, STORE_CLIENT_NAMESPACES } from "@/i18n/client-namespaces";
 import { routing } from "@/i18n/routing";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { localize } from "@/lib/utils/localized";
@@ -65,6 +66,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "Common" });
+  // Only what storefront client components need (the admin panel adds the rest).
+  const messages = pickNamespaces(await getMessages(), STORE_CLIENT_NAMESPACES);
 
   return (
     <html
@@ -73,7 +76,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       suppressHydrationWarning
     >
       <body className="flex min-h-dvh flex-col bg-background font-sans text-foreground antialiased">
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
