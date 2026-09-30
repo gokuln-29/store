@@ -71,6 +71,7 @@ DATABASE_URL="postgresql://ecom:ecom@localhost:5440/ecom?schema=public"
 | `pnpm db:seed`             | Seed demo data (safe to re-run)                   |
 | `pnpm db:deploy`           | Apply migrations without prompts (production)     |
 | `pnpm setup:store`         | First-run setup of a real store (no demo data)    |
+| `pnpm reset:password`      | Set a new password for an owner/staff account     |
 | `pnpm db:reset`            | Drop the database, re-apply migrations and seed   |
 | `pnpm db:studio`           | Browse data in Prisma Studio                      |
 
@@ -148,6 +149,8 @@ manual test checklist: **[docs/pwa.md](docs/pwa.md)**.
 
 ## Deployment and handover
 
+- **[docs/hostinger.md](docs/hostinger.md):** the portfolio demo on a Hostinger VPS in one
+  command (`scripts/hostinger-setup.sh`), with a demo login, test payments and a view-only admin.
 - **[docs/deployment.md](docs/deployment.md):** production on a VPS with Docker (Postgres,
   HTTPS via Caddy, cron jobs, backups) or on Vercel; custom domain; Razorpay live mode; CI/CD.
 - **[docs/backups.md](docs/backups.md):** daily backups (optionally copied to S3) and restore.

@@ -11,6 +11,9 @@ deployment, with its own database, secrets and domain.
 | Cron every 5 minutes | Built in (scheduler container)                                                    | Needs Vercel Pro or an external cron service               |
 | Backups              | Built in: daily, kept 14 days, optionally copied to S3 ([backups.md](backups.md)) | Use your database provider's backups                       |
 
+For a public **portfolio demo** on Hostinger (demo logins, test payments), follow
+[hostinger.md](hostinger.md) instead: one script does all of Option A.
+
 Before going live, work through the go-live checklist in
 [security-checklist.md](security-checklist.md#go-live-checklist).
 
