@@ -15,6 +15,7 @@ import {
   variantOptionValuesSchema,
 } from "../src/lib/validators/catalog";
 import { buildSearchText } from "../src/lib/utils/search-text";
+import { productImageCount } from "./demo-images";
 import {
   banners,
   categories,
@@ -168,12 +169,12 @@ async function seedProducts(categoryIds: Map<string, string>) {
 
       await tx.productImage.deleteMany({ where: { productId: product.id } });
       await tx.productImage.createMany({
-        data: Array.from({ length: p.imageCount }, (_, i) => ({
+        data: Array.from({ length: productImageCount(p.slug) || p.imageCount }, (_, i) => ({
           productId: product.id,
           url: productImage(p.slug, i + 1),
           alt: p.name,
-          width: 800,
-          height: 800,
+          width: 1200,
+          height: 1200,
           sortOrder: i,
         })),
       });

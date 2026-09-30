@@ -6,13 +6,15 @@ import type {
   Choice,
   ProductOptions,
 } from "../src/lib/validators/catalog";
+import { bannerPhotos, categoryPhotos, productImageUrl, unsplashUrl } from "./demo-images";
 import type { LocalizedText } from "../src/lib/validators/localized";
 
 type L = LocalizedText;
 
 const t = (en: string, ta: string, kn: string): L => ({ en, ta, kn });
 const choice = (value: string, label: L): Choice => ({ value, label });
-const image = (slug: string, n: number) => `https://picsum.photos/seed/${slug}-${n}/800/800`;
+const image = (slug: string, n: number) =>
+  productImageUrl(slug, n - 1) ?? `https://picsum.photos/seed/${slug}-${n}/800/800`;
 
 // ───────────────────────────── Store settings ─────────────────────────────
 
@@ -23,13 +25,14 @@ export const storeSettings = {
     "அன்றாடத் தேவைகள், உங்கள் வீட்டு வாசலில்",
     "ದಿನನಿತ್ಯದ ಅಗತ್ಯಗಳು, ನಿಮ್ಮ ಮನೆ ಬಾಗಿಲಿಗೆ",
   ),
-  primaryColor: "#0f766e",
-  secondaryColor: "#f59e0b",
-  headingFont: "Noto Sans",
-  bodyFont: "Noto Sans",
+  // Matches the Neo Store logo: deep violet with a cyan accent.
+  primaryColor: "#5b21b6",
+  secondaryColor: "#22d3ee",
+  headingFont: "Poppins",
+  bodyFont: "Poppins",
   contactEmail: "support@example.com",
-  contactPhone: "+919876543210",
-  whatsappNumber: "+919876543210",
+  contactPhone: "+916380202766",
+  whatsappNumber: "+916380202766",
   businessAddress: {
     line1: "12, MG Road",
     city: "Bengaluru",
@@ -63,6 +66,7 @@ export type SeedCategory = {
   taxRateBps: number;
   hsnCode?: string;
   sortOrder: number;
+  imageUrl?: string;
   attributes: AttributeDefinitionInput[];
 };
 
@@ -71,6 +75,7 @@ const size = (value: string) => choice(value, t(value, value, value));
 export const categories: SeedCategory[] = [
   {
     slug: "clothing",
+    imageUrl: unsplashUrl(categoryPhotos.clothing, 1200, 900),
     name: t("Clothing", "ஆடைகள்", "ಉಡುಪುಗಳು"),
     description: t(
       "Comfortable everyday wear and festive outfits",
@@ -132,6 +137,7 @@ export const categories: SeedCategory[] = [
   },
   {
     slug: "food",
+    imageUrl: unsplashUrl(categoryPhotos.food, 1200, 900),
     name: t("Food", "உணவுப் பொருட்கள்", "ಆಹಾರ ಪದಾರ್ಥಗಳು"),
     description: t(
       "Traditional sweets, spices and pantry staples",
@@ -188,6 +194,7 @@ export const categories: SeedCategory[] = [
   },
   {
     slug: "electronics",
+    imageUrl: unsplashUrl(categoryPhotos.electronics, 1200, 900),
     name: t("Electronics", "மின்னணு சாதனங்கள்", "ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್"),
     description: t(
       "Audio, wearables and accessories",
@@ -706,8 +713,8 @@ export const banners = [
       "ಪ್ರತಿ ಸಂಭ್ರಮಕ್ಕೂ ಕೈಮಗ್ಗದ ರೇಷ್ಮೆ ಮತ್ತು ಹತ್ತಿ",
     ),
     ctaLabel: t("Shop clothing", "ஆடைகளை வாங்குங்கள்", "ಉಡುಪುಗಳನ್ನು ಖರೀದಿಸಿ"),
-    imageUrl: "https://picsum.photos/seed/banner-festive/1600/600",
-    mobileImageUrl: "https://picsum.photos/seed/banner-festive-m/800/800",
+    imageUrl: unsplashUrl(bannerPhotos.festive, 2000, 800),
+    mobileImageUrl: unsplashUrl(bannerPhotos.festive, 900, 1100),
     linkUrl: "/c/clothing",
     sortOrder: 1,
   },
@@ -720,9 +727,27 @@ export const banners = [
       "ಈ ವಾರ ಹುರಿದದ್ದು, ನಿಮ್ಮ ಮನೆ ಬಾಗಿಲಿಗೆ",
     ),
     ctaLabel: t("Shop food", "உணவுப் பொருட்களை வாங்குங்கள்", "ಆಹಾರ ಪದಾರ್ಥಗಳನ್ನು ಖರೀದಿಸಿ"),
-    imageUrl: "https://picsum.photos/seed/banner-coffee/1600/600",
-    mobileImageUrl: "https://picsum.photos/seed/banner-coffee-m/800/800",
+    imageUrl: unsplashUrl(bannerPhotos.coffee, 2000, 800),
+    mobileImageUrl: unsplashUrl(bannerPhotos.coffee, 900, 1100),
     linkUrl: "/c/food",
+    sortOrder: 3,
+  },
+  {
+    id: "seed-banner-tech",
+    title: t(
+      "Smart tech, everyday",
+      "அன்றாடத்துக்கான ஸ்மார்ட் தொழில்நுட்பம்",
+      "ದಿನನಿತ್ಯದ ಸ್ಮಾರ್ಟ್ ತಂತ್ರಜ್ಞಾನ",
+    ),
+    subtitle: t(
+      "Earbuds, speakers and watches that keep up with you",
+      "உங்களுடன் பயணிக்கும் இயர்பட்ஸ், ஸ்பீக்கர்கள் மற்றும் கைக்கடிகாரங்கள்",
+      "ನಿಮ್ಮೊಂದಿಗೆ ಸಾಗುವ ಇಯರ್‌ಬಡ್ಸ್, ಸ್ಪೀಕರ್‌ಗಳು ಮತ್ತು ವಾಚ್‌ಗಳು",
+    ),
+    ctaLabel: t("Shop electronics", "எலக்ட்ரானிக்ஸ் வாங்குங்கள்", "ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್ ಖರೀದಿಸಿ"),
+    imageUrl: unsplashUrl(bannerPhotos.tech, 2000, 800),
+    mobileImageUrl: unsplashUrl(bannerPhotos.tech, 900, 1100),
+    linkUrl: "/c/electronics",
     sortOrder: 2,
   },
 ];
@@ -744,7 +769,7 @@ export const homeSections = [
   {
     id: "seed-home-hero",
     type: "HERO_BANNER" as const,
-    config: { bannerIds: ["seed-banner-festive", "seed-banner-coffee"] },
+    config: { bannerIds: ["seed-banner-festive", "seed-banner-tech", "seed-banner-coffee"] },
   },
   {
     id: "seed-home-categories",
