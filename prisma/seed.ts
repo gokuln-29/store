@@ -246,6 +246,20 @@ async function seedShipping() {
 }
 
 async function seedHomePage(categoryIds: Map<string, string>) {
+  // pnpm setup:store creates its own "New arrivals" carousel; the demo home page has one too,
+  // so drop that leftover instead of showing the section twice. Other sections are kept.
+  const leftovers = await db.homeSection.findMany({
+    where: { type: "PRODUCT_CAROUSEL", NOT: { id: { startsWith: "seed-" } } },
+    select: { id: true, config: true },
+  });
+  const duplicateIds = leftovers
+    .filter((s) => (s.config as { source?: string } | null)?.source === "newest")
+    .map((s) => s.id);
+  if (duplicateIds.length) {
+    await db.homeSection.deleteMany({ where: { id: { in: duplicateIds } } });
+    console.log(`  home page: removed ${duplicateIds.length} duplicate "New arrivals" section`);
+  }
+
   for (const { id, ...banner } of banners) {
     await db.banner.upsert({ where: { id }, create: { id, ...banner }, update: banner });
   }
