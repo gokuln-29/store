@@ -3,6 +3,9 @@
 #
 #   docker compose -f docker-compose.prod.yml up -d
 #
+# COMPOSE_PROFILES=caddy in .env adds Caddy for HTTPS (dedicated server). Without it the app
+# listens on 127.0.0.1:APP_PORT for an existing web server (Nginx etc.) to forward to.
+#
 # Values come from .env next to this file. DATABASE_URL is built here from POSTGRES_*.
 
 x-app-env: &app-env
@@ -62,9 +65,14 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    expose: ["3000"]
+    # Local only: Caddy (below) or the server's own Nginx forwards to it; never public.
+    ports:
+      - "127.0.0.1:${APP_PORT:-3005}:3000"
 
+  # HTTPS for a server that runs only this store. On a server that already hosts other sites,
+  # leave COMPOSE_PROFILES unset and let the existing web server forward to APP_PORT instead.
   caddy:
+    profiles: ["caddy"]
     image: caddy:2-alpine
     restart: unless-stopped
     ports:

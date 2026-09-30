@@ -92,6 +92,22 @@ few seconds while the HTTPS certificate is issued.
 **Save `~/neostore/.env` in your password manager.** It holds the secrets that logins and
 backups depend on.
 
+### On a server that already hosts other sites
+
+The script detects the existing web server. If Nginx (or anything else) already listens on ports
+80/443, it switches to **shared mode**:
+
+- your firewall and your other sites are not touched;
+- the store listens on `127.0.0.1:APP_PORT` only (the first free port from 3005, or the
+  `APP_PORT` in an existing `.env`);
+- with Nginx, it adds `/etc/nginx/sites-available/<domain>`, which forwards to the store and
+  overwrites `X-Real-IP` with the visitor's address, reloads Nginx, and gets the certificate with
+  `certbot --nginx` (install certbot first if it's missing:
+  `apt install certbot python3-certbot-nginx`);
+- with another web server, it prints what to forward and which headers to set.
+
+The mode is saved in `.env` as `COMPOSE_PROFILES` (empty = shared, `caddy` = dedicated).
+
 ## 5. Share it
 
 - **Store:** `https://<your-domain>` (add `/ta` or `/kn` for Tamil or Kannada).
