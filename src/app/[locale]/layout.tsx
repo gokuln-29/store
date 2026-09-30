@@ -45,7 +45,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     description:
       localize(settings.tagline, locale, settings.defaultLocale) || t("Metadata.description"),
     icons: {
-      ...(settings.faviconUrl ? { icon: settings.faviconUrl } : {}),
+      // Without an uploaded favicon, use the icon generated from the logo.
+      icon: settings.faviconUrl ?? `/icons/icon-192.png?v=${iconVersion(settings)}`,
       apple: `/icons/apple-touch-icon.png?v=${iconVersion(settings)}`,
     },
     appleWebApp: { capable: true, title: shortName(storeName), statusBarStyle: "default" },
