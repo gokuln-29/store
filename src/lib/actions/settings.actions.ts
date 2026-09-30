@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateStorefront } from "@/lib/revalidate-storefront";
 import type { z } from "zod";
 import { authorize } from "@/lib/auth-guards";
 import {
@@ -35,7 +36,7 @@ const FORBIDDEN: ActionResult<never> = { ok: false, error: "forbidden" };
 
 /** Settings affect every page (name, theme, languages), so refresh everything. */
 function revalidateStore() {
-  revalidatePath("/", "layout");
+  revalidateStorefront();
 }
 
 async function saveSection<S extends z.ZodType>(

@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidateStorefront } from "@/lib/revalidate-storefront";
 import { cronGuard } from "@/lib/cron";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +10,6 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const denied = cronGuard(request);
   if (denied) return denied;
-  revalidatePath("/", "layout");
+  revalidateStorefront();
   return Response.json({ ok: true });
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateStorefront } from "@/lib/revalidate-storefront";
 import { z } from "zod";
 import { authorize } from "@/lib/auth-guards";
 import { deleteCategory, saveCategory } from "@/lib/services/category.service";
@@ -19,7 +19,7 @@ const idSchema = z.string().min(1).max(64);
 
 /** Catalog changes affect admin lists and every storefront page that shows products. */
 function revalidateCatalog() {
-  revalidatePath("/", "layout");
+  revalidateStorefront();
 }
 
 export async function saveCategoryAction(

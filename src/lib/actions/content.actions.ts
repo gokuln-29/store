@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateStorefront } from "@/lib/revalidate-storefront";
 import { z } from "zod";
 import { authorize } from "@/lib/auth-guards";
 import {
@@ -24,7 +24,7 @@ const idSchema = z.string().min(1).max(64);
 
 /** Home page content appears on the storefront home in every language. */
 function revalidateHome() {
-  revalidatePath("/", "layout");
+  revalidateStorefront();
 }
 
 export async function saveBannerAction(

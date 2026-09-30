@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidateStorefront } from "@/lib/revalidate-storefront";
 import { sameOriginGuard } from "@/lib/csrf";
 import { authorize } from "@/lib/auth-guards";
 import { importProductsCsv } from "@/lib/services/product-import.service";
@@ -24,6 +24,6 @@ export async function POST(request: Request) {
 
   const dryRun = form?.get("dryRun") !== "0";
   const report = await importProductsCsv(await file.text(), { dryRun, actorId: user.id });
-  if (!dryRun) revalidatePath("/", "layout");
+  if (!dryRun) revalidateStorefront();
   return Response.json({ ok: true, report });
 }

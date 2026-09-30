@@ -29,6 +29,10 @@ describe("revalidatePath patterns", () => {
     expect(calls.length).toBeGreaterThan(5);
   });
 
+  it('never expire "/" (that would also expire the service worker route)', () => {
+    expect(calls.filter((c) => c.route === "/")).toEqual([]);
+  });
+
   it.each(calls)("$route ($type) in $file matches a route folder", ({ route, type }) => {
     const dir = path.join(APP, route);
     expect(existsSync(dir), `${dir} does not exist`).toBe(true);
