@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdminLoginForm } from "@/components/auth/admin-login-form";
+import { demoAdminCredentials, isDemoMode } from "@/lib/demo";
 import { LocaleSwitcher } from "@/components/shared/locale-switcher";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +45,11 @@ export default async function AdminLoginPage({
           {passwordChanged && (
             <Alert role="status">
               <AlertDescription>{tPassword("done")}</AlertDescription>
+            </Alert>
+          )}
+          {isDemoMode() && (
+            <Alert role="note">
+              <AlertDescription>{t("demoHint", demoAdminCredentials())}</AlertDescription>
             </Alert>
           )}
           <AdminLoginForm callbackUrl={callbackUrl} />

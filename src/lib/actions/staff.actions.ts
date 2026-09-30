@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { isReadOnlyDemoUser } from "@/lib/demo";
 import { authorize, getCurrentUser } from "@/lib/auth-guards";
 import { signOut } from "@/lib/auth";
 import { isStaffRole } from "@/lib/permissions";
@@ -91,6 +92,7 @@ export async function changeOwnPasswordAction(
 ): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user || !isStaffRole(user.role)) return FORBIDDEN;
+  if (await isReadOnlyDemoUser(user.id)) return FORBIDDEN;
   const parsed = changePasswordSchema.safeParse(input);
   if (!parsed.success) return invalid(parsed.error);
   const result = await changeOwnPassword(

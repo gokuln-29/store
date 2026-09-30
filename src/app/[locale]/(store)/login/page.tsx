@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { OtpLoginForm } from "@/components/auth/otp-login-form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DEMO_OTP_CODE, isDemoMode } from "@/lib/demo";
 import { firstParam } from "@/lib/utils/search-params";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,7 +30,12 @@ export default async function CustomerLoginPage({
           </CardTitle>
           <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid gap-4">
+          {isDemoMode() && (
+            <Alert role="note">
+              <AlertDescription>{t("demoHint", { code: DEMO_OTP_CODE })}</AlertDescription>
+            </Alert>
+          )}
           <OtpLoginForm callbackUrl={callbackUrl} />
         </CardContent>
       </Card>

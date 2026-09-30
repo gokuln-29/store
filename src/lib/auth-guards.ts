@@ -1,6 +1,7 @@
 import type { Session } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { isReadOnlyDemoUser, isWritePermission } from "@/lib/demo";
 import { can, type Permission } from "@/lib/permissions";
 
 export type SessionUser = Session["user"];
@@ -38,8 +39,13 @@ export async function requirePermission(
   return user;
 }
 
-/** For server actions and route handlers: returns the user or null, never redirects. */
+/**
+ * For server actions and route handlers: returns the user or null, never redirects.
+ * In demo mode the demo admin may open every admin page but never change data.
+ */
 export async function authorize(permission: Permission): Promise<SessionUser | null> {
   const user = await getCurrentUser();
-  return user && can(user.role, permission) ? user : null;
+  if (!user || !can(user.role, permission)) return null;
+  if (isWritePermission(permission) && (await isReadOnlyDemoUser(user.id))) return null;
+  return user;
 }

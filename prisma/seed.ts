@@ -16,6 +16,7 @@ import {
 } from "../src/lib/validators/catalog";
 import { buildSearchText } from "../src/lib/utils/search-text";
 import { productImageCount } from "./demo-images";
+import { demoAdminCredentials, isDemoMode } from "../src/lib/demo-config";
 import {
   banners,
   categories,
@@ -69,6 +70,22 @@ async function seedOwner() {
     },
   });
   console.log(`  owner: ${email}${isDefault ? ` / ${password} (dev default, change it!)` : ""}`);
+}
+
+/**
+ * DEMO_MODE=true: a view-only admin account whose login is shown on the admin sign-in page.
+ * Its password is reset on every seed so the published login always works.
+ */
+async function seedDemoAdmin() {
+  if (!isDemoMode()) return;
+  const { email, password } = demoAdminCredentials();
+  const passwordHash = await hash(password);
+  await db.user.upsert({
+    where: { email },
+    create: { email, name: "Demo Admin", role: "OWNER", passwordHash, emailVerifiedAt: new Date() },
+    update: { role: "OWNER", isActive: true, passwordHash },
+  });
+  console.log(`  demo admin (view only): ${email}`);
 }
 
 async function seedSettings() {
@@ -239,6 +256,7 @@ async function seedHomePage(categoryIds: Map<string, string>) {
 async function main() {
   console.log("Seeding database…");
   await seedOwner();
+  await seedDemoAdmin();
   await seedSettings();
   const categoryIds = await seedCategories();
   await seedProducts(categoryIds);

@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { fontVar } from "@/lib/constants/fonts";
+import { getTranslations } from "next-intl/server";
+import { isDemoMode } from "@/lib/demo";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { readableForeground } from "@/lib/utils/color";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
@@ -54,6 +56,14 @@ export async function StoreShell({ children }: { children: ReactNode }) {
     <>
       <FeaturesProvider value={resolveFeatures(settings.features)}>
         <div data-store-theme style={storeThemeStyle(settings)} className="flex flex-1 flex-col">
+          {isDemoMode() && (
+            <p
+              role="note"
+              className="bg-amber-100 px-4 py-1.5 text-center text-xs font-medium text-amber-950"
+            >
+              {(await getTranslations("Common"))("demoBanner")}
+            </p>
+          )}
           <SiteHeader />
           <main id="main" className="flex-1">
             {children}

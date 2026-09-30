@@ -13,6 +13,7 @@ import { AdminUserMenu } from "@/components/admin/user-menu";
 import { LocaleSwitcher } from "@/components/shared/locale-switcher";
 import { Link } from "@/i18n/navigation";
 import { requirePermission } from "@/lib/auth-guards";
+import { isReadOnlyDemoUser } from "@/lib/demo";
 import { can, PERMISSIONS } from "@/lib/permissions";
 import { getStoreSettings } from "@/lib/services/settings.service";
 
@@ -33,6 +34,9 @@ export default async function AdminPanelLayout({
   const theme: AdminTheme = saved === "dark" || saved === "light" ? saved : "system";
   const permissions = PERMISSIONS.filter((p) => can(user.role, p));
   const title = `${settings.name} · ${t("panel")}`;
+
+  const demoReadOnly = await isReadOnlyDemoUser(user.id);
+  const tDemo = await getTranslations("Admin");
 
   return (
     <NextIntlClientProvider messages={messages}>
@@ -60,6 +64,14 @@ export default async function AdminPanelLayout({
                 />
               </div>
             </header>
+            {demoReadOnly && (
+              <p
+                role="status"
+                className="border-b bg-amber-50 px-4 py-2 text-center text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+              >
+                {tDemo("demoBanner")}
+              </p>
+            )}
             <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8">
               {children}
             </main>

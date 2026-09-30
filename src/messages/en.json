@@ -13,7 +13,8 @@
     "back": "Back",
     "close": "Close",
     "more": "More",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "demoBanner": "Demo store: orders and payments aren't real. Please don't enter real personal details."
   },
   "Header": {
     "home": "Home",
@@ -94,11 +95,13 @@
     "password": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
-    "customerLink": "Shopping? Log in with your mobile number"
+    "customerLink": "Shopping? Log in with your mobile number",
+    "demoHint": "Demo admin (view only): {email} / {password}"
   },
   "Admin": {
     "panel": "Admin",
-    "dashboardTitle": "Dashboard"
+    "dashboardTitle": "Dashboard",
+    "demoBanner": "Demo admin: look around freely — changes are switched off."
   },
   "CustomerLogin": {
     "title": "Log in or sign up",
@@ -114,7 +117,8 @@
     "resendIn": "Resend code in {seconds}s",
     "resend": "Resend code",
     "codeResent": "A new code has been sent.",
-    "changeNumber": "Change number"
+    "changeNumber": "Change number",
+    "demoHint": "Demo: use any mobile number, for example 9000000001, and the code {code}."
   },
   "Account": {
     "title": "My account",

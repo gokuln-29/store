@@ -23,7 +23,11 @@ export function getPaymentProviderByName(name: string): PaymentProvider {
   if (override && override.name === name) return override;
   switch (name) {
     case "mock":
-      if (process.env.NODE_ENV === "production" && process.env.ALLOW_MOCK_PAYMENTS !== "true") {
+      if (
+        process.env.NODE_ENV === "production" &&
+        process.env.ALLOW_MOCK_PAYMENTS !== "true" &&
+        process.env.DEMO_MODE !== "true"
+      ) {
         throw new Error("PAYMENT_PROVIDER=mock is not allowed in production.");
       }
       return mockPaymentProvider;

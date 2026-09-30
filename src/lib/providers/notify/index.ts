@@ -28,7 +28,12 @@ export function getSmsProvider(): SmsProvider {
       return createMsg91Provider({ authKey });
     }
     case "console":
-      if (isProduction() && process.env.ALLOW_CONSOLE_SMS !== "true") {
+      // DEMO_MODE: a public showcase logs messages instead of sending them (src/lib/demo.ts).
+      if (
+        isProduction() &&
+        process.env.ALLOW_CONSOLE_SMS !== "true" &&
+        process.env.DEMO_MODE !== "true"
+      ) {
         throw new Error(
           "SMS_PROVIDER=console is not allowed in production. Configure a real SMS provider.",
         );
