@@ -197,10 +197,16 @@ server {
 NGINX
       ln -sf "$site" "/etc/nginx/sites-enabled/${DOMAIN}"
       nginx -t && systemctl reload nginx
+      NEW_SITE=true
     else
-      say "Keeping the existing Nginx site ${site}"
+      say "Keeping the existing Nginx site ${site} (not changed)"
+      grep -q "127.0.0.1:${APP_PORT}" "$site" \
+        || warn "Note: ${site} doesn't mention 127.0.0.1:${APP_PORT}; make sure it forwards there."
+      NEW_SITE=false
     fi
-    if [ "$DNS_OK" = true ]; then
+    if [ "$NEW_SITE" = false ]; then
+      : # An existing site already has its HTTPS setup; leave it alone.
+    elif [ "$DNS_OK" = true ]; then
       if command -v certbot >/dev/null 2>&1; then
         say "Getting the HTTPS certificate"
         certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$ACME_EMAIL" --redirect \
