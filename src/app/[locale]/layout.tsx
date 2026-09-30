@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans, Noto_Sans_Kannada, Noto_Sans_Tamil } from "next/font/google";
+import { storeFontVariables } from "@/lib/fonts/store-fonts";
+import { storeFontStyle } from "@/components/shared/store-shell";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -14,7 +16,14 @@ import { shortName } from "@/lib/pwa/manifest";
 import { siteUrl } from "@/lib/seo";
 import "@/styles/globals.css";
 
-const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-noto-sans", display: "swap" });
+// Not preloaded: stores usually pick their own font (Settings → Branding), and a preload would
+// compete with the hero image. The browser still fetches it wherever it is used.
+const notoSans = Noto_Sans({
+  subsets: ["latin"],
+  variable: "--font-noto-sans",
+  display: "swap",
+  preload: false,
+});
 // Tamil/Kannada fonts are not preloaded: their @font-face unicode-range makes the browser
 // fetch them only on pages that actually contain those scripts.
 const notoTamil = Noto_Sans_Tamil({
@@ -69,14 +78,16 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const t = await getTranslations({ locale, namespace: "Common" });
   // Only what storefront client components need (the admin panel adds the rest).
   const messages = pickNamespaces(await getMessages(), STORE_CLIENT_NAMESPACES);
+  const settings = await getStoreSettings();
 
   return (
     <html
       lang={locale}
-      className={`${notoSans.variable} ${notoTamil.variable} ${notoKannada.variable}`}
+      className={`${notoSans.variable} ${notoTamil.variable} ${notoKannada.variable} ${storeFontVariables}`}
+      style={storeFontStyle(settings)}
       suppressHydrationWarning
     >
-      <body className="flex min-h-dvh flex-col bg-background font-sans text-foreground antialiased">
+      <body className="flex min-h-dvh flex-col bg-background font-[family-name:var(--store-font-body)] text-foreground antialiased">
         <NextIntlClientProvider messages={messages}>
           <a
             href="#main"

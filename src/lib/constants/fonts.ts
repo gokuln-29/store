@@ -1,20 +1,17 @@
 /**
- * Fonts a store owner can pick. All are on Google Fonts. Tamil and Kannada text always
- * falls back to Noto Sans Tamil / Kannada (loaded in the root layout).
+ * Fonts a store owner can pick. They are self-hosted with next/font (src/lib/fonts/store-fonts.ts)
+ * and exposed as CSS variables. Tamil and Kannada text always falls back to Noto Sans Tamil /
+ * Kannada (loaded in the root layout).
  */
 export const STORE_FONTS = [
-  { name: "Noto Sans", family: "Noto Sans", googleId: null }, // bundled with next/font
-  { name: "Inter", family: "Inter", googleId: "Inter:wght@400;500;600;700" },
-  { name: "Poppins", family: "Poppins", googleId: "Poppins:wght@400;500;600;700" },
-  { name: "Lato", family: "Lato", googleId: "Lato:wght@400;700" },
-  { name: "Montserrat", family: "Montserrat", googleId: "Montserrat:wght@400;500;600;700" },
-  {
-    name: "Playfair Display",
-    family: "Playfair Display",
-    googleId: "Playfair+Display:wght@500;600;700",
-  },
-  { name: "Merriweather", family: "Merriweather", googleId: "Merriweather:wght@400;700" },
-  { name: "Mukta", family: "Mukta", googleId: "Mukta:wght@400;500;600;700" },
+  { name: "Noto Sans", cssVar: "--font-noto-sans" },
+  { name: "Inter", cssVar: "--font-store-inter" },
+  { name: "Poppins", cssVar: "--font-store-poppins" },
+  { name: "Lato", cssVar: "--font-store-lato" },
+  { name: "Montserrat", cssVar: "--font-store-montserrat" },
+  { name: "Playfair Display", cssVar: "--font-store-playfair" },
+  { name: "Merriweather", cssVar: "--font-store-merriweather" },
+  { name: "Mukta", cssVar: "--font-store-mukta" },
 ] as const;
 
 export type StoreFontName = (typeof STORE_FONTS)[number]["name"];
@@ -23,10 +20,8 @@ export const STORE_FONT_NAMES = STORE_FONTS.map((f) => f.name) as [
   ...StoreFontName[],
 ];
 
-export function googleFontsHref(names: readonly string[]): string | null {
-  const ids = [...new Set(names)]
-    .map((n) => STORE_FONTS.find((f) => f.name === n)?.googleId)
-    .filter((id): id is NonNullable<typeof id> => Boolean(id));
-  if (!ids.length) return null;
-  return `https://fonts.googleapis.com/css2?${ids.map((id) => `family=${id}`).join("&")}&display=swap`;
+/** `var(--font-store-…)` for a font name; Noto Sans for unknown names. */
+export function fontVar(name: string): string {
+  const font = STORE_FONTS.find((f) => f.name === name);
+  return `var(${font?.cssVar ?? "--font-noto-sans"})`;
 }

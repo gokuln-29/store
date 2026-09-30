@@ -14,13 +14,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useActionForm } from "@/hooks/use-action-form";
 import { useErrorText } from "@/hooks/use-error-text";
 import { updateBrandingSettingsAction } from "@/lib/actions/settings.actions";
-import { STORE_FONTS, googleFontsHref } from "@/lib/constants/fonts";
+import { STORE_FONTS, fontVar } from "@/lib/constants/fonts";
 import { contrastRatio, HEX_COLOR, readableForeground } from "@/lib/utils/color";
 import { brandingSettingsSchema, type BrandingSettingsInput } from "@/lib/validators/settings";
 
 function fontFamily(name: string) {
-  const font = STORE_FONTS.find((f) => f.name === name);
-  return font?.googleId ? `"${font.family}", var(--font-noto-sans)` : "var(--font-noto-sans)";
+  return `${fontVar(name)}, var(--font-noto-sans)`;
 }
 
 export function BrandingSettingsForm({
@@ -50,7 +49,6 @@ export function BrandingSettingsForm({
     ? values.secondaryColor
     : defaults.secondaryColor;
   const lowContrast = contrastRatio(primary, "#ffffff") < 3;
-  const fontsHref = googleFontsHref([values.headingFont, values.bodyFont]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -171,7 +169,6 @@ export function BrandingSettingsForm({
           <CardTitle className="text-base">{t("preview")}</CardTitle>
         </CardHeader>
         <CardContent>
-          {fontsHref && <link rel="stylesheet" href={fontsHref} />}
           <div
             className="overflow-hidden rounded-lg border bg-white text-neutral-900"
             style={{ fontFamily: fontFamily(values.bodyFont) }}
