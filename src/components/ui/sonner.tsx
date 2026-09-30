@@ -28,6 +28,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+          // Sonner's richColors texts are just under 4.5:1 on their tinted backgrounds (WCAG AA);
+          // these darker shades keep the same hues.
+          "--success-text": "hsl(140, 100%, 22%)",
+          "--info-text": "hsl(210, 100%, 35%)",
+          "--warning-text": "hsl(31, 92%, 30%)",
+          "--error-text": "hsl(360, 100%, 38%)",
         } as React.CSSProperties
       }
       {...props}
