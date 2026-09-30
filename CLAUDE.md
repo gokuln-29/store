@@ -94,7 +94,7 @@ pnpm prisma db seed      # seed demo data
 - [ ] Empty, loading, and error states handled
 - [ ] Docs/README/.env.example updated if needed
 
-## 8. Environment variables (keep in `.env.example`)
+## 8. Environment variables (keep in `.env.example`; the full list lives there)
 ```
 DATABASE_URL=
 AUTH_SECRET=
@@ -106,7 +106,9 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 RESEND_API_KEY=
-SMS_PROVIDER_KEY=
+SMS_PROVIDER=            # msg91 in production (see docs/sms.md)
+MSG91_AUTH_KEY=
+CRON_SECRET=
 VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=
 ```

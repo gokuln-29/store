@@ -65,6 +65,8 @@ const nextConfig: NextConfig = {
   images: {
     // AVIF is ~20% smaller than WebP; uploads have unique names, so long caching is safe.
     formats: ["image/avif", "image/webp"],
+    // Next.js 16 only serves listed qualities: 75 is the default, 70 is used for hero banners.
+    qualities: [70, 75],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
