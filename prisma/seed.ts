@@ -42,17 +42,16 @@ const DEV_OWNER_EMAIL = "owner@example.com";
 const DEV_OWNER_PASSWORD = "ChangeMe@123";
 
 function ownerCredentials() {
-  const email = (process.env.SEED_OWNER_EMAIL ?? DEV_OWNER_EMAIL).trim().toLowerCase();
   const password = process.env.SEED_OWNER_PASSWORD ?? DEV_OWNER_PASSWORD;
   if (process.env.NODE_ENV === "production" && !process.env.SEED_OWNER_PASSWORD) {
     throw new Error("Set SEED_OWNER_PASSWORD when seeding in production.");
   }
   if (password.length < 10) throw new Error("SEED_OWNER_PASSWORD must be at least 10 characters.");
-  return { email, password, isDefault: password === DEV_OWNER_PASSWORD };
+  return { password, isDefault: password === DEV_OWNER_PASSWORD };
 }
 
 async function seedOwner() {
-  const { email, password, isDefault } = ownerCredentials();
+  const email = (process.env.SEED_OWNER_EMAIL ?? DEV_OWNER_EMAIL).trim().toLowerCase();
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) {
     // Never overwrite an existing password on re-seed.
@@ -60,6 +59,19 @@ async function seedOwner() {
     console.log(`  owner: ${email} (exists, password unchanged)`);
     return;
   }
+  // A store set up another way (pnpm setup:store, the admin panel) already has its owner: keep it
+  // instead of adding a second one. The demo admin is an owner too, so it doesn't count.
+  if (!process.env.SEED_OWNER_EMAIL) {
+    const owner = await db.user.findFirst({
+      where: { role: "OWNER", email: { not: demoAdminCredentials().email } },
+      select: { email: true },
+    });
+    if (owner) {
+      console.log(`  owner: ${owner.email} (existing owner kept)`);
+      return;
+    }
+  }
+  const { password, isDefault } = ownerCredentials();
   await db.user.create({
     data: {
       email,
@@ -88,7 +100,16 @@ async function seedDemoAdmin() {
   console.log(`  demo admin (view only): ${email}`);
 }
 
+/**
+ * Demo store settings. An existing store keeps its own name, logo, contact details and branding
+ * unless SEED_RESET_SETTINGS=true, so seeding the demo catalogue never overwrites them.
+ */
 async function seedSettings() {
+  const existing = await db.storeSettings.findUnique({ where: { id: "default" } });
+  if (existing && process.env.SEED_RESET_SETTINGS !== "true") {
+    console.log(`  store settings: ${existing.name} (kept; SEED_RESET_SETTINGS=true to reset)`);
+    return;
+  }
   await db.storeSettings.upsert({
     where: { id: "default" },
     create: { id: "default", ...storeSettings },
