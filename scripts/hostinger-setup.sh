@@ -172,7 +172,12 @@ fi
 if [ "$SHARED" = true ]; then
   if systemctl is-active --quiet nginx; then
     site=/etc/nginx/sites-available/${DOMAIN}
-    if [ ! -f "$site" ]; then
+    # A site for this domain may already exist anywhere (often a plain file in sites-enabled,
+    # edited by certbot): find it by server_name and never touch it.
+    existing=$(grep -rlsE "server_name[^;]*[[:space:]]${DOMAIN//./\\.}[[:space:];]" \
+      /etc/nginx/sites-enabled /etc/nginx/conf.d 2>/dev/null | head -1 || true)
+    [ -n "$existing" ] && site=$existing
+    if [ -z "$existing" ] && [ ! -f "$site" ]; then
       say "Adding the Nginx site for ${DOMAIN}"
       cat > "$site" <<NGINX
 # Neo Store (docker-compose.prod.yml, app on 127.0.0.1:${APP_PORT}). Written by hostinger-setup.sh.
