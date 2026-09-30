@@ -77,6 +77,7 @@ test("CSV import check reports errors by row and writes nothing", async ({ page 
   ].join("\n");
 
   await page.goto("/en/admin/products/import");
+  await page.waitForLoadState("networkidle"); // hydrated, so choosing the file updates the form
   await page
     .locator("#csv-file")
     .setInputFiles({ name: "products.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });

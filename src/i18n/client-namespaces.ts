@@ -14,6 +14,7 @@ export const STORE_CLIENT_NAMESPACES = [
   "Common",
   "Coupon",
   "CustomerLogin",
+  "ErrorPage",
   "Errors",
   "Header",
   "Home",
