@@ -18,7 +18,7 @@ const SETTINGS_ID = "default";
 /** Used when the database has no settings row yet (fresh install before setup). */
 export const DEFAULT_SETTINGS: StoreSettings = {
   id: SETTINGS_ID,
-  name: "My Store",
+  name: "Neo Store",
   tagline: null,
   logoUrl: null,
   faviconUrl: null,

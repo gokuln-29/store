@@ -220,7 +220,7 @@ class CheckoutAbort extends Error {
   }
 }
 
-/** "Demo Store" → "DS"; used when no order number prefix is configured. */
+/** "Neo Store" → "NS"; used when no order number prefix is configured. */
 export function storeInitials(name: string): string {
   const initials = name
     .split(/\s+/)

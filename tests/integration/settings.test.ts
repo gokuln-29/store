@@ -43,7 +43,7 @@ describe("settings service", () => {
       where: { action: "settings.general.update" },
     });
     expect(log.actorId).toBe(actor.id);
-    expect(log.changes).toMatchObject({ name: { from: "My Store", to: "Kaveri Mart" } });
+    expect(log.changes).toMatchObject({ name: { from: "Neo Store", to: "Kaveri Mart" } });
   });
 
   it("updates only its own section", async () => {

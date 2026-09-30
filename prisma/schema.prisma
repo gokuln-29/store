@@ -1,4 +1,4 @@
-// Prisma schema for the universal e-commerce template.
+// Prisma schema for Neo Store, the universal e-commerce template.
 //
 // Conventions (see CLAUDE.md):
 // - Money is Int in paise (₹1 = 100). Never floats.

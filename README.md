@@ -1,6 +1,6 @@
-# E-commerce Template
+# Neo Store
 
-A single-store, white-label e-commerce template (storefront + PWA + admin panel) for the Indian market.
+Neo Store is a single-store, white-label e-commerce template (storefront + PWA + admin panel) for the Indian market.
 Store name, branding, languages, home page sections, product attributes and shipping rules are all
 configured from the database, so one codebase can be deployed for any product type.
 

@@ -8,7 +8,7 @@ export type ManifestSettings = IconSource & {
   defaultLocale: string;
 };
 
-/** "Demo Store Online" → at most 12 characters for home screen labels. */
+/** "Neo Store Online" → at most 12 characters for home screen labels. */
 export function shortName(name: string): string {
   const trimmed = name.trim();
   if (trimmed.length <= 12) return trimmed;

@@ -17,7 +17,7 @@ const image = (slug: string, n: number) => `https://picsum.photos/seed/${slug}-$
 // ───────────────────────────── Store settings ─────────────────────────────
 
 export const storeSettings = {
-  name: "Demo Store",
+  name: "Neo Store",
   tagline: t(
     "Everyday essentials, delivered",
     "அன்றாடத் தேவைகள், உங்கள் வீட்டு வாசலில்",
@@ -38,7 +38,7 @@ export const storeSettings = {
     pincode: "560001",
   },
   socialLinks: { instagram: "https://instagram.com/example" },
-  legalName: "Demo Store Private Limited",
+  legalName: "Neo Store Private Limited",
   // Sample GSTIN format for demo purposes only.
   gstNumber: "29ABCDE1234F1Z5",
   stateCode: "KA",

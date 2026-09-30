@@ -63,7 +63,7 @@ class Writer {
   static async create(title: string): Promise<Writer> {
     const doc = await PDFDocument.create();
     doc.setTitle(pdfSafe(title));
-    doc.setProducer("E-commerce template");
+    doc.setProducer("Neo Store");
     const w = new Writer(
       doc,
       await doc.embedFont(StandardFonts.Helvetica),
