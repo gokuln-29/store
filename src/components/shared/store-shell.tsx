@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { STORE_FONTS, googleFontsHref } from "@/lib/constants/fonts";
+import { fontVar } from "@/lib/constants/fonts";
 import { getStoreSettings } from "@/lib/services/settings.service";
 import { readableForeground } from "@/lib/utils/color";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
@@ -16,8 +16,7 @@ const INDIC_FALLBACK =
   '"Rupee Local", var(--font-noto-sans), var(--font-noto-tamil), var(--font-noto-kannada), sans-serif';
 
 function fontStack(name: string): string {
-  const font = STORE_FONTS.find((f) => f.name === name);
-  return font?.googleId ? `"Rupee Local", "${font.family}", ${INDIC_FALLBACK}` : INDIC_FALLBACK;
+  return `"Rupee Local", ${fontVar(name)}, ${INDIC_FALLBACK}`;
 }
 
 /** Storefront theme variables from StoreSettings (brand colours and fonts). */
@@ -33,6 +32,16 @@ export function storeThemeStyle(settings: {
     "--ring": settings.primaryColor,
     "--brand-secondary": settings.secondaryColor,
     "--brand-secondary-foreground": readableForeground(settings.secondaryColor),
+    ...storeFontStyle(settings),
+  } as CSSProperties;
+}
+
+/**
+ * The store's fonts as CSS variables. Set on <html> (root layout) so everything, including the
+ * skip link and toasts outside the storefront shell, uses them and no unused font downloads.
+ */
+export function storeFontStyle(settings: { headingFont: string; bodyFont: string }) {
+  return {
     "--store-font-body": fontStack(settings.bodyFont),
     "--store-font-heading": fontStack(settings.headingFont),
   } as CSSProperties;
@@ -41,11 +50,8 @@ export function storeThemeStyle(settings: {
 /** Header + main + footer used by storefront and customer account pages, with the store theme. */
 export async function StoreShell({ children }: { children: ReactNode }) {
   const settings = await getStoreSettings();
-  const fontsHref = googleFontsHref([settings.headingFont, settings.bodyFont]);
-
   return (
     <>
-      {fontsHref && <link rel="stylesheet" href={fontsHref} precedence="default" />}
       <FeaturesProvider value={resolveFeatures(settings.features)}>
         <div data-store-theme style={storeThemeStyle(settings)} className="flex flex-1 flex-col">
           <SiteHeader />

@@ -23,7 +23,10 @@ test("guest cart, then checkout with cash on delivery", async ({ page, context, 
   await page.getByLabel("City / town").fill("Bengaluru");
   await page.getByLabel("State").selectOption("KA");
   await page.getByLabel("Pincode").fill("560001");
-  await page.getByText("Cash on delivery", { exact: true }).click();
+  await page
+    .getByRole("radiogroup", { name: "Payment" })
+    .getByText("Cash on delivery", { exact: true })
+    .click();
   await expect(page.getByText("Cash on delivery fee")).toBeVisible();
   // 250g coffee ₹220 + ₹40 local delivery + ₹49 COD fee
   await expect(page.getByTestId("checkout-total")).toHaveText("₹309");
@@ -33,7 +36,9 @@ test("guest cart, then checkout with cash on delivery", async ({ page, context, 
   await expect(
     page.getByRole("heading", { name: "Thank you! Your order is placed." }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Cart", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("banner").getByRole("link", { name: "Cart", exact: true }),
+  ).toBeVisible();
 });
 
 test("online payment through the test provider", async ({ page, context, baseURL }) => {

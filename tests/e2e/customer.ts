@@ -93,7 +93,10 @@ export async function placeCodOrder(page: Page): Promise<string> {
   await page.getByLabel("City / town").fill("Chennai");
   await page.getByLabel("State").selectOption("TN");
   await page.getByLabel("Pincode").fill("600020");
-  await page.getByText("Cash on delivery", { exact: true }).click();
+  await page
+    .getByRole("radiogroup", { name: "Payment" })
+    .getByText("Cash on delivery", { exact: true })
+    .click();
   await page.getByRole("button", { name: "Place order" }).click();
   await page.waitForURL(/\/en\/order\/[A-Z0-9]+-\d+$/);
   return decodeURIComponent(page.url().split("/").pop()!);

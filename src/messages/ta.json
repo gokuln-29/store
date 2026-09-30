@@ -32,7 +32,23 @@
     "locale": "{locale, select, en {English} ta {தமிழ்} kn {ಕನ್ನಡ} other {Unknown}}"
   },
   "Footer": {
-    "rights": "© {year} {storeName}. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை."
+    "rights": "© {year} {storeName}. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
+    "shop": "கடை",
+    "allProducts": "அனைத்துப் பொருட்களும்",
+    "help": "உதவி",
+    "account": "என் கணக்கு",
+    "orders": "என் ஆர்டர்கள்",
+    "wishlist": "விருப்பப் பட்டியல்",
+    "cart": "கூடை",
+    "contact": "எங்களைத் தொடர்பு கொள்ள",
+    "weAccept": "நாங்கள் ஏற்கும் கட்டண முறைகள்",
+    "upi": "UPI",
+    "cards": "கார்டுகள்",
+    "netbanking": "நெட்பேங்கிங்",
+    "cod": "கேஷ் ஆன் டெலிவரி",
+    "social": "{network}-இல் {storeName}",
+    "legal": "{legalName} · GSTIN {gstin}",
+    "whatsapp": "WhatsApp"
   },
   "Home": {
     "title": "எங்கள் கடைக்கு வரவேற்கிறோம்",
@@ -41,7 +57,18 @@
     "viewAll": "அனைத்தையும் பார்",
     "slide": "{total} இல் {index}வது",
     "previous": "முந்தையது",
-    "nextSlide": "அடுத்தது"
+    "nextSlide": "அடுத்தது",
+    "shopNow": "இப்போது வாங்குங்கள்",
+    "highlightsLabel": "எங்களிடம் ஏன் வாங்க வேண்டும்",
+    "deliveryFree": "{amount}க்கு மேல் இலவச டெலிவரி",
+    "delivery": "வீட்டு வாசலில் டெலிவரி",
+    "deliveryHint": "எங்கள் கடையிலிருந்து உங்கள் வீடு வரை கண்காணிப்புடன்",
+    "secure": "பாதுகாப்பான கட்டணம்",
+    "secureHint": "UPI, கார்டுகள் மற்றும் நெட்பேங்கிங்",
+    "cod": "கேஷ் ஆன் டெலிவரி",
+    "codHint": "ஆர்டர் வந்ததும் பணம் செலுத்துங்கள்",
+    "support": "உதவ நாங்கள் இருக்கிறோம்",
+    "supportHint": "{phone} எண்ணில் அழைக்கவும் அல்லது WhatsApp செய்யவும்"
   },
   "ErrorPage": {
     "title": "ஏதோ தவறு நடந்துவிட்டது",

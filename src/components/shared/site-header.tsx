@@ -9,7 +9,7 @@ import { HeaderSearch } from "@/components/store/header-search";
 import { Link } from "@/i18n/navigation";
 import { getCategoryTree } from "@/lib/services/catalog-query.service";
 import { getStoreSettings } from "@/lib/services/settings.service";
-import { isLocalUpload } from "@/lib/utils/images";
+import { storeLogoSrc } from "@/lib/pwa/icon-meta";
 import { localize } from "@/lib/utils/localized";
 
 const MAX_HEADER_CATEGORIES = 5;
@@ -34,30 +34,35 @@ export async function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container mx-auto flex h-16 items-center gap-3 px-4">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+      <div className="container mx-auto flex h-16 items-center gap-3 px-4 sm:h-[72px]">
         <MobileNav links={mobileLinks} />
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight"
+          className="flex shrink-0 items-center gap-2.5 text-lg font-bold tracking-tight"
         >
           {settings.logoUrl ? (
-            <Image
-              src={settings.logoUrl}
-              alt={settings.name}
-              width={160}
-              height={40}
-              className="h-9 w-auto object-contain"
-              priority
-              unoptimized={isLocalUpload(settings.logoUrl)}
-            />
+            <>
+              <Image
+                src={storeLogoSrc(settings)}
+                alt=""
+                width={48}
+                height={48}
+                className="size-10 object-contain sm:size-12"
+                priority
+                // Already a small, sized copy of the logo.
+                unoptimized
+              />
+              {/* The name sits next to the logo; on small screens only screen readers get it. */}
+              <span className="sr-only font-heading text-xl sm:not-sr-only">{settings.name}</span>
+            </>
           ) : (
-            settings.name
+            <span className="font-heading">{settings.name}</span>
           )}
         </Link>
 
         <nav aria-label={t("primaryNav")} className="ml-4 hidden lg:block">
-          <ul className="flex items-center gap-5 text-sm font-medium">
+          <ul className="flex items-center gap-6 text-sm font-medium">
             <li>
               <Link href="/shop" className="transition-colors hover:text-primary">
                 {t("shop")}

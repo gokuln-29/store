@@ -37,7 +37,10 @@ test("browse, buy with cash on delivery, and the store fulfils the order", async
   await page.getByLabel("City / town").fill("Bengaluru");
   await page.getByLabel("State").selectOption("KA");
   await page.getByLabel("Pincode").fill("560001");
-  await page.getByText("Cash on delivery", { exact: true }).click();
+  await page
+    .getByRole("radiogroup", { name: "Payment" })
+    .getByText("Cash on delivery", { exact: true })
+    .click();
   await expect(page.getByTestId("checkout-total")).toHaveText(/₹\d/);
   await page.getByRole("button", { name: "Place order" }).click();
   await expect(page).toHaveURL(/\/en\/order\/[A-Z0-9]+-\d+$/);

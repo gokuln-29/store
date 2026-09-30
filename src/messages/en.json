@@ -32,7 +32,23 @@
     "locale": "{locale, select, en {English} ta {தமிழ்} kn {ಕನ್ನಡ} other {Unknown}}"
   },
   "Footer": {
-    "rights": "© {year} {storeName}. All rights reserved."
+    "rights": "© {year} {storeName}. All rights reserved.",
+    "shop": "Shop",
+    "allProducts": "All products",
+    "help": "Help",
+    "account": "My account",
+    "orders": "My orders",
+    "wishlist": "Wishlist",
+    "cart": "Cart",
+    "contact": "Contact us",
+    "weAccept": "We accept",
+    "upi": "UPI",
+    "cards": "Cards",
+    "netbanking": "Netbanking",
+    "cod": "Cash on delivery",
+    "social": "{storeName} on {network}",
+    "legal": "{legalName} · GSTIN {gstin}",
+    "whatsapp": "WhatsApp"
   },
   "Home": {
     "title": "Welcome to our store",
@@ -41,7 +57,18 @@
     "viewAll": "View all",
     "slide": "Slide {index} of {total}",
     "previous": "Previous",
-    "nextSlide": "Next"
+    "nextSlide": "Next",
+    "shopNow": "Shop now",
+    "highlightsLabel": "Why shop with us",
+    "deliveryFree": "Free delivery over {amount}",
+    "delivery": "Doorstep delivery",
+    "deliveryHint": "Tracked from our door to yours",
+    "secure": "Secure payments",
+    "secureHint": "UPI, cards and netbanking",
+    "cod": "Cash on delivery",
+    "codHint": "Pay when your order arrives",
+    "support": "Here to help",
+    "supportHint": "Call or WhatsApp {phone}"
   },
   "ErrorPage": {
     "title": "Something went wrong",

@@ -7,6 +7,7 @@ import { RecentlyViewedRow } from "@/components/store/recently-viewed/recently-v
 import { JsonLd } from "@/components/store/json-ld";
 import { getHomeBlocks } from "@/lib/services/home.service";
 import { getStoreSettings } from "@/lib/services/settings.service";
+import { getStoreHighlights } from "@/lib/services/storefront.service";
 import { localeAlternates, siteUrl } from "@/lib/seo";
 import { localize } from "@/lib/utils/localized";
 
@@ -40,14 +41,22 @@ function ComingSoon() {
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale as Locale);
-  const [blocks, settings] = await Promise.all([getHomeBlocks(locale), getStoreSettings()]);
+  const [blocks, settings, highlights] = await Promise.all([
+    getHomeBlocks(locale),
+    getStoreSettings(),
+    getStoreHighlights(),
+  ]);
   const url = `${siteUrl()}/${locale}`;
 
   return (
     <>
       <h1 className="sr-only">{settings.name}</h1>
-      {blocks.length ? <HomeBlocks blocks={blocks} locale={locale} /> : <ComingSoon />}
-      <div className="container mx-auto px-4 pb-10">
+      {blocks.length ? (
+        <HomeBlocks blocks={blocks} locale={locale} highlights={highlights} />
+      ) : (
+        <ComingSoon />
+      )}
+      <div className="container mx-auto px-4 pb-10 empty:hidden">
         <RecentlyViewedRow />
       </div>
       <JsonLd

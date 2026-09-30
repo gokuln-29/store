@@ -52,6 +52,7 @@ function bagSvg(size: number, color: string, background: string | null, scale: n
  * - maskable: content inside the central safe zone (launchers crop to circles/squircles)
  * - apple: opaque (iOS shows transparency as black)
  * - badge: white glyph on transparent (Android status bar uses only the alpha channel)
+ * - logo: the logo itself on transparent, for the storefront header and footer
  */
 export async function renderIcon(
   name: IconName,
@@ -64,8 +65,23 @@ export async function renderIcon(
     return sharp(bagSvg(size, "#ffffff", null, 0.75))
       .png()
       .toBuffer();
+  if (kind === "logo") {
+    if (logo) {
+      try {
+        return await sharp(logo)
+          .resize(size, size, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+          .png({ palette: true, quality: 90 })
+          .toBuffer();
+      } catch {
+        // Not a readable image: fall back to the glyph.
+      }
+    }
+    return sharp(bagSvg(size, primary, null, 0.9))
+      .png()
+      .toBuffer();
+  }
 
-  const scale: Record<Exclude<IconKind, "badge">, number> = {
+  const scale: Record<Exclude<IconKind, "badge" | "logo">, number> = {
     any: 0.84,
     maskable: 0.6,
     apple: 0.8,

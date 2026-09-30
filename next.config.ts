@@ -17,7 +17,7 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://res.cloudinary.com https://picsum.photos https://*.razorpay.com",
+  "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://picsum.photos https://*.razorpay.com",
   `connect-src 'self' https://*.razorpay.com${isDev ? " ws: http://localhost:*" : ""}`,
   "frame-src https://api.razorpay.com https://checkout.razorpay.com",
   "worker-src 'self'",
@@ -65,12 +65,13 @@ const nextConfig: NextConfig = {
   images: {
     // AVIF is ~20% smaller than WebP; uploads have unique names, so long caching is safe.
     formats: ["image/avif", "image/webp"],
-    // Next.js 16 only serves listed qualities: 75 is the default, 70 is used for hero banners.
-    qualities: [70, 75],
+    // Next.js 16 only serves listed qualities: 75 is the default, 60 is used for hero banners.
+    qualities: [60, 75],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
-      // Placeholder images used by the demo seed.
+      // Demo seed photos (Unsplash) and placeholders.
+      { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "picsum.photos" },
     ],
   },

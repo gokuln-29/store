@@ -31,32 +31,32 @@ export function ProductCard({
     <div className="group relative h-full">
       <Link
         href={`/p/${product.slug}`}
-        className="flex h-full flex-col gap-2 rounded-lg focus-visible:outline-2"
+        className="flex h-full flex-col gap-3 rounded-2xl focus-visible:outline-2"
       >
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+        <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted ring-1 ring-black/5 transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-primary/10">
           {product.image ? (
             <Image
               src={product.image.url}
               alt={localize(product.image.alt, locale) || name}
               fill
               sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 50vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               priority={priority}
               unoptimized={isLocalUpload(product.image.url)}
             />
           ) : null}
           {!product.inStock ? (
-            <span className="absolute top-2 left-2 rounded bg-background/90 px-2 py-0.5 text-xs font-medium">
+            <span className="absolute top-3 left-3 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur">
               {t("outOfStock")}
             </span>
           ) : off ? (
-            <span className="absolute top-2 left-2 rounded bg-[var(--brand-secondary,#f59e0b)] px-2 py-0.5 text-xs font-semibold text-[var(--brand-secondary-foreground,#0a0a0a)]">
+            <span className="absolute top-3 left-3 rounded-full bg-[var(--brand-secondary,#f59e0b)] px-2.5 py-1 text-xs font-semibold text-[var(--brand-secondary-foreground,#0a0a0a)] shadow-sm">
               {t("off", { percent: off })}
             </span>
           ) : null}
         </div>
-        <div className="grid gap-1 px-0.5">
-          <Heading className="line-clamp-2 text-sm leading-snug font-medium group-hover:underline">
+        <div className="grid gap-1 px-1">
+          <Heading className="line-clamp-2 text-sm leading-snug font-medium transition-colors group-hover:text-primary sm:text-[15px]">
             {name}
           </Heading>
           <CardRating rating={product.rating} />
@@ -69,7 +69,7 @@ export function ProductCard({
         </div>
       </Link>
       {/* A sibling of the link: buttons can't be nested inside links. */}
-      <WishlistButton productId={product.id} name={name} className="absolute top-2 right-2" />
+      <WishlistButton productId={product.id} name={name} className="absolute top-3 right-3" />
     </div>
   );
 }
@@ -95,7 +95,7 @@ export function ProductGrid({
 export function ProductCardSkeleton() {
   return (
     <div className="grid gap-2" aria-hidden>
-      <div className="aspect-square animate-pulse rounded-lg bg-muted" />
+      <div className="aspect-square animate-pulse rounded-2xl bg-muted" />
       <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
       <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
     </div>

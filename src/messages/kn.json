@@ -32,7 +32,23 @@
     "locale": "{locale, select, en {English} ta {தமிழ்} kn {ಕನ್ನಡ} other {Unknown}}"
   },
   "Footer": {
-    "rights": "© {year} {storeName}. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ."
+    "rights": "© {year} {storeName}. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.",
+    "shop": "ಅಂಗಡಿ",
+    "allProducts": "ಎಲ್ಲಾ ಉತ್ಪನ್ನಗಳು",
+    "help": "ಸಹಾಯ",
+    "account": "ನನ್ನ ಖಾತೆ",
+    "orders": "ನನ್ನ ಆರ್ಡರ್‌ಗಳು",
+    "wishlist": "ಇಷ್ಟದ ಪಟ್ಟಿ",
+    "cart": "ಕಾರ್ಟ್",
+    "contact": "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ",
+    "weAccept": "ನಾವು ಸ್ವೀಕರಿಸುವ ಪಾವತಿಗಳು",
+    "upi": "UPI",
+    "cards": "ಕಾರ್ಡ್‌ಗಳು",
+    "netbanking": "ನೆಟ್‌ಬ್ಯಾಂಕಿಂಗ್",
+    "cod": "ಕ್ಯಾಶ್ ಆನ್ ಡೆಲಿವರಿ",
+    "social": "{network} ನಲ್ಲಿ {storeName}",
+    "legal": "{legalName} · GSTIN {gstin}",
+    "whatsapp": "WhatsApp"
   },
   "Home": {
     "title": "ನಮ್ಮ ಅಂಗಡಿಗೆ ಸ್ವಾಗತ",
@@ -41,7 +57,18 @@
     "viewAll": "ಎಲ್ಲವನ್ನೂ ನೋಡಿ",
     "slide": "{total} ರಲ್ಲಿ {index}ನೇ",
     "previous": "ಹಿಂದಿನದು",
-    "nextSlide": "ಮುಂದಿನದು"
+    "nextSlide": "ಮುಂದಿನದು",
+    "shopNow": "ಈಗ ಖರೀದಿಸಿ",
+    "highlightsLabel": "ನಮ್ಮಲ್ಲಿ ಏಕೆ ಖರೀದಿಸಬೇಕು",
+    "deliveryFree": "{amount}ಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಆರ್ಡರ್‌ಗೆ ಉಚಿತ ಡೆಲಿವರಿ",
+    "delivery": "ಮನೆ ಬಾಗಿಲಿಗೆ ಡೆಲಿವರಿ",
+    "deliveryHint": "ನಮ್ಮ ಅಂಗಡಿಯಿಂದ ನಿಮ್ಮ ಮನೆಯವರೆಗೆ ಟ್ರ್ಯಾಕ್ ಮಾಡಬಹುದು",
+    "secure": "ಸುರಕ್ಷಿತ ಪಾವತಿ",
+    "secureHint": "UPI, ಕಾರ್ಡ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ಬ್ಯಾಂಕಿಂಗ್",
+    "cod": "ಕ್ಯಾಶ್ ಆನ್ ಡೆಲಿವರಿ",
+    "codHint": "ಆರ್ಡರ್ ತಲುಪಿದಾಗ ಪಾವತಿಸಿ",
+    "support": "ಸಹಾಯಕ್ಕೆ ನಾವಿದ್ದೇವೆ",
+    "supportHint": "{phone} ಗೆ ಕರೆ ಮಾಡಿ ಅಥವಾ WhatsApp ಮಾಡಿ"
   },
   "ErrorPage": {
     "title": "ಏನೋ ತಪ್ಪಾಗಿದೆ",
